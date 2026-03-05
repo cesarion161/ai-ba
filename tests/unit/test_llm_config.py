@@ -1,10 +1,15 @@
-from app.core.llm_config import MODEL_ROUTING, get_model_config
+from app.core.llm_config import get_model_config
 
 
 def test_all_node_types_have_config():
     expected = [
-        "research", "calculate", "generate_document",
-        "critic_review", "ask_user", "densify", "format_export",
+        "research",
+        "calculate",
+        "generate_document",
+        "critic_review",
+        "ask_user",
+        "densify",
+        "format_export",
     ]
     for task_type in expected:
         config = get_model_config(task_type)

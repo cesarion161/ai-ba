@@ -4,7 +4,7 @@ import uuid
 
 import structlog
 from fastapi import Request, Response
-from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from app.core.exceptions import AppError
 
@@ -12,7 +12,7 @@ logger = structlog.get_logger()
 
 
 class RequestIdMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         request_id = str(uuid.uuid4())[:8]
         structlog.contextvars.bind_contextvars(request_id=request_id)
 
@@ -25,7 +25,7 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
 
 
 class ErrorHandlerMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         try:
             return await call_next(request)
         except AppError as e:

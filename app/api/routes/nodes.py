@@ -14,7 +14,7 @@ from app.api.schemas.node import (
 )
 from app.models.database import get_db
 from app.services import node_service
-from app.services.node_service import InvalidTransition
+from app.services.node_service import InvalidTransitionError
 
 router = APIRouter(prefix="/api/projects/{project_id}/nodes", tags=["nodes"])
 
@@ -37,9 +37,7 @@ async def list_nodes(
     db: AsyncSession = Depends(get_db),
 ) -> NodeListResponse:
     nodes = await node_service.list_nodes(db, project_id, branch, status, node_type)
-    return NodeListResponse(
-        nodes=[NodeResponse.model_validate(n) for n in nodes]
-    )
+    return NodeListResponse(nodes=[NodeResponse.model_validate(n) for n in nodes])
 
 
 @router.get("/{slug}", response_model=NodeResponse)
@@ -61,7 +59,7 @@ async def approve_node(
     node = await _get_node_or_404(db, project_id, slug)
     try:
         node = await node_service.approve_node(db, node)
-    except InvalidTransition as e:
+    except InvalidTransitionError as e:
         raise HTTPException(status_code=409, detail=str(e))
     return NodeResponse.model_validate(node)
 
@@ -76,7 +74,7 @@ async def reject_node(
     node = await _get_node_or_404(db, project_id, slug)
     try:
         node = await node_service.reject_node(db, node, body.feedback)
-    except InvalidTransition as e:
+    except InvalidTransitionError as e:
         raise HTTPException(status_code=409, detail=str(e))
     return NodeResponse.model_validate(node)
 
@@ -102,7 +100,7 @@ async def retry_node(
     node = await _get_node_or_404(db, project_id, slug)
     try:
         node = await node_service.retry_node(db, node)
-    except InvalidTransition as e:
+    except InvalidTransitionError as e:
         raise HTTPException(status_code=409, detail=str(e))
     return NodeResponse.model_validate(node)
 
@@ -116,7 +114,7 @@ async def skip_node(
     node = await _get_node_or_404(db, project_id, slug)
     try:
         node = await node_service.skip_node(db, node)
-    except InvalidTransition as e:
+    except InvalidTransitionError as e:
         raise HTTPException(status_code=409, detail=str(e))
     return NodeResponse.model_validate(node)
 
@@ -136,10 +134,7 @@ async def get_node_questions(
         "slug": node.slug,
         "label": node.label,
         "status": node.status.value,
-        "questions": [
-            {"index": i, "question": q}
-            for i, q in enumerate(questions)
-        ],
+        "questions": [{"index": i, "question": q} for i, q in enumerate(questions)],
     }
 
 

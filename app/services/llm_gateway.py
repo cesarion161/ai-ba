@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import structlog
 from litellm import acompletion
@@ -57,7 +57,7 @@ class LLMGateway:
                     input_tokens=response.usage.prompt_tokens,
                     output_tokens=response.usage.completion_tokens,
                 )
-                return content
+                return cast(str, content)
             except Exception as e:
                 logger.warning("llm_fallback", model=m, error=str(e))
                 last_error = e
@@ -76,9 +76,7 @@ class LLMGateway:
         extra = {}
         if response_format:
             extra["response_format"] = response_format
-        return await self.complete(
-            messages, model=model, task_type=task_type, **kwargs, **extra
-        )
+        return await self.complete(messages, model=model, task_type=task_type, **kwargs, **extra)  # type: ignore[arg-type]
 
 
 llm_gateway = LLMGateway()

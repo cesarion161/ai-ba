@@ -1,17 +1,18 @@
 """LangGraph orchestrator implementing scheduler-loop pattern for DAG execution."""
+
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import structlog
 from langgraph.graph import END, StateGraph
-from langgraph.types import Command, Send, interrupt
+from langgraph.types import Send, interrupt
 
 from app.engine.handlers.base import get_handler
 from app.engine.state import WorkflowState
-from app.models.workflow_node import NodeStatus, NodeType
+from app.models.workflow_node import NodeStatus
 
 logger = structlog.get_logger()
 
@@ -77,7 +78,7 @@ async def execute_node(
 
         # Mark as running
         node.status = NodeStatus.RUNNING
-        node.started_at = datetime.now(timezone.utc)
+        node.started_at = datetime.now(UTC)
         await session.commit()
 
         # Gather input from upstream outputs
@@ -91,12 +92,10 @@ async def execute_node(
         # Execute handler
         try:
             handler = get_handler(node.node_type)
-            output = await handler.execute(
-                node.config, input_data, node.user_feedback
-            )
+            output = await handler.execute(node.config, input_data, node.user_feedback)
         except Exception as e:
             node.status = NodeStatus.FAILED
-            node.completed_at = datetime.now(timezone.utc)
+            node.completed_at = datetime.now(UTC)
             await session.commit()
             logger.error("node execution failed", slug=slug, error=str(e))
             return {"error": str(e)}
@@ -119,20 +118,21 @@ async def execute_node(
             # When resumed, decision comes from Command(resume=...)
             if decision == "approve":
                 node.status = NodeStatus.APPROVED
-                node.completed_at = datetime.now(timezone.utc)
+                node.completed_at = datetime.now(UTC)
             elif decision == "reject":
                 node.status = NodeStatus.REJECTED
             else:
                 node.status = NodeStatus.APPROVED
-                node.completed_at = datetime.now(timezone.utc)
+                node.completed_at = datetime.now(UTC)
             await session.commit()
         else:
             node.status = NodeStatus.APPROVED
-            node.completed_at = datetime.now(timezone.utc)
+            node.completed_at = datetime.now(UTC)
             await session.commit()
 
         # Propagate completion
         from app.engine.resolver import propagate_completion
+
         await propagate_completion(session, node.id)
         await session.commit()
 
@@ -157,7 +157,11 @@ def build_workflow_graph() -> StateGraph:
     # Scheduler conditionally ends or dispatches (handled by Send returns)
     graph.add_conditional_edges(
         "scheduler",
-        lambda state: END if state.get("error") is not None or not state.get("current_node_slug") else "execute_node",
+        lambda state: (
+            END
+            if state.get("error") is not None or not state.get("current_node_slug")
+            else "execute_node"
+        ),
         {END: END, "execute_node": "execute_node"},
     )
 

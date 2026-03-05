@@ -1,4 +1,5 @@
 """Model routing configuration — maps task types to preferred models."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

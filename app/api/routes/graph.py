@@ -15,7 +15,7 @@ from app.api.schemas.graph import (
 )
 from app.models.database import get_db
 from app.services import project_service
-from app.tasks.workflow_tasks import resume_workflow_task, run_workflow_task
+from app.tasks.workflow_tasks import run_workflow_task
 
 router = APIRouter(prefix="/api/projects/{project_id}/graph", tags=["graph"])
 
@@ -105,9 +105,6 @@ async def get_graph_status(
         project_id=project_id,
         total_nodes=total,
         by_status=dict(by_status),
-        branches=[
-            BranchGroup(branch=b, nodes=ns)
-            for b, ns in branches_map.items()
-        ],
+        branches=[BranchGroup(branch=b, nodes=ns) for b, ns in branches_map.items()],
         progress_pct=round(progress, 1),
     )

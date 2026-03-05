@@ -54,7 +54,8 @@ class ResearchHandler:
             all_results.extend(results)
 
         # Synthesize with LLM
-        template_key = f"market_research/{'competitor_analysis' if focus == 'competitors' else 'web_search'}"
+        sub = "competitor_analysis" if focus == "competitors" else "web_search"
+        template_key = f"market_research/{sub}"
         try:
             prompt = prompt_engine.render(
                 template_key,

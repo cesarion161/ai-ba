@@ -1,11 +1,18 @@
+from __future__ import annotations
+
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.database import Base
+
+if TYPE_CHECKING:
+    from app.models.user import User
+    from app.models.workflow_node import WorkflowNode
 
 
 class Project(Base):
@@ -19,9 +26,10 @@ class Project(Base):
     description: Mapped[str | None] = mapped_column(Text, default=None)
     template_key: Mapped[str] = mapped_column(String(100), nullable=False, default="full_analysis")
     status: Mapped[str] = mapped_column(String(50), nullable=False, default="active")
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    user: Mapped["User"] = relationship(back_populates="projects")  # noqa: F821
-    nodes: Mapped[list["WorkflowNode"]] = relationship(back_populates="project", passive_deletes=True)  # noqa: F821
+    user: Mapped[User] = relationship(back_populates="projects")  # noqa: F821
+    nodes: Mapped[list[WorkflowNode]] = relationship(  # noqa: F821
+        back_populates="project",
+        passive_deletes=True,
+    )

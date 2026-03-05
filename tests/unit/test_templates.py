@@ -23,12 +23,18 @@ def test_template_cycle_detection():
             label="Bad",
             nodes=[
                 NodeTemplate(
-                    slug="a", label="A", branch="x",
-                    node_type=NodeType.RESEARCH, depends_on=["b"],
+                    slug="a",
+                    label="A",
+                    branch="x",
+                    node_type=NodeType.RESEARCH,
+                    depends_on=["b"],
                 ),
                 NodeTemplate(
-                    slug="b", label="B", branch="x",
-                    node_type=NodeType.RESEARCH, depends_on=["a"],
+                    slug="b",
+                    label="B",
+                    branch="x",
+                    node_type=NodeType.RESEARCH,
+                    depends_on=["a"],
                 ),
             ],
         )
@@ -41,10 +47,16 @@ def test_template_duplicate_slug():
             label="Bad",
             nodes=[
                 NodeTemplate(
-                    slug="a", label="A", branch="x", node_type=NodeType.RESEARCH,
+                    slug="a",
+                    label="A",
+                    branch="x",
+                    node_type=NodeType.RESEARCH,
                 ),
                 NodeTemplate(
-                    slug="a", label="A2", branch="x", node_type=NodeType.RESEARCH,
+                    slug="a",
+                    label="A2",
+                    branch="x",
+                    node_type=NodeType.RESEARCH,
                 ),
             ],
         )
@@ -57,8 +69,11 @@ def test_template_bad_dependency():
             label="Bad",
             nodes=[
                 NodeTemplate(
-                    slug="a", label="A", branch="x",
-                    node_type=NodeType.RESEARCH, depends_on=["nonexistent"],
+                    slug="a",
+                    label="A",
+                    branch="x",
+                    node_type=NodeType.RESEARCH,
+                    depends_on=["nonexistent"],
                 ),
             ],
         )

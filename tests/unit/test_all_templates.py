@@ -1,4 +1,5 @@
 """Verify all registered templates are valid and consistent."""
+
 from app.engine.templates.registry import TEMPLATE_REGISTRY
 from app.models.workflow_node import NodeType
 
@@ -55,14 +56,70 @@ def test_all_prompts_render():
     from app.services.prompt_engine import prompt_engine
 
     templates_to_test = [
-        ("market_research/web_search", {"business_idea": "X", "target_audience": "Y", "user_feedback": None}),
-        ("market_research/competitor_analysis", {"business_idea": "X", "known_competitors": ["A"], "user_feedback": None}),
-        ("market_research/market_sizing", {"research_data": "data", "business_context": "ctx"}),
-        ("market_research/lean_canvas", {"research_summary": "r", "competitor_analysis": "c", "market_sizing": "m", "user_answers": "a", "user_feedback": None}),
-        ("product_strategy/product_roadmap", {"product_overview": "p", "feature_research": "f", "pricing_research": "pr", "user_answers": "a", "user_feedback": None}),
-        ("ux_requirements/user_stories", {"user_personas": "p", "user_journeys": "j", "platforms": "web", "ux_research": "r", "user_feedback": None}),
-        ("technical_architecture/architecture", {"product_requirements": "r", "tech_expertise": "t", "scalability": "s", "integrations": "i", "tech_research": "tr", "user_feedback": None}),
-        ("execution_planning/execution_plan", {"team_info": "t", "budget": "b", "timeline": "tl", "risks": "r", "cost_estimation": "c", "user_feedback": None}),
+        (
+            "market_research/web_search",
+            {"business_idea": "X", "target_audience": "Y", "user_feedback": None},
+        ),
+        (
+            "market_research/competitor_analysis",
+            {"business_idea": "X", "known_competitors": ["A"], "user_feedback": None},
+        ),
+        (
+            "market_research/market_sizing",
+            {"research_data": "data", "business_context": "ctx"},
+        ),
+        (
+            "market_research/lean_canvas",
+            {
+                "research_summary": "r",
+                "competitor_analysis": "c",
+                "market_sizing": "m",
+                "user_answers": "a",
+                "user_feedback": None,
+            },
+        ),
+        (
+            "product_strategy/product_roadmap",
+            {
+                "product_overview": "p",
+                "feature_research": "f",
+                "pricing_research": "pr",
+                "user_answers": "a",
+                "user_feedback": None,
+            },
+        ),
+        (
+            "ux_requirements/user_stories",
+            {
+                "user_personas": "p",
+                "user_journeys": "j",
+                "platforms": "web",
+                "ux_research": "r",
+                "user_feedback": None,
+            },
+        ),
+        (
+            "technical_architecture/architecture",
+            {
+                "product_requirements": "r",
+                "tech_expertise": "t",
+                "scalability": "s",
+                "integrations": "i",
+                "tech_research": "tr",
+                "user_feedback": None,
+            },
+        ),
+        (
+            "execution_planning/execution_plan",
+            {
+                "team_info": "t",
+                "budget": "b",
+                "timeline": "tl",
+                "risks": "r",
+                "cost_estimation": "c",
+                "user_feedback": None,
+            },
+        ),
     ]
 
     for template_key, context in templates_to_test:

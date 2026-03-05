@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from collections import defaultdict
+from dataclasses import dataclass, field
 
 from app.models.workflow_node import NodeType
 
@@ -41,9 +41,7 @@ class WorkflowTemplate:
         for n in self.nodes:
             for dep in n.depends_on:
                 if dep not in slugs:
-                    raise ValueError(
-                        f"Node '{n.slug}' depends on '{dep}' which does not exist"
-                    )
+                    raise ValueError(f"Node '{n.slug}' depends on '{dep}' which does not exist")
 
         # Cycle detection via topological sort (Kahn's algorithm)
         in_degree: dict[str, int] = defaultdict(int)

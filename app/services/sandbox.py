@@ -1,8 +1,6 @@
 """Secure Python execution sandbox using E2B Code Interpreter."""
-from __future__ import annotations
 
-import base64
-from typing import Any
+from __future__ import annotations
 
 import structlog
 
@@ -60,15 +58,19 @@ class PythonSandbox:
                 # Capture any generated charts/images
                 for result in execution.results:
                     if hasattr(result, "png") and result.png:
-                        charts.append({
-                            "format": "png",
-                            "data": result.png,  # base64 encoded
-                        })
+                        charts.append(
+                            {
+                                "format": "png",
+                                "data": result.png,  # base64 encoded
+                            }
+                        )
                     if hasattr(result, "svg") and result.svg:
-                        charts.append({
-                            "format": "svg",
-                            "data": result.svg,
-                        })
+                        charts.append(
+                            {
+                                "format": "svg",
+                                "data": result.svg,
+                            }
+                        )
 
                 error = None
                 if execution.error:
@@ -124,7 +126,7 @@ class PythonSandbox:
                 stderr=stderr_bytes.decode().strip(),
                 error=None if proc.returncode == 0 else f"Exit code {proc.returncode}",
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             if proc:
                 proc.kill()
                 await proc.wait()

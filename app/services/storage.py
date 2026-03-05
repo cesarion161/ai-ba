@@ -15,7 +15,7 @@ class S3Storage:
         self.settings = get_settings()
         self._client = None
 
-    def _get_client(self):
+    def _get_client(self) -> Any:
         if self._client is None:
             self._client = boto3.client(
                 "s3",
@@ -45,12 +45,12 @@ class S3Storage:
             Params={"Bucket": self.settings.S3_BUCKET, "Key": key},
             ExpiresIn=expires_in,
         )
-        return url
+        return str(url)
 
     async def download(self, key: str) -> bytes:
         client = self._get_client()
         response = client.get_object(Bucket=self.settings.S3_BUCKET, Key=key)
-        return response["Body"].read()
+        return bytes(response["Body"].read())
 
 
 s3_storage = S3Storage()

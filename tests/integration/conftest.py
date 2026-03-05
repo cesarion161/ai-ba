@@ -1,9 +1,9 @@
 """Integration test fixtures with real PostgreSQL database."""
+
 from __future__ import annotations
 
 import uuid
 
-import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
@@ -23,7 +23,9 @@ async def db_session():
 
     async with factory() as session:
         # Clean all tables (order matters for FK constraints)
-        await session.execute(text("TRUNCATE node_artifacts, node_edges, workflow_nodes, projects, users CASCADE"))
+        await session.execute(
+            text("TRUNCATE node_artifacts, node_edges, workflow_nodes, projects, users CASCADE")
+        )
         await session.commit()
         yield session
 
@@ -33,8 +35,8 @@ async def db_session():
 @pytest_asyncio.fixture
 async def test_user(db_session: AsyncSession):
     """Create a test user and return their ID."""
-    from app.models.user import User
     from app.core.security import hash_password
+    from app.models.user import User
 
     user = User(
         email="test@example.com",
@@ -49,8 +51,8 @@ async def test_user(db_session: AsyncSession):
 @pytest_asyncio.fixture
 async def client(db_session: AsyncSession):
     """Create an async test client with DB session override."""
-    from app.models.user import User
     from app.core.security import hash_password
+    from app.models.user import User
 
     # Create the placeholder user that project routes expect
     placeholder_user = User(

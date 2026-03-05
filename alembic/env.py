@@ -3,10 +3,9 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-
 from app.core.config import get_settings
+from app.models import artifact, project, user, workflow_node  # noqa: F401
 from app.models.database import Base
-from app.models import user, project, workflow_node, artifact  # noqa: F401
 
 config = context.config
 

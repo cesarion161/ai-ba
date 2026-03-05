@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/projects/{project_id}/stream", tags=["streaming"
 
 @router.get("")
 async def stream_project_events(project_id: uuid.UUID) -> EventSourceResponse:
-    async def event_generator():
+    async def event_generator():  # type: ignore[no-untyped-def]
         async for event in event_bus.subscribe(str(project_id)):
             yield {
                 "event": event.get("event", "message"),
@@ -24,10 +24,8 @@ async def stream_project_events(project_id: uuid.UUID) -> EventSourceResponse:
 
 
 @router.get("/nodes/{slug}")
-async def stream_node_events(
-    project_id: uuid.UUID, slug: str
-) -> EventSourceResponse:
-    async def event_generator():
+async def stream_node_events(project_id: uuid.UUID, slug: str) -> EventSourceResponse:
+    async def event_generator():  # type: ignore[no-untyped-def]
         async for event in event_bus.subscribe(str(project_id), node_slug=slug):
             yield {
                 "event": event.get("event", "message"),

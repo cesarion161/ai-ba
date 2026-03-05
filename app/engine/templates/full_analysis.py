@@ -1,4 +1,5 @@
 """Full analysis composite template — combines all branches with cross-branch dependencies."""
+
 from app.engine.templates.base import NodeTemplate, WorkflowTemplate
 from app.models.workflow_node import NodeType
 
@@ -237,7 +238,13 @@ FULL_ANALYSIS = WorkflowTemplate(
             label="Densify for Developer",
             branch="densification",
             node_type=NodeType.DENSIFY,
-            depends_on=["lean_canvas_critic", "product_roadmap_critic", "user_stories_critic", "architecture_critic", "execution_plan_critic"],
+            depends_on=[
+                "lean_canvas_critic",
+                "product_roadmap_critic",
+                "user_stories_critic",
+                "architecture_critic",
+                "execution_plan_critic",
+            ],
             config={"role": "developer"},
         ),
         NodeTemplate(
@@ -245,7 +252,13 @@ FULL_ANALYSIS = WorkflowTemplate(
             label="Densify for Designer",
             branch="densification",
             node_type=NodeType.DENSIFY,
-            depends_on=["lean_canvas_critic", "product_roadmap_critic", "user_stories_critic", "architecture_critic", "execution_plan_critic"],
+            depends_on=[
+                "lean_canvas_critic",
+                "product_roadmap_critic",
+                "user_stories_critic",
+                "architecture_critic",
+                "execution_plan_critic",
+            ],
             config={"role": "designer"},
         ),
         NodeTemplate(
@@ -253,7 +266,13 @@ FULL_ANALYSIS = WorkflowTemplate(
             label="Densify for Product Manager",
             branch="densification",
             node_type=NodeType.DENSIFY,
-            depends_on=["lean_canvas_critic", "product_roadmap_critic", "user_stories_critic", "architecture_critic", "execution_plan_critic"],
+            depends_on=[
+                "lean_canvas_critic",
+                "product_roadmap_critic",
+                "user_stories_critic",
+                "architecture_critic",
+                "execution_plan_critic",
+            ],
             config={"role": "product_manager"},
         ),
         # ===== Export Branch =====

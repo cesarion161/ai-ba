@@ -21,12 +21,14 @@ async def search_web(query: str, max_results: int = 10) -> list[dict[str, Any]]:
 
     results = []
     for r in response.get("results", []):
-        results.append({
-            "title": r.get("title", ""),
-            "url": r.get("url", ""),
-            "content": r.get("content", ""),
-            "score": r.get("score", 0),
-        })
+        results.append(
+            {
+                "title": r.get("title", ""),
+                "url": r.get("url", ""),
+                "content": r.get("content", ""),
+                "score": r.get("score", 0),
+            }
+        )
 
     logger.info("web_search_completed", query=query, num_results=len(results))
     return results

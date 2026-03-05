@@ -8,6 +8,7 @@ Tests:
 - Dependency resolution marks downstream as READY
 - Graph status reports correct progress
 """
+
 from __future__ import annotations
 
 import pytest
@@ -19,11 +20,14 @@ pytestmark = pytest.mark.asyncio
 
 async def test_create_project_instantiates_dag(client: AsyncClient):
     """POST /api/projects creates project with market_research workflow nodes."""
-    resp = await client.post("/api/projects", json={
-        "name": "Test Project",
-        "description": "Integration test project",
-        "template_key": "market_research",
-    })
+    resp = await client.post(
+        "/api/projects",
+        json={
+            "name": "Test Project",
+            "description": "Integration test project",
+            "template_key": "market_research",
+        },
+    )
     assert resp.status_code == 201
     data = resp.json()
     assert data["name"] == "Test Project"
@@ -35,15 +39,19 @@ async def test_create_project_instantiates_dag(client: AsyncClient):
     assert graph_resp.status_code == 200
     graph = graph_resp.json()
     assert len(graph["nodes"]) == 6  # market_research has 6 nodes
-    assert len(graph["edges"]) == 7  # intake->web, intake->comp, web->sizing, web+comp+sizing->lean, lean->critic
+    # intake->web, intake->comp, web->sizing, web+comp+sizing->lean, lean->critic
+    assert len(graph["edges"]) == 7
 
 
 async def test_root_nodes_are_ready(client: AsyncClient):
     """Root nodes (no dependencies) should start as READY."""
-    resp = await client.post("/api/projects", json={
-        "name": "Root Test",
-        "template_key": "market_research",
-    })
+    resp = await client.post(
+        "/api/projects",
+        json={
+            "name": "Root Test",
+            "template_key": "market_research",
+        },
+    )
     project_id = resp.json()["id"]
 
     graph = (await client.get(f"/api/projects/{project_id}/graph")).json()
@@ -60,29 +68,33 @@ async def test_root_nodes_are_ready(client: AsyncClient):
 
 async def test_answer_ask_user_unlocks_downstream(client: AsyncClient, db_session: AsyncSession):
     """Answering an ask_user node approves it and makes dependents READY."""
-    resp = await client.post("/api/projects", json={
-        "name": "Answer Test",
-        "template_key": "market_research",
-    })
+    resp = await client.post(
+        "/api/projects",
+        json={
+            "name": "Answer Test",
+            "template_key": "market_research",
+        },
+    )
     project_id = resp.json()["id"]
 
     # Answer intake questions
     answer_resp = await client.post(
         f"/api/projects/{project_id}/nodes/intake_questions/answer",
-        json={"answers": {
-            "0": "AI tutoring platform",
-            "1": "K-12 students",
-            "2": "Personalized learning",
-            "3": "$20-50/month",
-            "4": "Khan Academy, Duolingo",
-        }},
+        json={
+            "answers": {
+                "0": "AI tutoring platform",
+                "1": "K-12 students",
+                "2": "Personalized learning",
+                "3": "$20-50/month",
+                "4": "Khan Academy, Duolingo",
+            }
+        },
     )
     assert answer_resp.status_code == 200
     assert answer_resp.json()["status"] == "approved"
 
     # Trigger the resolver to propagate completion
     from app.engine.resolver import propagate_completion
-    from app.services.node_service import get_node
 
     # Get the intake node to propagate from
     nodes_resp = await client.get(f"/api/projects/{project_id}/nodes")
@@ -106,10 +118,13 @@ async def test_answer_ask_user_unlocks_downstream(client: AsyncClient, db_sessio
 
 async def test_graph_status_reports_progress(client: AsyncClient):
     """GET /graph/status shows correct progress percentages."""
-    resp = await client.post("/api/projects", json={
-        "name": "Status Test",
-        "template_key": "market_research",
-    })
+    resp = await client.post(
+        "/api/projects",
+        json={
+            "name": "Status Test",
+            "template_key": "market_research",
+        },
+    )
     project_id = resp.json()["id"]
 
     status = (await client.get(f"/api/projects/{project_id}/graph/status")).json()
@@ -132,10 +147,13 @@ async def test_graph_status_reports_progress(client: AsyncClient):
 
 async def test_create_project_full_analysis(client: AsyncClient):
     """Full analysis template creates 27 nodes across 7 branches."""
-    resp = await client.post("/api/projects", json={
-        "name": "Full Analysis Test",
-        "template_key": "full_analysis",
-    })
+    resp = await client.post(
+        "/api/projects",
+        json={
+            "name": "Full Analysis Test",
+            "template_key": "full_analysis",
+        },
+    )
     assert resp.status_code == 201
     project_id = resp.json()["id"]
 
@@ -144,8 +162,13 @@ async def test_create_project_full_analysis(client: AsyncClient):
 
     branches = {n["branch"] for n in graph["nodes"]}
     assert branches == {
-        "market_research", "product_strategy", "ux_requirements",
-        "technical_architecture", "execution_planning", "densification", "export",
+        "market_research",
+        "product_strategy",
+        "ux_requirements",
+        "technical_architecture",
+        "execution_planning",
+        "densification",
+        "export",
     }
 
     # Only intake_questions should be ready
@@ -156,10 +179,13 @@ async def test_create_project_full_analysis(client: AsyncClient):
 
 async def test_list_and_get_project(client: AsyncClient):
     """CRUD: list and get project."""
-    resp = await client.post("/api/projects", json={
-        "name": "CRUD Test",
-        "template_key": "market_research",
-    })
+    resp = await client.post(
+        "/api/projects",
+        json={
+            "name": "CRUD Test",
+            "template_key": "market_research",
+        },
+    )
     project_id = resp.json()["id"]
 
     # List
@@ -176,10 +202,13 @@ async def test_list_and_get_project(client: AsyncClient):
 
 async def test_delete_project(client: AsyncClient):
     """DELETE /api/projects/{id} removes the project."""
-    resp = await client.post("/api/projects", json={
-        "name": "Delete Me",
-        "template_key": "market_research",
-    })
+    resp = await client.post(
+        "/api/projects",
+        json={
+            "name": "Delete Me",
+            "template_key": "market_research",
+        },
+    )
     project_id = resp.json()["id"]
 
     del_resp = await client.delete(f"/api/projects/{project_id}")
@@ -191,10 +220,13 @@ async def test_delete_project(client: AsyncClient):
 
 async def test_list_nodes_with_filters(client: AsyncClient):
     """GET /nodes with branch/status/type filters."""
-    resp = await client.post("/api/projects", json={
-        "name": "Filter Test",
-        "template_key": "market_research",
-    })
+    resp = await client.post(
+        "/api/projects",
+        json={
+            "name": "Filter Test",
+            "template_key": "market_research",
+        },
+    )
     project_id = resp.json()["id"]
 
     # Filter by status

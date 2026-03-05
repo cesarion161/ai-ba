@@ -35,9 +35,11 @@ class DensifyHandler:
 
         combined = "\n\n---\n\n".join(documents)
 
-        prompt = f"""You are a technical writer specializing in creating machine-readable directives.
+        prompt = f"""You are a technical writer specializing in \
+creating machine-readable directives.
 
-Compress the following business analysis documents into dense, actionable directives for a {target_role}.
+Compress the following business analysis documents into dense, \
+actionable directives for a {target_role}.
 
 ## Source Documents
 {combined}

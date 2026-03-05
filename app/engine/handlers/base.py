@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any, Protocol
 
 from app.models.workflow_node import NodeType
@@ -17,10 +18,11 @@ class NodeHandler(Protocol):
 NODE_HANDLERS: dict[NodeType, NodeHandler] = {}
 
 
-def register_handler(node_type: NodeType):
-    def decorator(cls: type[NodeHandler]):
+def register_handler(node_type: NodeType) -> Callable[[type[NodeHandler]], type[NodeHandler]]:
+    def decorator(cls: type[NodeHandler]) -> type[NodeHandler]:
         NODE_HANDLERS[node_type] = cls()
         return cls
+
     return decorator
 
 

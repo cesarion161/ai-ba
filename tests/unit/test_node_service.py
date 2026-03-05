@@ -1,7 +1,7 @@
 import pytest
 
 from app.models.workflow_node import NodeStatus
-from app.services.node_service import InvalidTransition, validate_transition
+from app.services.node_service import InvalidTransitionError, validate_transition
 
 
 def test_valid_transitions():
@@ -15,11 +15,11 @@ def test_valid_transitions():
 
 
 def test_invalid_transitions():
-    with pytest.raises(InvalidTransition):
+    with pytest.raises(InvalidTransitionError):
         validate_transition(NodeStatus.APPROVED, NodeStatus.RUNNING)
 
-    with pytest.raises(InvalidTransition):
+    with pytest.raises(InvalidTransitionError):
         validate_transition(NodeStatus.PENDING, NodeStatus.RUNNING)
 
-    with pytest.raises(InvalidTransition):
+    with pytest.raises(InvalidTransitionError):
         validate_transition(NodeStatus.SKIPPED, NodeStatus.RUNNING)

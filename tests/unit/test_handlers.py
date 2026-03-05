@@ -1,7 +1,7 @@
 import pytest
 
-from app.engine.handlers.base import NODE_HANDLERS, get_handler
 from app.engine.handlers import stubs  # noqa: F401 — registers all stubs
+from app.engine.handlers.base import NODE_HANDLERS, get_handler
 from app.models.workflow_node import NodeType
 
 

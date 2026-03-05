@@ -44,7 +44,12 @@ class CalculateHandler:
         )
 
         messages = [
-            {"role": "system", "content": "You are a data analyst. Output ONLY valid Python code, no markdown fences."},
+            {
+                "role": "system",
+                "content": (
+                    "You are a data analyst. Output ONLY valid Python code, no markdown fences."
+                ),
+            },
             {"role": "user", "content": code_prompt},
         ]
 

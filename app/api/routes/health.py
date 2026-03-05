@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,12 +9,12 @@ router = APIRouter(tags=["health"])
 
 
 @router.get("/health")
-async def health():
+async def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
 @router.get("/health/ready")
-async def readiness(db: AsyncSession = Depends(get_db)):
+async def readiness(db: AsyncSession = Depends(get_db)) -> JSONResponse:
     checks: dict[str, str] = {}
 
     # Check PostgreSQL
@@ -26,6 +27,7 @@ async def readiness(db: AsyncSession = Depends(get_db)):
     # Check Redis
     try:
         import redis.asyncio as aioredis
+
         from app.core.config import get_settings
 
         settings = get_settings()

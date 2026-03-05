@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-import uuid
 from typing import Annotated, Any, TypedDict
 
 
-def merge_node_results(
-    existing: dict[str, Any], new: dict[str, Any]
-) -> dict[str, Any]:
+def merge_node_results(existing: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
     merged = {**existing}
     merged.update(new)
     return merged

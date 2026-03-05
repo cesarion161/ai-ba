@@ -1,4 +1,5 @@
 """Stub handlers for all node types. Return mock data for testing."""
+
 from __future__ import annotations
 
 from typing import Any

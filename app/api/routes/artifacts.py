@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.artifact import NodeArtifact
@@ -47,9 +47,7 @@ async def list_artifacts(
         .order_by(NodeArtifact.created_at.desc())
     )
     artifacts = result.scalars().all()
-    return ArtifactListResponse(
-        artifacts=[ArtifactResponse.model_validate(a) for a in artifacts]
-    )
+    return ArtifactListResponse(artifacts=[ArtifactResponse.model_validate(a) for a in artifacts])
 
 
 @router.get("/{artifact_id}", response_model=ArtifactResponse)
@@ -80,9 +78,7 @@ async def list_node_artifacts(
         .order_by(NodeArtifact.version.desc())
     )
     artifacts = result.scalars().all()
-    return ArtifactListResponse(
-        artifacts=[ArtifactResponse.model_validate(a) for a in artifacts]
-    )
+    return ArtifactListResponse(artifacts=[ArtifactResponse.model_validate(a) for a in artifacts])
 
 
 @router.post("/import", response_model=ImportResult, status_code=201)

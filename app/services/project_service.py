@@ -4,12 +4,11 @@ import uuid
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.engine.instantiate import instantiate_workflow
 from app.engine.templates.registry import get_template
 from app.models.project import Project
-from app.models.workflow_node import WorkflowNode, NodeEdge
+from app.models.workflow_node import NodeEdge, WorkflowNode
 
 
 async def create_project(

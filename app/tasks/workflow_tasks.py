@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-import uuid
+from typing import Any
 
 import structlog
 
@@ -18,7 +18,7 @@ logger = structlog.get_logger()
     retry_backoff=True,
     retry_backoff_max=60,
 )
-def run_workflow_task(self, project_id: str) -> dict:
+def run_workflow_task(self: Any, project_id: str) -> dict:
     """Run the workflow DAG for a project."""
     logger.info("Starting workflow", project_id=project_id, task_id=self.request.id)
 
@@ -35,9 +35,7 @@ def run_workflow_task(self, project_id: str) -> dict:
     max_retries=3,
     default_retry_delay=5,
 )
-def resume_workflow_task(
-    self, project_id: str, node_slug: str, decision: str
-) -> dict:
+def resume_workflow_task(self: Any, project_id: str, node_slug: str, decision: str) -> dict:
     """Resume a paused workflow after HITL decision."""
     logger.info(
         "Resuming workflow",
@@ -48,9 +46,7 @@ def resume_workflow_task(
 
     loop = asyncio.new_event_loop()
     try:
-        result = loop.run_until_complete(
-            _resume_workflow(project_id, node_slug, decision)
-        )
+        result = loop.run_until_complete(_resume_workflow(project_id, node_slug, decision))
         return result
     finally:
         loop.close()
@@ -58,12 +54,11 @@ def resume_workflow_task(
 
 async def _run_workflow(project_id: str) -> dict:
     from app.engine.orchestrator import build_workflow_graph
-    from app.models.database import async_session
 
     graph = build_workflow_graph()
     compiled = graph.compile()
 
-    initial_state = {
+    initial_state: dict[str, Any] = {
         "project_id": project_id,
         "node_results": {},
         "completed_slugs": [],
@@ -73,23 +68,22 @@ async def _run_workflow(project_id: str) -> dict:
 
     config = {"configurable": {"thread_id": project_id}}
 
-    result = await compiled.ainvoke(initial_state, config=config)
+    await compiled.ainvoke(initial_state, config=config)  # type: ignore[arg-type]
     return {"status": "completed", "project_id": project_id}
 
 
-async def _resume_workflow(
-    project_id: str, node_slug: str, decision: str
-) -> dict:
-    from app.engine.orchestrator import build_workflow_graph
+async def _resume_workflow(project_id: str, node_slug: str, decision: str) -> dict:
     from langgraph.types import Command
+
+    from app.engine.orchestrator import build_workflow_graph
 
     graph = build_workflow_graph()
     compiled = graph.compile()
 
     config = {"configurable": {"thread_id": project_id}}
 
-    result = await compiled.ainvoke(
+    await compiled.ainvoke(
         Command(resume=decision),
-        config=config,
+        config=config,  # type: ignore[arg-type]
     )
     return {"status": "resumed", "project_id": project_id, "node_slug": node_slug}

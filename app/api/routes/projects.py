@@ -34,9 +34,7 @@ async def list_projects(
     db: AsyncSession = Depends(get_db),
 ) -> ProjectListResponse:
     projects = await project_service.list_projects(db, PLACEHOLDER_USER_ID)
-    return ProjectListResponse(
-        projects=[ProjectResponse.model_validate(p) for p in projects]
-    )
+    return ProjectListResponse(projects=[ProjectResponse.model_validate(p) for p in projects])
 
 
 @router.get("/{project_id}", response_model=ProjectResponse)

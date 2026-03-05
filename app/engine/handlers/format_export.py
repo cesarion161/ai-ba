@@ -36,7 +36,7 @@ class FormatExportHandler:
                     if role == "developer":
                         claude_md = data["densified"]
                     else:
-                        documents[f".cursorrules"] = data["densified"]
+                        documents[".cursorrules"] = data["densified"]
                     densified_content = data["densified"]
 
         # Create in-memory zip

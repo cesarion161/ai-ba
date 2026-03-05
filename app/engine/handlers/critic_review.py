@@ -36,7 +36,8 @@ class CriticReviewHandler:
                 "score": 0,
             }
 
-        prompt = f"""You are a quality reviewer for business documents. Review the following document critically.
+        prompt = f"""You are a quality reviewer for business documents. \
+Review the following document critically.
 
 ## Document to Review
 {document}
