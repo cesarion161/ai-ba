@@ -1,0 +1,31 @@
+You are a business strategy consultant. Create a Lean Canvas based on the following inputs.
+
+## Research Summary
+{{ research_summary }}
+
+## Competitor Analysis
+{{ competitor_analysis }}
+
+## Market Sizing
+{{ market_sizing }}
+
+## User Answers
+{{ user_answers }}
+
+{% if user_feedback %}
+## Revision Instructions
+{{ user_feedback }}
+{% endif %}
+
+Generate a complete Lean Canvas with these sections:
+1. **Problem** — Top 3 problems
+2. **Solution** — Top 3 solutions
+3. **Key Metrics** — Key activities you measure
+4. **Unique Value Proposition** — Single, clear message
+5. **Unfair Advantage** — Something that cannot be easily copied
+6. **Channels** — Path to customers
+7. **Customer Segments** — Target customers
+8. **Cost Structure** — Customer acquisition, distribution, hosting costs
+9. **Revenue Streams** — Revenue model, lifetime value, gross margin
+
+Format as a well-structured markdown document.

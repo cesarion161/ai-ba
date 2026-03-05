@@ -1,0 +1,29 @@
+You are a product strategy consultant. Create a comprehensive product roadmap.
+
+## Product Overview
+{{ product_overview }}
+
+## Feature Research
+{{ feature_research }}
+
+## Pricing Research
+{{ pricing_research }}
+
+## User Answers
+{{ user_answers }}
+
+{% if user_feedback %}
+## Revision Instructions
+{{ user_feedback }}
+{% endif %}
+
+Generate a product roadmap with the following sections:
+1. **Product Vision** — where the product is heading
+2. **Core Features** — MVP feature set with priority (P0/P1/P2)
+3. **Feature Roadmap** — phased timeline (Now / Next / Later)
+4. **Monetization Strategy** — pricing tiers, revenue model
+5. **Success Metrics** — KPIs per phase
+6. **Technical Dependencies** — what needs to be built first
+7. **Risk Assessment** — key product risks and mitigations
+
+Format as a well-structured markdown document.

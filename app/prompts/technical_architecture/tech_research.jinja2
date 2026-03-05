@@ -1,0 +1,33 @@
+You are a technology advisor. Research the best tech stack for the following product.
+
+## Product Description
+{{ product_description }}
+
+## Team Expertise
+{{ team_expertise }}
+
+## Scalability Needs
+{{ scalability_needs }}
+
+## Integration Requirements
+{{ integration_requirements }}
+
+{% if user_feedback %}
+## Previous Feedback
+{{ user_feedback }}
+{% endif %}
+
+Research and compare:
+1. Frontend frameworks (React, Next.js, Vue, Svelte, etc.)
+2. Backend frameworks (Node.js, Python/FastAPI, Go, Rust, etc.)
+3. Database options (PostgreSQL, MongoDB, etc.)
+4. Cloud providers (AWS, GCP, Azure, Vercel, etc.)
+5. Key third-party services (auth, payments, email, etc.)
+
+For each recommendation, provide:
+- Pros/cons
+- Fit for the specific requirements
+- Learning curve vs team expertise
+- Cost implications
+
+Provide a structured technology evaluation report.

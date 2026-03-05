@@ -1,0 +1,47 @@
+You are a UX strategist and requirements analyst. Create comprehensive user stories.
+
+## User Personas
+{{ user_personas }}
+
+## Critical User Journeys
+{{ user_journeys }}
+
+## Platform Requirements
+{{ platforms }}
+
+## UX Research
+{{ ux_research }}
+
+{% if user_feedback %}
+## Revision Instructions
+{{ user_feedback }}
+{% endif %}
+
+Generate the following:
+
+## 1. User Personas
+For each persona, include:
+- Name, role, demographics
+- Goals and motivations
+- Pain points and frustrations
+- Technical proficiency
+- Key scenarios
+
+## 2. User Stories
+Format: "As a [persona], I want to [action], so that [benefit]"
+- Group by epic
+- Include acceptance criteria for each story
+- Priority: Must/Should/Could/Won't (MoSCoW)
+
+## 3. User Journey Maps
+For each critical journey:
+- Steps, touchpoints, emotions
+- Pain points and opportunities
+- Success metrics
+
+## 4. Information Architecture
+- Site map / navigation structure
+- Content hierarchy
+- Key screens and their relationships
+
+Format as a well-structured markdown document.
