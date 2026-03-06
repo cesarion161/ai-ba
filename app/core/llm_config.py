@@ -57,6 +57,18 @@ MODEL_ROUTING: dict[str, ModelConfig] = {
         temperature=0.1,
         max_tokens=2048,
     ),
+    "chat": ModelConfig(
+        primary="claude-sonnet-4-20250514",
+        fallbacks=["gpt-4o"],
+        temperature=0.7,
+        max_tokens=2048,
+    ),
+    "analysis": ModelConfig(
+        primary="claude-sonnet-4-20250514",
+        fallbacks=["gpt-4o"],
+        temperature=0.2,
+        max_tokens=4096,
+    ),
 }
 
 

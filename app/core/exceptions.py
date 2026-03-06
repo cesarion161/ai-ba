@@ -26,3 +26,13 @@ class ValidationError(AppError):
 class AuthenticationError(AppError):
     def __init__(self, message: str = "Authentication required"):
         super().__init__(message, status_code=401)
+
+
+class RateLimitError(AppError):
+    def __init__(self, message: str = "Rate limit exceeded. Please try again shortly."):
+        super().__init__(message, status_code=429)
+
+
+class LLMConnectionError(AppError):
+    def __init__(self, message: str = "Unable to connect to the AI service. Retrying..."):
+        super().__init__(message, status_code=503)

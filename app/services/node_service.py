@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.artifact import NodeArtifact
 from app.models.workflow_node import NodeStatus, WorkflowNode
+from app.services import audit_service
 
 VALID_TRANSITIONS: dict[NodeStatus, set[NodeStatus]] = {
     NodeStatus.PENDING: {NodeStatus.READY, NodeStatus.SKIPPED},
@@ -62,6 +63,9 @@ async def approve_node(session: AsyncSession, node: WorkflowNode) -> WorkflowNod
     validate_transition(node.status, NodeStatus.APPROVED)
     node.status = NodeStatus.APPROVED
     node.completed_at = datetime.now(UTC)
+    await audit_service.record(
+        session, "approve", "node", entity_id=node.id, project_id=node.project_id
+    )
     await session.commit()
     await session.refresh(node)
     return node
@@ -71,6 +75,10 @@ async def reject_node(session: AsyncSession, node: WorkflowNode, feedback: str) 
     validate_transition(node.status, NodeStatus.REJECTED)
     node.status = NodeStatus.REJECTED
     node.user_feedback = feedback
+    await audit_service.record(
+        session, "reject", "node", entity_id=node.id, project_id=node.project_id,
+        details={"feedback": feedback},
+    )
     await session.commit()
     await session.refresh(node)
     return node
@@ -101,6 +109,9 @@ async def update_node_output(
         version=max_version + 1,
     )
     session.add(artifact)
+    await audit_service.record(
+        session, "edit_output", "node", entity_id=node.id, project_id=node.project_id,
+    )
     await session.commit()
     await session.refresh(node)
     return node
@@ -111,6 +122,10 @@ async def retry_node(session: AsyncSession, node: WorkflowNode) -> WorkflowNode:
         raise InvalidTransitionError(f"Cannot retry node in status {node.status.value}")
     node.status = NodeStatus.READY
     node.retry_count += 1
+    await audit_service.record(
+        session, "retry", "node", entity_id=node.id, project_id=node.project_id,
+        details={"retry_count": node.retry_count},
+    )
     await session.commit()
     await session.refresh(node)
     return node
@@ -120,6 +135,9 @@ async def skip_node(session: AsyncSession, node: WorkflowNode) -> WorkflowNode:
     validate_transition(node.status, NodeStatus.SKIPPED)
     node.status = NodeStatus.SKIPPED
     node.completed_at = datetime.now(UTC)
+    await audit_service.record(
+        session, "skip", "node", entity_id=node.id, project_id=node.project_id,
+    )
     await session.commit()
     await session.refresh(node)
     return node
@@ -129,6 +147,9 @@ async def submit_answers(session: AsyncSession, node: WorkflowNode, answers: dic
     node.output_data = {"answers": answers}
     node.status = NodeStatus.APPROVED
     node.completed_at = datetime.now(UTC)
+    await audit_service.record(
+        session, "answer", "node", entity_id=node.id, project_id=node.project_id,
+    )
     await session.commit()
     await session.refresh(node)
     return node

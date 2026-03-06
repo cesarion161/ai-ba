@@ -27,6 +27,7 @@ dependencies = [
     "e2b-code-interpreter>=1.0.0",
     "psycopg2-binary>=2.9.0",
     "celery-types>=0.24.0",
+    "email-validator>=2.3.0",
 ]
 
 [project.optional-dependencies]

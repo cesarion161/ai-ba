@@ -9,6 +9,7 @@ from app.engine.instantiate import instantiate_workflow
 from app.engine.templates.registry import get_template
 from app.models.project import Project
 from app.models.workflow_node import NodeEdge, WorkflowNode
+from app.services import audit_service
 
 
 async def create_project(
@@ -29,6 +30,10 @@ async def create_project(
     await session.flush()
 
     await instantiate_workflow(session, project.id, template)
+    await audit_service.record(
+        session, "create", "project", entity_id=project.id,
+        project_id=project.id, user_id=user_id,
+    )
     await session.commit()
     await session.refresh(project)
     return project
@@ -49,6 +54,9 @@ async def delete_project(session: AsyncSession, project_id: uuid.UUID) -> bool:
     project = await session.get(Project, project_id)
     if not project:
         return False
+    await audit_service.record(
+        session, "delete", "project", entity_id=project_id, project_id=project_id,
+    )
     await session.delete(project)
     await session.commit()
     return True

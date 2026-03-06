@@ -29,3 +29,7 @@ htmlcov/
 
 # Lock file (regenerable)
 uv.lock
+
+# Frontend
+frontend/node_modules/
+frontend/.next/

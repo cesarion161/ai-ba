@@ -18,6 +18,8 @@ class ProjectResponse(BaseModel):
     description: str | None
     template_key: str
     status: str
+    chat_phase: str | None = None
+    selected_doc_types: list[str] | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

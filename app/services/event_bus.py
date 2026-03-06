@@ -11,6 +11,16 @@ from app.core.config import get_settings
 
 logger = structlog.get_logger()
 
+# Event type constants
+NODE_STATUS_CHANGED = "node.status_changed"
+NODE_RETRY = "node.retry"
+NODE_FAILED = "node.failed"
+NODE_COMPLETED = "node.completed"
+WORKFLOW_COMPLETED = "workflow.completed"
+CHAT_MESSAGE = "chat.message"
+CHAT_TOKEN = "chat.token"
+GRAPH_GENERATED = "graph.generated"
+
 
 class EventBus:
     def __init__(self) -> None:

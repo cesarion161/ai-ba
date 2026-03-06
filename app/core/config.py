@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
 
+    # CORS
+    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+
     # Auth
     JWT_SECRET: str = "change-me-in-production"
     JWT_ALGORITHM: str = "HS256"
