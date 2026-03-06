@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import uuid
 
+import structlog
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sse_starlette.sse import EventSourceResponse
@@ -16,9 +17,11 @@ from app.api.schemas.chat import (
     DocumentSelectionRequest,
     ProjectFromChatRequest,
 )
-from app.models.database import get_db
+from app.models.database import get_db, async_session
 from app.services import audit_service, chat_service, document_type_service
 from app.services.event_bus import event_bus
+
+logger = structlog.get_logger()
 
 router = APIRouter(prefix="/api/projects", tags=["chat"])
 
@@ -79,29 +82,44 @@ async def create_project_from_chat(
     return ChatMessageResponse.model_validate(assistant_msg)
 
 
-@router.post("/{project_id}/chat", response_model=ChatMessageResponse)
+@router.post("/{project_id}/chat")
 async def send_chat_message(
     project_id: uuid.UUID,
     body: ChatMessageCreate,
     db: AsyncSession = Depends(get_db),
-) -> ChatMessageResponse:
-    """Send a message and get an AI response."""
+) -> EventSourceResponse:
+    """Send a message and stream the AI response.
+
+    Returns an SSE stream:
+      - event: user_message   (the saved user message)
+      - event: assistant_token (each streamed token)
+      - event: assistant_done  (final saved assistant message)
+    """
     from app.services import project_service
 
     project = await project_service.get_project(db, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
 
-    assistant_msg = await chat_service.send_and_respond(db, project_id, body.content)
+    # Save user message in the request-scoped session
+    user_msg = await chat_service.save_user_message(db, project_id, body.content)
+    user_msg_data = ChatMessageResponse.model_validate(user_msg).model_dump(mode="json")
 
-    # Publish chat event for SSE
-    await event_bus.publish(
-        str(project_id),
-        "chat.message",
-        {"role": "assistant", "content": assistant_msg.content},
-    )
+    async def event_generator():  # type: ignore[no-untyped-def]
+        # 1. Emit saved user message so frontend can replace its optimistic one
+        yield {"event": "user_message", "data": json.dumps(user_msg_data)}
 
-    return ChatMessageResponse.model_validate(assistant_msg)
+        # 2. Stream AI response tokens, then the final saved message
+        async with async_session() as bg_session:
+            try:
+                async for sse_event in chat_service.stream_response_events(
+                    project_id, bg_session
+                ):
+                    yield sse_event
+            except Exception:
+                logger.exception("stream_error", project_id=str(project_id))
+
+    return EventSourceResponse(event_generator())
 
 
 @router.get("/{project_id}/chat", response_model=ChatHistoryResponse)
@@ -118,21 +136,6 @@ async def get_chat_history(
         total=total,
         has_more=offset + limit < total,
     )
-
-
-@router.get("/{project_id}/chat/stream")
-async def stream_chat(project_id: uuid.UUID) -> EventSourceResponse:
-    """SSE stream for chat token streaming."""
-
-    async def event_generator():  # type: ignore[no-untyped-def]
-        async for event in event_bus.subscribe(str(project_id)):
-            if event.get("event", "").startswith("chat."):
-                yield {
-                    "event": event.get("event", "message"),
-                    "data": json.dumps(event.get("data", {})),
-                }
-
-    return EventSourceResponse(event_generator())
 
 
 @router.post("/{project_id}/chat/select-documents", response_model=ChatMessageResponse)

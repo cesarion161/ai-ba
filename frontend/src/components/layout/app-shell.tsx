@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TopBar } from "./top-bar";
 import { LeftSidebar } from "./left-sidebar";
 import { CenterPane } from "./center-pane";
@@ -14,6 +14,11 @@ export function AppShell() {
   const [leftWidth, setLeftWidth] = useState(260);
   const [rightWidth, setRightWidth] = useState(340);
   const projectId = useUIStore((s) => s.selectedProjectId);
+  const hydrateFromURL = useUIStore((s) => s.hydrateFromURL);
+
+  useEffect(() => {
+    hydrateFromURL();
+  }, [hydrateFromURL]);
 
   useProjectSSE(projectId);
 

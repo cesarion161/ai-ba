@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import AsyncIterator
 from typing import Any, cast
 
 import structlog
@@ -98,6 +99,51 @@ class LLMGateway:
                 return result
 
         raise RuntimeError("All models failed after retries")
+
+    async def complete_stream(
+        self,
+        messages: list[dict[str, str]],
+        model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        task_type: str | None = None,
+        **kwargs: Any,
+    ) -> AsyncIterator[str]:
+        """Stream completion tokens with fallback support. Yields content deltas."""
+        if task_type:
+            config = get_model_config(task_type)
+            model = model or config.primary
+            temperature = temperature if temperature is not None else config.temperature
+            max_tokens = max_tokens or config.max_tokens
+            fallbacks = config.fallbacks
+        else:
+            model = model or self.settings.DEFAULT_MODEL
+            temperature = temperature if temperature is not None else 0.7
+            max_tokens = max_tokens or 4096
+            fallbacks = self.settings.FALLBACK_MODELS
+
+        models_to_try = [model] + fallbacks
+
+        for m in models_to_try:
+            try:
+                response = await acompletion(
+                    model=m,
+                    messages=messages,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    stream=True,
+                    **kwargs,
+                )
+                async for chunk in response:
+                    delta = chunk.choices[0].delta.content
+                    if delta:
+                        yield delta
+                return  # success — stop trying fallbacks
+            except Exception as e:
+                logger.warning("llm_stream_model_failed", model=m, error=str(e))
+                continue
+
+        raise RuntimeError("All models failed for streaming")
 
     async def complete_structured(
         self,

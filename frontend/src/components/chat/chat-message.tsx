@@ -5,9 +5,10 @@ import { cn } from "@/lib/utils";
 interface ChatMessageProps {
   role: string;
   content: string;
+  isStreaming?: boolean;
 }
 
-export function ChatMessageBubble({ role, content }: ChatMessageProps) {
+export function ChatMessageBubble({ role, content, isStreaming }: ChatMessageProps) {
   const isUser = role === "user";
 
   return (
@@ -20,7 +21,12 @@ export function ChatMessageBubble({ role, content }: ChatMessageProps) {
             : "bg-muted text-foreground",
         )}
       >
-        <div className="whitespace-pre-wrap break-words">{content}</div>
+        <div className="whitespace-pre-wrap break-words">
+          {content}
+          {isStreaming && (
+            <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-current align-middle" />
+          )}
+        </div>
       </div>
     </div>
   );

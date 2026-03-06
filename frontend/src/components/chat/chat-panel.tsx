@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { useChatHistory, useSendMessage } from "@/hooks/use-chat";
 import { useProject } from "@/hooks/use-projects";
-import { useChatStream } from "@/hooks/use-chat-stream";
 import { ChatMessageBubble } from "./chat-message";
 import { ChatInput } from "./chat-input";
 import { DocTypeSelector } from "./doc-type-selector";
@@ -19,8 +18,7 @@ interface ChatPanelProps {
 export function ChatPanel({ projectId, mode }: ChatPanelProps) {
   const { data: chatData, isLoading } = useChatHistory(projectId);
   const { data: project } = useProject(projectId);
-  const sendMutation = useSendMessage(projectId);
-  const { streamingContent } = useChatStream(projectId);
+  const { send, streamingContent, isStreaming, isPending } = useSendMessage(projectId);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const messages = chatData?.messages || [];
@@ -49,17 +47,21 @@ export function ChatPanel({ projectId, mode }: ChatPanelProps) {
           <ChatMessageBubble key={msg.id} role={msg.role} content={msg.content} />
         ))}
         {streamingContent && (
-          <ChatMessageBubble role="assistant" content={streamingContent} />
+          <ChatMessageBubble role="assistant" content={streamingContent} isStreaming />
         )}
         {showDocSelector && <DocTypeSelector projectId={projectId} />}
       </div>
       <ChatInput
-        onSend={(content) => sendMutation.mutate(content)}
-        disabled={sendMutation.isPending || showDocSelector || phase === "generating_graph"}
+        onSend={send}
+        disabled={isPending || isStreaming || showDocSelector || phase === "generating_graph"}
         placeholder={
           phase === "generating_graph"
             ? "Generating workflow..."
-            : "Type a message..."
+            : isPending
+              ? "Sending..."
+              : isStreaming
+                ? "AI is responding..."
+                : "Type a message..."
         }
       />
     </div>

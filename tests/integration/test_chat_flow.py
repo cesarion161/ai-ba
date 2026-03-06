@@ -55,13 +55,13 @@ async def test_send_chat_message(client: AsyncClient) -> None:
     )
     project_id = create_resp.json()["project_id"]
 
-    # Send message
+    # Send message — now returns user message immediately (AI streams via SSE)
     msg_resp = await client.post(
         f"/api/projects/{project_id}/chat",
         json={"content": "We target rural communities with limited restaurant access"},
     )
     assert msg_resp.status_code == 200
-    assert msg_resp.json()["role"] == "assistant"
+    assert msg_resp.json()["role"] == "user"
 
 
 @pytest.mark.asyncio
