@@ -35,9 +35,7 @@ def upgrade() -> None:
         sa.Column("role", chatrole, nullable=False),
         sa.Column("content", sa.Text(), nullable=False),
         sa.Column("metadata", postgresql.JSONB(), nullable=True),
-        sa.Column(
-            "created_at", sa.DateTime(timezone=True), server_default=sa.func.now()
-        ),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
     )
     op.create_index("ix_chat_messages_project_id", "chat_messages", ["project_id"])
 
@@ -50,9 +48,7 @@ def upgrade() -> None:
         sa.Column("category", sa.String(100), nullable=False),
         sa.Column("default_dependencies", postgresql.JSONB(), nullable=True),
         sa.Column("is_active", sa.Boolean(), server_default="true"),
-        sa.Column(
-            "created_at", sa.DateTime(timezone=True), server_default=sa.func.now()
-        ),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
     )
 
     op.create_table(
@@ -64,9 +60,7 @@ def upgrade() -> None:
         sa.Column("entity_type", sa.String(100), nullable=False),
         sa.Column("entity_id", postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column("details", postgresql.JSONB(), nullable=True),
-        sa.Column(
-            "created_at", sa.DateTime(timezone=True), server_default=sa.func.now()
-        ),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
     )
     op.create_index("ix_audit_logs_project_id", "audit_logs", ["project_id"])
     op.create_index("ix_audit_logs_entity_type", "audit_logs", ["entity_type"])

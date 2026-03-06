@@ -25,13 +25,9 @@ async def _get_project_or_404(db: AsyncSession, project_id: uuid.UUID):  # type:
     return project
 
 
-async def _get_node_by_slug(
-    db: AsyncSession, project_id: uuid.UUID, slug: str
-) -> WorkflowNode:
+async def _get_node_by_slug(db: AsyncSession, project_id: uuid.UUID, slug: str) -> WorkflowNode:
     result = await db.execute(
-        select(WorkflowNode).where(
-            WorkflowNode.project_id == project_id, WorkflowNode.slug == slug
-        )
+        select(WorkflowNode).where(WorkflowNode.project_id == project_id, WorkflowNode.slug == slug)
     )
     node = result.scalar_one_or_none()
     if not node:

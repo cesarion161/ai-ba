@@ -13,9 +13,7 @@ logger = structlog.get_logger()
 
 
 class InitialAnalysisAgent:
-    async def process_message(
-        self, history: list[dict[str, str]], user_message: str
-    ) -> str:
+    async def process_message(self, history: list[dict[str, str]], user_message: str) -> str:
         """Generate a response to continue the requirements conversation."""
         try:
             system_prompt = prompt_engine.render("chat/initial_analysis")
@@ -30,9 +28,7 @@ class InitialAnalysisAgent:
         )
         return response
 
-    async def is_requirements_complete(
-        self, history: list[dict[str, str]]
-    ) -> dict:
+    async def is_requirements_complete(self, history: list[dict[str, str]]) -> dict:
         """Check if we have enough info to proceed."""
         if len(history) < 4:
             return {"complete": False, "summary": "Need more conversation"}
@@ -106,9 +102,10 @@ class InitialAnalysisAgent:
                 json_str = json_str.split("```")[1].strip()
                 if json_str.startswith("json"):
                     json_str = json_str[4:].strip()
-            return json.loads(json_str)
+            result: list[str] = json.loads(json_str)
+            return result
         except (json.JSONDecodeError, KeyError):
-            return [dt["key"] for dt in all_doc_types]
+            return [str(dt["key"]) for dt in all_doc_types]
 
     @staticmethod
     def _default_system_prompt() -> str:
@@ -129,7 +126,9 @@ When you have a clear picture, let the user know you're ready to proceed."""
 
     @staticmethod
     def _default_requirements_check_prompt() -> str:
-        return """You analyze conversations to determine if enough business requirements have been gathered.
+        return """\
+You analyze conversations to determine if enough \
+business requirements have been gathered.
 
 Requirements are considered complete when we have clear information about:
 - What the business/product is

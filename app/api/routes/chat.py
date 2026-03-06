@@ -50,8 +50,12 @@ async def create_project_from_chat(
     await db.flush()
 
     await audit_service.record(
-        db, "create", "project", entity_id=project.id,
-        project_id=project.id, user_id=PLACEHOLDER_USER_ID,
+        db,
+        "create",
+        "project",
+        entity_id=project.id,
+        project_id=project.id,
+        user_id=PLACEHOLDER_USER_ID,
         details={"source": "chat"},
     )
 
@@ -163,7 +167,9 @@ async def select_documents(
     # Save selection as chat message
     selected_labels = ", ".join(body.doc_type_keys)
     await chat_service.save_message(
-        db, project_id, ChatRole.USER,
+        db,
+        project_id,
+        ChatRole.USER,
         f"Selected documents: {selected_labels}",
         metadata={"type": "doc_selection", "keys": body.doc_type_keys},
     )
@@ -191,7 +197,11 @@ async def select_documents(
     )
 
     await audit_service.record(
-        db, "generate_graph", "project", entity_id=project_id, project_id=project_id,
+        db,
+        "generate_graph",
+        "project",
+        entity_id=project_id,
+        project_id=project_id,
         details={"node_count": node_count, "doc_types": body.doc_type_keys},
     )
 
@@ -199,7 +209,8 @@ async def select_documents(
     await db.refresh(assistant_msg)
 
     await event_bus.publish(
-        str(project_id), "graph.generated",
+        str(project_id),
+        "graph.generated",
         {"node_count": node_count, "phase": "graph_ready"},
     )
 

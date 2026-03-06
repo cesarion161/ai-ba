@@ -12,9 +12,7 @@ BASE_URL = "http://test"
 
 @pytest.fixture
 async def client():
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url=BASE_URL
-    ) as c:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE_URL) as c:
         yield c
 
 
@@ -64,19 +62,14 @@ async def test_delete_node(client: AsyncClient, project_with_graph: str) -> None
             "node_type": "research",
         },
     )
-    resp = await client.delete(
-        f"/api/projects/{project_with_graph}/graph/nodes/to_delete"
-    )
+    resp = await client.delete(f"/api/projects/{project_with_graph}/graph/nodes/to_delete")
     assert resp.status_code == 204
 
 
 @pytest.mark.asyncio
-async def test_add_edge_with_cycle_detection(
-    client: AsyncClient, project_with_graph: str
-) -> None:
+async def test_add_edge_with_cycle_detection(client: AsyncClient, project_with_graph: str) -> None:
     # Get existing graph to find two nodes
     graph_resp = await client.get(f"/api/projects/{project_with_graph}/graph")
-    nodes = graph_resp.json()["nodes"]
     edges = graph_resp.json()["edges"]
 
     # Try adding a reverse edge that would create a cycle

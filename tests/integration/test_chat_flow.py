@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import uuid
-
 import pytest
 from httpx import ASGITransport, AsyncClient
 
@@ -14,9 +12,7 @@ BASE_URL = "http://test"
 
 @pytest.fixture
 async def client():
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url=BASE_URL
-    ) as c:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE_URL) as c:
         yield c
 
 

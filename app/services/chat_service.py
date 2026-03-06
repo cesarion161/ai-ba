@@ -74,7 +74,10 @@ async def send_and_respond(
     # Save user message
     await save_message(session, project_id, ChatRole.USER, user_content)
     await audit_service.record(
-        session, "chat_message", "chat", project_id=project_id,
+        session,
+        "chat_message",
+        "chat",
+        project_id=project_id,
         details={"role": "user"},
     )
 
@@ -126,9 +129,7 @@ async def send_and_respond(
         response_content = "I'm ready to help. What would you like to analyze?"
 
     # Save assistant response
-    assistant_msg = await save_message(
-        session, project_id, ChatRole.ASSISTANT, response_content
-    )
+    assistant_msg = await save_message(session, project_id, ChatRole.ASSISTANT, response_content)
     await session.commit()
     await session.refresh(assistant_msg)
     return assistant_msg

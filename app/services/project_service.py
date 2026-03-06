@@ -31,8 +31,12 @@ async def create_project(
 
     await instantiate_workflow(session, project.id, template)
     await audit_service.record(
-        session, "create", "project", entity_id=project.id,
-        project_id=project.id, user_id=user_id,
+        session,
+        "create",
+        "project",
+        entity_id=project.id,
+        project_id=project.id,
+        user_id=user_id,
     )
     await session.commit()
     await session.refresh(project)
@@ -55,7 +59,11 @@ async def delete_project(session: AsyncSession, project_id: uuid.UUID) -> bool:
     if not project:
         return False
     await audit_service.record(
-        session, "delete", "project", entity_id=project_id, project_id=project_id,
+        session,
+        "delete",
+        "project",
+        entity_id=project_id,
+        project_id=project_id,
     )
     await session.delete(project)
     await session.commit()

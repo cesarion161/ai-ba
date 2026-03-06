@@ -2,41 +2,65 @@
 
 from __future__ import annotations
 
-import json
 from collections import defaultdict
 
 import structlog
 
-from app.engine.templates.base import NodeTemplate, WorkflowTemplate
+from app.engine.templates.base import NodeTemplate
 from app.engine.templates.registry import TEMPLATE_REGISTRY
-from app.models.workflow_node import NodeType
 from app.services.llm_gateway import llm_gateway
 
 logger = structlog.get_logger()
 
 # Map document type keys to template keys and relevant node slugs
+_LEAN_CANVAS_SLUGS = [
+    "intake_questions",
+    "web_search",
+    "competitor_analysis",
+    "lean_canvas",
+    "lean_canvas_critic",
+]
+_COMPETITOR_SLUGS = ["intake_questions", "web_search", "competitor_analysis"]
+_SIZING_SLUGS = [
+    "intake_questions",
+    "web_search",
+    "competitor_analysis",
+    "market_sizing",
+]
+_ROADMAP_SLUGS = [
+    "product_questions",
+    "feature_research",
+    "pricing_research",
+    "product_roadmap",
+    "roadmap_critic",
+]
+_STORIES_SLUGS = [
+    "ux_questions",
+    "ux_research",
+    "user_stories",
+    "stories_critic",
+]
+_ARCH_SLUGS = [
+    "tech_questions",
+    "tech_stack_research",
+    "architecture_doc",
+    "architecture_critic",
+]
+_EXEC_SLUGS = [
+    "execution_questions",
+    "cost_estimation",
+    "execution_plan",
+    "plan_critic",
+]
+
 DOC_TYPE_TO_TEMPLATE: dict[str, list[tuple[str, list[str]]]] = {
-    "lean_canvas": [
-        ("market_research", ["intake_questions", "web_search", "competitor_analysis", "lean_canvas", "lean_canvas_critic"]),
-    ],
-    "competitor_analysis": [
-        ("market_research", ["intake_questions", "web_search", "competitor_analysis"]),
-    ],
-    "market_sizing": [
-        ("market_research", ["intake_questions", "web_search", "competitor_analysis", "market_sizing"]),
-    ],
-    "product_roadmap": [
-        ("product_strategy", ["product_questions", "feature_research", "pricing_research", "product_roadmap", "roadmap_critic"]),
-    ],
-    "user_stories": [
-        ("ux_requirements", ["ux_questions", "ux_research", "user_stories", "stories_critic"]),
-    ],
-    "architecture_doc": [
-        ("technical_architecture", ["tech_questions", "tech_stack_research", "architecture_doc", "architecture_critic"]),
-    ],
-    "execution_plan": [
-        ("execution_planning", ["execution_questions", "cost_estimation", "execution_plan", "plan_critic"]),
-    ],
+    "lean_canvas": [("market_research", _LEAN_CANVAS_SLUGS)],
+    "competitor_analysis": [("market_research", _COMPETITOR_SLUGS)],
+    "market_sizing": [("market_research", _SIZING_SLUGS)],
+    "product_roadmap": [("product_strategy", _ROADMAP_SLUGS)],
+    "user_stories": [("ux_requirements", _STORIES_SLUGS)],
+    "architecture_doc": [("technical_architecture", _ARCH_SLUGS)],
+    "execution_plan": [("execution_planning", _EXEC_SLUGS)],
 }
 
 
@@ -49,9 +73,10 @@ class GraphGeneratorAgent:
             {
                 "role": "system",
                 "content": (
-                    "Summarize the following conversation into structured business requirements. "
-                    "Include: business description, target market, competition, revenue model, "
-                    "and any other relevant details. Be concise but comprehensive."
+                    "Summarize the following conversation into structured "
+                    "business requirements. Include: business description, "
+                    "target market, competition, revenue model, "
+                    "and any other relevant details."
                 ),
             },
             {
@@ -59,7 +84,8 @@ class GraphGeneratorAgent:
                 "content": (
                     "Conversation:\n"
                     + "\n".join(f"{m['role']}: {m['content']}" for m in history)
-                    + f"\n\nSelected document types: {', '.join(selected_doc_types)}"
+                    + "\n\nSelected document types: "
+                    + ", ".join(selected_doc_types)
                 ),
             },
         ]
@@ -70,8 +96,7 @@ class GraphGeneratorAgent:
         requirements: str,
         selected_doc_types: list[str],
     ) -> dict:
-        """Compose a workflow graph from templates based on selected doc types."""
-        # Collect nodes from relevant templates
+        """Compose a workflow graph from templates."""
         all_nodes: dict[str, NodeTemplate] = {}
         template_slugs_needed: set[str] = set()
 
@@ -85,36 +110,35 @@ class GraphGeneratorAgent:
                     if nt.slug in slug_list or nt.slug in template_slugs_needed:
                         all_nodes[nt.slug] = nt
                         template_slugs_needed.add(nt.slug)
-                        # Also include dependencies
                         for dep in nt.depends_on:
                             template_slugs_needed.add(dep)
 
         # Second pass: ensure all dependencies are included
-        for template_key, template in TEMPLATE_REGISTRY.items():
-            for nt in template.nodes:
+        for _tkey, tmpl in TEMPLATE_REGISTRY.items():
+            for nt in tmpl.nodes:
                 if nt.slug in template_slugs_needed and nt.slug not in all_nodes:
                     all_nodes[nt.slug] = nt
 
-        # Build graph JSON
         nodes_json = []
         edges_json = []
 
         for slug, nt in all_nodes.items():
-            nodes_json.append({
-                "slug": nt.slug,
-                "label": nt.label,
-                "branch": nt.branch,
-                "node_type": nt.node_type.value,
-                "requires_approval": nt.requires_approval,
-                "config": nt.config,
-            })
+            nodes_json.append(
+                {
+                    "slug": nt.slug,
+                    "label": nt.label,
+                    "branch": nt.branch,
+                    "node_type": nt.node_type.value,
+                    "requires_approval": nt.requires_approval,
+                    "config": nt.config,
+                }
+            )
             for dep in nt.depends_on:
                 if dep in all_nodes:
                     edges_json.append({"from_slug": dep, "to_slug": nt.slug})
 
         graph = {"nodes": nodes_json, "edges": edges_json}
 
-        # Validate
         is_valid, errors = self.validate_graph(graph)
         if not is_valid:
             logger.error("Generated graph is invalid", errors=errors)
@@ -127,7 +151,6 @@ class GraphGeneratorAgent:
         errors: list[str] = []
         slugs = {n["slug"] for n in graph_json.get("nodes", [])}
 
-        # Check edge references
         for edge in graph_json.get("edges", []):
             if edge["from_slug"] not in slugs:
                 errors.append(f"Edge references unknown node: {edge['from_slug']}")

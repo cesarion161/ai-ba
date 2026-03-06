@@ -76,7 +76,11 @@ async def reject_node(session: AsyncSession, node: WorkflowNode, feedback: str) 
     node.status = NodeStatus.REJECTED
     node.user_feedback = feedback
     await audit_service.record(
-        session, "reject", "node", entity_id=node.id, project_id=node.project_id,
+        session,
+        "reject",
+        "node",
+        entity_id=node.id,
+        project_id=node.project_id,
         details={"feedback": feedback},
     )
     await session.commit()
@@ -110,7 +114,11 @@ async def update_node_output(
     )
     session.add(artifact)
     await audit_service.record(
-        session, "edit_output", "node", entity_id=node.id, project_id=node.project_id,
+        session,
+        "edit_output",
+        "node",
+        entity_id=node.id,
+        project_id=node.project_id,
     )
     await session.commit()
     await session.refresh(node)
@@ -123,7 +131,11 @@ async def retry_node(session: AsyncSession, node: WorkflowNode) -> WorkflowNode:
     node.status = NodeStatus.READY
     node.retry_count += 1
     await audit_service.record(
-        session, "retry", "node", entity_id=node.id, project_id=node.project_id,
+        session,
+        "retry",
+        "node",
+        entity_id=node.id,
+        project_id=node.project_id,
         details={"retry_count": node.retry_count},
     )
     await session.commit()
@@ -136,7 +148,11 @@ async def skip_node(session: AsyncSession, node: WorkflowNode) -> WorkflowNode:
     node.status = NodeStatus.SKIPPED
     node.completed_at = datetime.now(UTC)
     await audit_service.record(
-        session, "skip", "node", entity_id=node.id, project_id=node.project_id,
+        session,
+        "skip",
+        "node",
+        entity_id=node.id,
+        project_id=node.project_id,
     )
     await session.commit()
     await session.refresh(node)
@@ -148,7 +164,11 @@ async def submit_answers(session: AsyncSession, node: WorkflowNode, answers: dic
     node.status = NodeStatus.APPROVED
     node.completed_at = datetime.now(UTC)
     await audit_service.record(
-        session, "answer", "node", entity_id=node.id, project_id=node.project_id,
+        session,
+        "answer",
+        "node",
+        entity_id=node.id,
+        project_id=node.project_id,
     )
     await session.commit()
     await session.refresh(node)

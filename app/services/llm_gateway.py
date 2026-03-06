@@ -93,9 +93,7 @@ class LLMGateway:
         models_to_try = [model] + fallbacks
 
         for m in models_to_try:
-            result = await self._complete_with_retry(
-                m, messages, temperature, max_tokens, **kwargs
-            )
+            result = await self._complete_with_retry(m, messages, temperature, max_tokens, **kwargs)
             if result is not None:
                 return result
 
