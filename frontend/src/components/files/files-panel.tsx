@@ -92,8 +92,8 @@ export function FilesPanel({ projectId }: FilesPanelProps) {
   }
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center gap-3 border-b px-4 py-2">
+    <div className="flex h-full flex-col overflow-hidden">
+      <div className="flex items-center gap-3 border-b px-4 py-2 shrink-0">
         <Checkbox
           checked={allSelected}
           onCheckedChange={toggleAll}
@@ -114,33 +114,35 @@ export function FilesPanel({ projectId }: FilesPanelProps) {
           Download Selected
         </Button>
       </div>
-      <ScrollArea className="flex-1">
-        <div className="divide-y">
-          {files.map((node) => (
-            <div
-              key={node.slug}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 cursor-pointer"
-              onClick={() => openNodeDetail(node.slug)}
-            >
-              <Checkbox
-                checked={selected.has(node.slug)}
-                onCheckedChange={() => toggle(node.slug)}
-                onClick={(e) => e.stopPropagation()}
-                aria-label={`Select ${node.label}`}
-              />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium truncate">{node.label}</p>
-                <p className="text-xs text-muted-foreground">
-                  {node.node_type} &middot; {node.branch}
-                </p>
+      <div className="flex-1 min-h-0">
+        <ScrollArea className="h-full">
+          <div className="divide-y">
+            {files.map((node) => (
+              <div
+                key={node.slug}
+                className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 cursor-pointer"
+                onClick={() => openNodeDetail(node.slug)}
+              >
+                <Checkbox
+                  checked={selected.has(node.slug)}
+                  onCheckedChange={() => toggle(node.slug)}
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`Select ${node.label}`}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium truncate">{node.label}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {node.node_type} &middot; {node.branch}
+                  </p>
+                </div>
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {node.slug}{getFileExtension(node)}
+                </span>
               </div>
-              <span className="text-xs text-muted-foreground shrink-0">
-                {node.slug}{getFileExtension(node)}
-              </span>
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }

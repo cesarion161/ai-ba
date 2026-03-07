@@ -103,11 +103,24 @@ async def execute_node(
         )
         upstream_ids = [row[0] for row in upstream_edges.all()]
 
+        # Expire cached objects so we get fresh data from DB
+        session.expire_all()
+
         input_data: dict[str, Any] = {}
         for uid in upstream_ids:
-            upstream_node = await session.get(WFNode, uid)
+            result = await session.execute(
+                sa_select(WFNode).where(WFNode.id == uid)
+            )
+            upstream_node = result.scalar_one_or_none()
             if upstream_node and upstream_node.output_data:
                 input_data[upstream_node.slug] = upstream_node.output_data
+
+        if upstream_ids and not input_data:
+            logger.warning(
+                "node has upstream edges but no input data collected",
+                slug=slug,
+                upstream_count=len(upstream_ids),
+            )
 
         node.input_data = input_data
         await session.commit()

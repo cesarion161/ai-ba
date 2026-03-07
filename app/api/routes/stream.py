@@ -15,10 +15,9 @@ router = APIRouter(prefix="/api/projects/{project_id}/stream", tags=["streaming"
 async def stream_project_events(project_id: uuid.UUID) -> EventSourceResponse:
     async def event_generator():  # type: ignore[no-untyped-def]
         async for event in event_bus.subscribe(str(project_id)):
-            yield {
-                "event": event.get("event", "message"),
-                "data": json.dumps(event.get("data", {})),
-            }
+            # Send as unnamed events so EventSource.onmessage receives them.
+            # The event type is included in the JSON data payload.
+            yield {"data": json.dumps(event)}
 
     return EventSourceResponse(event_generator())
 
@@ -27,9 +26,6 @@ async def stream_project_events(project_id: uuid.UUID) -> EventSourceResponse:
 async def stream_node_events(project_id: uuid.UUID, slug: str) -> EventSourceResponse:
     async def event_generator():  # type: ignore[no-untyped-def]
         async for event in event_bus.subscribe(str(project_id), node_slug=slug):
-            yield {
-                "event": event.get("event", "message"),
-                "data": json.dumps(event.get("data", {})),
-            }
+            yield {"data": json.dumps(event)}
 
     return EventSourceResponse(event_generator())

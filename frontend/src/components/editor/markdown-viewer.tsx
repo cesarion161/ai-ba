@@ -8,6 +8,7 @@ import rehypeKatex from "rehype-katex";
 
 interface MarkdownViewerProps {
   content: string;
+  compact?: boolean;
 }
 
 /**
@@ -29,11 +30,17 @@ function normalizeLatex(text: string): string {
   return result;
 }
 
-export function MarkdownViewer({ content }: MarkdownViewerProps) {
+export function MarkdownViewer({ content, compact }: MarkdownViewerProps) {
   const normalized = useMemo(() => normalizeLatex(content), [content]);
 
   return (
-    <div className="prose prose-sm dark:prose-invert max-w-none">
+    <div
+      className={
+        compact
+          ? "prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0"
+          : "prose prose-sm dark:prose-invert max-w-none"
+      }
+    >
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}

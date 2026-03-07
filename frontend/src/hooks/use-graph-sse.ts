@@ -22,6 +22,7 @@ export function useGraphSSE(projectId: string | null) {
         if (eventType.startsWith("node.") || eventType.startsWith("workflow.")) {
           qc.invalidateQueries({ queryKey: ["graph", projectId] });
           qc.invalidateQueries({ queryKey: ["graph-status", projectId] });
+          qc.invalidateQueries({ queryKey: ["nodes", projectId] });
           qc.invalidateQueries({ queryKey: ["project", projectId] });
         }
       } catch {

@@ -1,34 +1,62 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import contextmanager
 from typing import Any
 
+import redis
 import structlog
 
+from app.core.config import get_settings
 from app.worker import celery_app
 
 logger = structlog.get_logger()
 
+WORKFLOW_LOCK_TTL = 300  # 5 minutes max lock
+
+
+@contextmanager
+def _workflow_lock(project_id: str):
+    """Redis-based lock to prevent concurrent workflow runs for the same project."""
+    settings = get_settings()
+    r = redis.from_url(settings.REDIS_URL)
+    lock_key = f"workflow_lock:{project_id}"
+    lock = r.lock(lock_key, timeout=WORKFLOW_LOCK_TTL, blocking_timeout=0)
+    acquired = lock.acquire(blocking=False)
+    if not acquired:
+        logger.info("Workflow already running, skipping", project_id=project_id)
+        yield False
+        return
+    try:
+        yield True
+    finally:
+        try:
+            lock.release()
+        except redis.exceptions.LockNotOwnedError:
+            pass
+
 
 @celery_app.task(
     bind=True,
-    max_retries=3,
+    max_retries=5,
     default_retry_delay=5,
-    autoretry_for=(Exception,),
-    retry_backoff=True,
-    retry_backoff_max=60,
 )
 def run_workflow_task(self: Any, project_id: str) -> dict:
     """Run the workflow DAG for a project."""
     logger.info("Starting workflow", project_id=project_id, task_id=self.request.id)
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    try:
-        result = loop.run_until_complete(_run_workflow(project_id))
-        return result
-    finally:
-        loop.close()
+    with _workflow_lock(project_id) as acquired:
+        if not acquired:
+            # Another task is already running; retry after a delay
+            raise self.retry(countdown=3)
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            result = loop.run_until_complete(_run_workflow(project_id))
+            return result
+        finally:
+            loop.close()
 
 
 @celery_app.task(

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { MarkdownViewer } from "@/components/editor/markdown-viewer";
 
 interface ChatMessageProps {
   role: string;
@@ -21,12 +22,16 @@ export function ChatMessageBubble({ role, content, isStreaming }: ChatMessagePro
             : "bg-muted text-foreground",
         )}
       >
-        <div className="whitespace-pre-wrap break-words">
-          {content}
-          {isStreaming && (
-            <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-current align-middle" />
-          )}
-        </div>
+        {isUser ? (
+          <div className="whitespace-pre-wrap break-words">{content}</div>
+        ) : (
+          <div className="break-words">
+            <MarkdownViewer content={content} compact />
+            {isStreaming && (
+              <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-current align-middle" />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
