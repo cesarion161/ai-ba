@@ -32,9 +32,12 @@ export function useApproveNode(projectId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (slug: string) => approveNode(projectId, slug),
-    onSuccess: () => {
+    onSuccess: (_data, slug) => {
       qc.invalidateQueries({ queryKey: ["nodes", projectId] });
+      qc.invalidateQueries({ queryKey: ["node", projectId, slug] });
       qc.invalidateQueries({ queryKey: ["graph", projectId] });
+      qc.invalidateQueries({ queryKey: ["graph-status", projectId] });
+      qc.invalidateQueries({ queryKey: ["project", projectId] });
     },
   });
 }
@@ -44,9 +47,11 @@ export function useRejectNode(projectId: string) {
   return useMutation({
     mutationFn: ({ slug, feedback }: { slug: string; feedback: string }) =>
       rejectNode(projectId, slug, feedback),
-    onSuccess: () => {
+    onSuccess: (_data, { slug }) => {
       qc.invalidateQueries({ queryKey: ["nodes", projectId] });
+      qc.invalidateQueries({ queryKey: ["node", projectId, slug] });
       qc.invalidateQueries({ queryKey: ["graph", projectId] });
+      qc.invalidateQueries({ queryKey: ["graph-status", projectId] });
     },
   });
 }
@@ -55,9 +60,11 @@ export function useRetryNode(projectId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (slug: string) => retryNode(projectId, slug),
-    onSuccess: () => {
+    onSuccess: (_data, slug) => {
       qc.invalidateQueries({ queryKey: ["nodes", projectId] });
+      qc.invalidateQueries({ queryKey: ["node", projectId, slug] });
       qc.invalidateQueries({ queryKey: ["graph", projectId] });
+      qc.invalidateQueries({ queryKey: ["graph-status", projectId] });
     },
   });
 }
@@ -66,9 +73,12 @@ export function useSkipNode(projectId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (slug: string) => skipNode(projectId, slug),
-    onSuccess: () => {
+    onSuccess: (_data, slug) => {
       qc.invalidateQueries({ queryKey: ["nodes", projectId] });
+      qc.invalidateQueries({ queryKey: ["node", projectId, slug] });
       qc.invalidateQueries({ queryKey: ["graph", projectId] });
+      qc.invalidateQueries({ queryKey: ["graph-status", projectId] });
+      qc.invalidateQueries({ queryKey: ["project", projectId] });
     },
   });
 }

@@ -9,7 +9,7 @@ from app.models.workflow_node import NodeEdge, NodeStatus, WorkflowNode
 
 
 async def resolve_ready_nodes(session: AsyncSession, project_id: uuid.UUID) -> list[WorkflowNode]:
-    """Find PENDING nodes whose ALL upstream dependencies are APPROVED or SKIPPED."""
+    """Find READY nodes and PENDING nodes whose ALL upstream deps are done."""
 
     # Subquery: nodes that have at least one non-completed upstream dependency
     blocked_nodes = (
@@ -20,8 +20,8 @@ async def resolve_ready_nodes(session: AsyncSession, project_id: uuid.UUID) -> l
         .scalar_subquery()
     )
 
-    # Find PENDING nodes not in the blocked set
-    result = await session.execute(
+    # Find PENDING nodes not in the blocked set and promote them to READY
+    pending_result = await session.execute(
         select(WorkflowNode).where(
             and_(
                 WorkflowNode.project_id == project_id,
@@ -30,16 +30,24 @@ async def resolve_ready_nodes(session: AsyncSession, project_id: uuid.UUID) -> l
             )
         )
     )
-    nodes = list(result.scalars().all())
+    newly_ready = list(pending_result.scalars().all())
 
-    # Mark them as READY
-    for node in nodes:
+    for node in newly_ready:
         node.status = NodeStatus.READY
 
-    if nodes:
+    if newly_ready:
         await session.flush()
 
-    return nodes
+    # Return all READY nodes (including those already marked READY during graph creation)
+    ready_result = await session.execute(
+        select(WorkflowNode).where(
+            and_(
+                WorkflowNode.project_id == project_id,
+                WorkflowNode.status == NodeStatus.READY,
+            )
+        )
+    )
+    return list(ready_result.scalars().all())
 
 
 async def propagate_completion(session: AsyncSession, node_id: uuid.UUID) -> list[WorkflowNode]:

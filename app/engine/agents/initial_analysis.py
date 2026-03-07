@@ -30,11 +30,40 @@ class InitialAnalysisAgent:
 
     async def is_requirements_complete(self, history: list[dict[str, str]]) -> dict:
         """Check if we have enough info to proceed."""
-        if len(history) < 4:
+        user_message_count = sum(1 for m in history if m["role"] == "user")
+
+        if user_message_count < 2:
             return {"complete": False, "summary": "Need more conversation"}
 
+        # Hard cap: after 6 user messages, force completion — we have enough to work with
+        if user_message_count >= 6:
+            summary = self._build_forced_summary(history)
+            logger.info(
+                "requirements_forced_complete",
+                user_messages=user_message_count,
+            )
+            return {"complete": True, "summary": summary}
+
+        # Build a message count hint for the prompt
+        if user_message_count >= 4:
+            message_count_hint = (
+                f"The user has sent {user_message_count} messages. "
+                "This is getting long — strongly prefer marking as COMPLETE now "
+                "unless the core idea is truly unclear."
+            )
+        elif user_message_count >= 3:
+            message_count_hint = (
+                f"The user has sent {user_message_count} messages. "
+                "If the basic idea and target market are clear, mark as COMPLETE."
+            )
+        else:
+            message_count_hint = ""
+
         try:
-            check_prompt = prompt_engine.render("chat/requirements_check")
+            check_prompt = prompt_engine.render(
+                "chat/requirements_check",
+                message_count_hint=message_count_hint,
+            )
         except Exception:
             check_prompt = self._default_requirements_check_prompt()
 
@@ -64,6 +93,10 @@ class InitialAnalysisAgent:
             return {"complete": bool(result.get("complete")), "summary": result.get("summary", "")}
         except (json.JSONDecodeError, KeyError):
             logger.warning("Failed to parse requirements check response", response=response)
+            # After 4+ user messages, parsing failure should not block progress
+            if user_message_count >= 4:
+                summary = self._build_forced_summary(history)
+                return {"complete": True, "summary": summary}
             return {"complete": False, "summary": "Could not determine completeness"}
 
     async def get_recommended_doc_types(
@@ -108,6 +141,12 @@ class InitialAnalysisAgent:
             return [str(dt["key"]) for dt in all_doc_types]
 
     @staticmethod
+    def _build_forced_summary(history: list[dict[str, str]]) -> str:
+        """Build a summary from user messages when forcing completion."""
+        user_messages = [m["content"] for m in history if m["role"] == "user"]
+        return "User-provided context: " + " | ".join(user_messages[:6])
+
+    @staticmethod
     def _default_system_prompt() -> str:
         return """You are an AI business analyst helping a user define their business project.
 
@@ -128,12 +167,13 @@ When you have a clear picture, let the user know you're ready to proceed."""
     def _default_requirements_check_prompt() -> str:
         return """\
 You analyze conversations to determine if enough \
-business requirements have been gathered.
+information has been gathered to proceed with automated research.
 
-Requirements are considered complete when we have clear information about:
-- What the business/product is
-- Who the target customers are
-- Basic understanding of the market
-- Revenue/business model direction
+Requirements are COMPLETE when we know:
+- What the business/product is (the core idea)
+- Who the target customers are (even roughly)
+
+Lean toward COMPLETE. The system will research competitors, \
+market data, and technical details automatically.
 
 Respond ONLY with valid JSON: {"complete": true/false, "summary": "brief summary"}"""

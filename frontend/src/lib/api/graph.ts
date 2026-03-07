@@ -44,6 +44,18 @@ export function fetchGraphStatus(
   return apiFetch(`/api/projects/${projectId}/graph/status`);
 }
 
+export interface PreflightResponse {
+  can_run: boolean;
+  issues: string[];
+  node_types: string[];
+}
+
+export function fetchPreflight(
+  projectId: string,
+): Promise<PreflightResponse> {
+  return apiFetch(`/api/projects/${projectId}/graph/preflight`);
+}
+
 // Graph editing
 export function addGraphNode(
   projectId: string,

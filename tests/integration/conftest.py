@@ -1,4 +1,8 @@
-"""Integration test fixtures with real PostgreSQL database."""
+"""Integration test fixtures with real PostgreSQL database.
+
+Uses a dedicated 'ai_business_test' database so tests never touch dev data.
+The database is auto-created if it doesn't exist.
+"""
 
 from __future__ import annotations
 
@@ -10,22 +14,53 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 import app.models  # noqa: F401 — ensure all models are loaded for relationship resolution
+from app.models.database import Base  # used for sorted_tables in TRUNCATE
 
-TEST_DB_URL = "postgresql+asyncpg://postgres:postgres@localhost:5433/ai_business"
+# Separate test database — never wipes the dev database
+_PG_ADMIN_URL = "postgresql+asyncpg://postgres:postgres@localhost:5433/postgres"
+_TEST_DB_NAME = "ai_business_test"
+TEST_DB_URL = f"postgresql+asyncpg://postgres:postgres@localhost:5433/{_TEST_DB_NAME}"
+
+
+async def _ensure_test_db() -> None:
+    """Create the test database if it doesn't exist."""
+    engine = create_async_engine(_PG_ADMIN_URL, isolation_level="AUTOCOMMIT")
+    async with engine.connect() as conn:
+        result = await conn.execute(
+            text("SELECT 1 FROM pg_database WHERE datname = :name"),
+            {"name": _TEST_DB_NAME},
+        )
+        if not result.scalar():
+            await conn.execute(text(f"CREATE DATABASE {_TEST_DB_NAME}"))
+    await engine.dispose()
+
+
+def _run_migrations():
+    """Run Alembic migrations against the test database."""
+    from alembic import command
+    from alembic.config import Config
+
+    alembic_cfg = Config("alembic.ini")
+    sync_url = TEST_DB_URL.replace("+asyncpg", "")
+    alembic_cfg.set_main_option("sqlalchemy.url", sync_url)
+    command.upgrade(alembic_cfg, "head")
 
 
 @pytest_asyncio.fixture
 async def db_session():
     """Provide a clean DB session for each test with its own engine."""
-    # Each test gets its own engine to avoid connection pool conflicts
+    await _ensure_test_db()
+    _run_migrations()
+
     test_engine = create_async_engine(TEST_DB_URL, echo=False)
+
     factory = async_sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
 
     async with factory() as session:
-        # Clean all tables (order matters for FK constraints)
-        await session.execute(
-            text("TRUNCATE node_artifacts, node_edges, workflow_nodes, projects, users CASCADE")
-        )
+        # Clean all tables — use metadata to get the actual table list
+        table_names = [t.name for t in reversed(Base.metadata.sorted_tables)]
+        if table_names:
+            await session.execute(text(f"TRUNCATE {', '.join(table_names)} CASCADE"))
         await session.commit()
         yield session
 

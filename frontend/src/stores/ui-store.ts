@@ -21,6 +21,8 @@ interface UIState {
   selectedProjectId: string | null;
   selectedNodeSlug: string | null;
   isNodeDetailOpen: boolean;
+  centerTab: "graph" | "files";
+  setCenterTab: (tab: "graph" | "files") => void;
   setSelectedProject: (id: string | null) => void;
   setSelectedNode: (slug: string | null) => void;
   openNodeDetail: (slug: string) => void;
@@ -32,6 +34,8 @@ export const useUIStore = create<UIState>((set) => ({
   selectedProjectId: null,
   selectedNodeSlug: null,
   isNodeDetailOpen: false,
+  centerTab: "graph",
+  setCenterTab: (tab) => set({ centerTab: tab }),
   setSelectedProject: (id) => {
     syncProjectIdToURL(id);
     set({ selectedProjectId: id, selectedNodeSlug: null, isNodeDetailOpen: false });

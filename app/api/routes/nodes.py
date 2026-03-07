@@ -61,6 +61,10 @@ async def approve_node(
         node = await node_service.approve_node(db, node)
     except InvalidTransitionError as e:
         raise HTTPException(status_code=409, detail=str(e))
+
+    # Trigger workflow continuation for any newly-ready nodes
+    await _continue_workflow(db, project_id)
+
     return NodeResponse.model_validate(node)
 
 
@@ -116,6 +120,9 @@ async def skip_node(
         node = await node_service.skip_node(db, node)
     except InvalidTransitionError as e:
         raise HTTPException(status_code=409, detail=str(e))
+
+    await _continue_workflow(db, project_id)
+
     return NodeResponse.model_validate(node)
 
 
@@ -148,3 +155,51 @@ async def answer_node(
     node = await _get_node_or_404(db, project_id, slug)
     node = await node_service.submit_answers(db, node, body.answers)
     return NodeResponse.model_validate(node)
+
+
+async def _continue_workflow(db: AsyncSession, project_id: uuid.UUID) -> None:
+    """If there are newly READY nodes, kick off a Celery task to process them."""
+    from sqlalchemy import select, func, and_
+
+    from app.models.workflow_node import NodeStatus, WorkflowNode
+
+    ready_count_result = await db.execute(
+        select(func.count()).select_from(WorkflowNode).where(
+            and_(
+                WorkflowNode.project_id == project_id,
+                WorkflowNode.status == NodeStatus.READY,
+            )
+        )
+    )
+    ready_count = ready_count_result.scalar()
+
+    if ready_count > 0:
+        from app.services import project_service
+        from app.tasks.workflow_tasks import run_workflow_task
+
+        project = await project_service.get_project(db, project_id)
+        if project and project.chat_phase != "executing":
+            project.chat_phase = "executing"
+            await db.commit()
+
+        run_workflow_task.delay(str(project_id))
+    else:
+        # Check if all nodes are done (no pending, ready, or running)
+        from app.services import project_service
+
+        incomplete = await db.execute(
+            select(func.count()).select_from(WorkflowNode).where(
+                and_(
+                    WorkflowNode.project_id == project_id,
+                    WorkflowNode.status.in_([
+                        NodeStatus.PENDING, NodeStatus.READY,
+                        NodeStatus.RUNNING, NodeStatus.AWAITING_REVIEW,
+                    ]),
+                )
+            )
+        )
+        if incomplete.scalar() == 0:
+            project = await project_service.get_project(db, project_id)
+            if project:
+                project.chat_phase = "completed"
+                await db.commit()

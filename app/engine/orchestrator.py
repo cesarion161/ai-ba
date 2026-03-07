@@ -13,6 +13,13 @@ from langgraph.types import Send, interrupt
 from app.engine.handlers.base import get_handler
 from app.engine.state import WorkflowState
 from app.models.workflow_node import NodeStatus
+from app.services.event_bus import (
+    NODE_COMPLETED,
+    NODE_FAILED,
+    NODE_STATUS_CHANGED,
+    WORKFLOW_COMPLETED,
+    event_bus,
+)
 
 logger = structlog.get_logger()
 
@@ -21,8 +28,8 @@ async def scheduler_node(
     state: WorkflowState,
     *,
     session_factory: Any = None,
-) -> list[Send] | dict:
-    """Check which nodes are ready and fan out to them in parallel."""
+) -> dict:
+    """Check which nodes are ready and store their slugs for fan-out."""
     if session_factory is None:
         return {"error": "No session factory provided"}
 
@@ -33,28 +40,30 @@ async def scheduler_node(
         ready_nodes = await resolve_ready_nodes(session, project_id)
         await session.commit()
 
-    if not ready_nodes:
+    slugs = [n.slug for n in ready_nodes]
+
+    if not slugs:
         logger.info("scheduler: no ready nodes, ending", project_id=state["project_id"])
-        return {"error": None}
-
-    sends = []
-    for node in ready_nodes:
-        sends.append(
-            Send(
-                "execute_node",
-                {
-                    **state,
-                    "current_node_slug": node.slug,
-                },
-            )
+        await event_bus.publish(
+            state["project_id"], WORKFLOW_COMPLETED,
+            {"status": "paused_or_complete"},
         )
+    else:
+        logger.info("scheduler: dispatching nodes", count=len(slugs), slugs=slugs)
 
-    logger.info(
-        "scheduler: dispatching nodes",
-        count=len(sends),
-        slugs=[n.slug for n in ready_nodes],
-    )
-    return sends
+    return {"ready_slugs": slugs, "error": None}
+
+
+def _fan_out_ready(state: WorkflowState) -> list[Send] | str:
+    """Conditional edge: fan out to ready nodes or end."""
+    slugs = state.get("ready_slugs", [])
+    if not slugs:
+        return END
+
+    return [
+        Send("execute_node", {**state, "current_node_slug": slug})
+        for slug in slugs
+    ]
 
 
 async def execute_node(
@@ -80,6 +89,10 @@ async def execute_node(
         node.status = NodeStatus.RUNNING
         node.started_at = datetime.now(UTC)
         await session.commit()
+        await event_bus.publish(
+            state["project_id"], NODE_STATUS_CHANGED,
+            {"slug": slug, "status": "running"},
+        )
 
         # Gather input from upstream outputs
         node_results = state.get("node_results", {})
@@ -88,6 +101,11 @@ async def execute_node(
             input_data[dep_slug] = dep_output
         node.input_data = input_data
         await session.commit()
+
+        # Inject requirements summary into input_data for context
+        requirements_summary = state.get("requirements_summary", "")
+        if requirements_summary:
+            input_data["_requirements_summary"] = requirements_summary
 
         # Execute handler
         try:
@@ -98,6 +116,10 @@ async def execute_node(
             node.completed_at = datetime.now(UTC)
             await session.commit()
             logger.error("node execution failed", slug=slug, error=str(e))
+            await event_bus.publish(
+                state["project_id"], NODE_FAILED,
+                {"slug": slug, "status": "failed", "error": str(e)},
+            )
             return {"error": str(e)}
 
         node.output_data = output
@@ -107,6 +129,10 @@ async def execute_node(
         if node.requires_approval:
             node.status = NodeStatus.AWAITING_REVIEW
             await session.commit()
+            await event_bus.publish(
+                state["project_id"], NODE_STATUS_CHANGED,
+                {"slug": slug, "status": "awaiting_review"},
+            )
             # LangGraph interrupt — graph pauses here
             decision = interrupt(
                 {
@@ -129,6 +155,10 @@ async def execute_node(
             node.status = NodeStatus.APPROVED
             node.completed_at = datetime.now(UTC)
             await session.commit()
+            await event_bus.publish(
+                state["project_id"], NODE_COMPLETED,
+                {"slug": slug, "status": "approved"},
+            )
 
         # Propagate completion
         from app.engine.resolver import propagate_completion
@@ -142,27 +172,28 @@ async def execute_node(
     }
 
 
-def build_workflow_graph() -> StateGraph:
-    """Build the reusable workflow StateGraph."""
+def build_workflow_graph(session_factory: Any = None) -> StateGraph:
+    """Build the reusable workflow StateGraph with a bound session factory."""
+    from functools import partial
+
+    if session_factory is not None:
+        bound_scheduler = partial(scheduler_node, session_factory=session_factory)
+        bound_execute = partial(execute_node, session_factory=session_factory)
+    else:
+        bound_scheduler = scheduler_node
+        bound_execute = execute_node
+
     graph = StateGraph(WorkflowState)
 
-    graph.add_node("scheduler", scheduler_node)
-    graph.add_node("execute_node", execute_node)
+    graph.add_node("scheduler", bound_scheduler)
+    graph.add_node("execute_node", bound_execute)
 
     graph.set_entry_point("scheduler")
 
     # After execute_node, go back to scheduler to check for newly ready nodes
     graph.add_edge("execute_node", "scheduler")
 
-    # Scheduler conditionally ends or dispatches (handled by Send returns)
-    graph.add_conditional_edges(
-        "scheduler",
-        lambda state: (
-            END
-            if state.get("error") is not None or not state.get("current_node_slug")
-            else "execute_node"
-        ),
-        {END: END, "execute_node": "execute_node"},
-    )
+    # Scheduler sets ready_slugs, then conditional edge fans out or ends
+    graph.add_conditional_edges("scheduler", _fan_out_ready, ["execute_node", END])
 
     return graph

@@ -31,9 +31,9 @@ export function NodeDetailPanel() {
         </SheetHeader>
 
         {isLoading ? (
-          <NodeDetailSkeleton />
+          <div className="px-4"><NodeDetailSkeleton /></div>
         ) : node ? (
-          <div className="mt-4 space-y-4">
+          <div className="space-y-4 px-4 pb-6">
             <NodeActions projectId={selectedProjectId!} node={node} />
 
             {node.node_type === "ask_user" &&
@@ -68,7 +68,7 @@ export function NodeDetailPanel() {
             </Tabs>
           </div>
         ) : (
-          <p className="mt-4 text-sm text-muted-foreground">Node not found.</p>
+          <p className="mt-4 px-4 text-sm text-muted-foreground">Node not found.</p>
         )}
       </SheetContent>
     </Sheet>

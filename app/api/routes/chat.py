@@ -186,6 +186,7 @@ async def select_documents(
     # Build graph in DB
     await build_graph_from_json(db, project_id, graph_json)
 
+    project.requirements_summary = requirements
     project.chat_phase = "graph_ready"
     await db.flush()
 

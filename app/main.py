@@ -10,6 +10,12 @@ from app.core.middleware import ErrorHandlerMiddleware, RequestIdMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
+    from app.models.database import async_session
+    from app.services.document_type_service import seed_defaults
+
+    async with async_session() as session:
+        await seed_defaults(session)
+
     yield
 
 

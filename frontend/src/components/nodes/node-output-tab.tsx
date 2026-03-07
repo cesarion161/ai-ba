@@ -28,6 +28,7 @@ export function NodeOutputTab({
       ? node.output_data
       : (node.output_data.document as string | undefined) ||
         (node.output_data.summary as string | undefined) ||
+        (node.output_data.result as string | undefined) ||
         JSON.stringify(node.output_data, null, 2);
   const content = String(raw);
 

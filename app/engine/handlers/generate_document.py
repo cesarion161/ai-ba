@@ -24,6 +24,7 @@ class GenerateDocumentHandler:
         template_name = config.get("template", "generic")
 
         # Gather all upstream outputs
+        requirements = input_data.pop("_requirements_summary", "")
         context_parts: dict[str, str] = {}
         for key, data in input_data.items():
             if isinstance(data, dict):
@@ -31,8 +32,6 @@ class GenerateDocumentHandler:
                     context_parts[key] = data["summary"]
                 elif "result" in data:
                     context_parts[key] = data["result"]
-                elif "answers" in data:
-                    context_parts[key] = str(data["answers"])
                 elif "document" in data:
                     context_parts[key] = data["document"]
 
@@ -43,11 +42,13 @@ class GenerateDocumentHandler:
                 research_summary=context_parts.get("web_search", ""),
                 competitor_analysis=context_parts.get("competitor_analysis", ""),
                 market_sizing=context_parts.get("market_sizing", ""),
-                user_answers=context_parts.get("intake_questions", ""),
+                requirements_summary=requirements,
                 user_feedback=user_feedback,
             )
         except Exception:
             prompt = f"Generate a {template_name} document based on:\n\n"
+            if requirements:
+                prompt += f"## Business Requirements\n{requirements}\n\n"
             for key, val in context_parts.items():
                 prompt += f"## {key}\n{val[:1000]}\n\n"
 

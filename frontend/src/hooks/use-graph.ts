@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchGraph,
   fetchGraphStatus,
+  fetchPreflight,
   runGraph,
   deleteGraphNode,
   addGraphNode,
@@ -23,7 +24,7 @@ export function useGraphStatus(projectId: string | null) {
     queryKey: ["graph-status", projectId],
     queryFn: () => fetchGraphStatus(projectId!),
     enabled: !!projectId,
-    refetchInterval: 5000,
+    refetchInterval: 3000,
   });
 }
 
@@ -34,6 +35,7 @@ export function useRunGraph(projectId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["graph", projectId] });
       qc.invalidateQueries({ queryKey: ["graph-status", projectId] });
+      qc.invalidateQueries({ queryKey: ["project", projectId] });
     },
   });
 }
@@ -53,6 +55,14 @@ export function useAddGraphNode(projectId: string) {
     mutationFn: addGraphNode.bind(null, projectId),
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ["graph", projectId] }),
+  });
+}
+
+export function usePreflight(projectId: string | null) {
+  return useQuery({
+    queryKey: ["preflight", projectId],
+    queryFn: () => fetchPreflight(projectId!),
+    enabled: !!projectId,
   });
 }
 

@@ -66,6 +66,10 @@ async def approve_node(session: AsyncSession, node: WorkflowNode) -> WorkflowNod
     await audit_service.record(
         session, "approve", "node", entity_id=node.id, project_id=node.project_id
     )
+    # Propagate: mark downstream nodes as READY if all their deps are done
+    from app.engine.resolver import propagate_completion
+
+    await propagate_completion(session, node.id)
     await session.commit()
     await session.refresh(node)
     return node
@@ -154,6 +158,9 @@ async def skip_node(session: AsyncSession, node: WorkflowNode) -> WorkflowNode:
         entity_id=node.id,
         project_id=node.project_id,
     )
+    from app.engine.resolver import propagate_completion
+
+    await propagate_completion(session, node.id)
     await session.commit()
     await session.refresh(node)
     return node

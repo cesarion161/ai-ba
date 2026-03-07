@@ -26,13 +26,11 @@ class CalculateHandler:
 
         # Gather upstream research data
         research_data = ""
-        business_context = ""
+        business_context = input_data.pop("_requirements_summary", "")
         for key, data in input_data.items():
             if isinstance(data, dict):
                 if "summary" in data:
                     research_data += data["summary"] + "\n\n"
-                if "answers" in data:
-                    business_context = str(data["answers"])
 
         # Use LLM to generate Python calculation code
         code_prompt = (

@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     TAVILY_API_KEY: str = ""
     SERPAPI_API_KEY: str = ""
 
+    # Sandbox
+    E2B_API_KEY: str = ""
+
     # S3 / Object Storage
     S3_BUCKET: str = ""
     S3_REGION: str = "us-east-1"

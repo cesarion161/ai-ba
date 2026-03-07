@@ -61,13 +61,24 @@ export function GraphCanvas({ projectId }: GraphCanvasProps) {
       };
     });
 
-    const rfEdges: RFEdge[] = graphData.edges.map((e) => ({
-      id: `${e.from_slug}-${e.to_slug}`,
-      source: e.from_slug,
-      target: e.to_slug,
-      markerEnd: { type: MarkerType.ArrowClosed, color: "#94a3b8" },
-      style: { stroke: "#94a3b8" },
-    }));
+    const nodeStatusMap = Object.fromEntries(
+      graphData.nodes.map((n) => [n.slug, n.status]),
+    );
+
+    const rfEdges: RFEdge[] = graphData.edges.map((e) => {
+      const sourceStatus = nodeStatusMap[e.from_slug] || "pending";
+      const isDone = sourceStatus === "approved" || sourceStatus === "skipped";
+      const isActive = sourceStatus === "running";
+      const edgeColor = isDone ? "#22C55E" : isActive ? "#3B82F6" : "#94a3b8";
+      return {
+        id: `${e.from_slug}-${e.to_slug}`,
+        source: e.from_slug,
+        target: e.to_slug,
+        markerEnd: { type: MarkerType.ArrowClosed, color: edgeColor },
+        style: { stroke: edgeColor, strokeWidth: isDone ? 2 : 1.5 },
+        animated: isActive,
+      };
+    });
 
     return { initialNodes: rfNodes, initialEdges: rfEdges };
   }, [graphData]);

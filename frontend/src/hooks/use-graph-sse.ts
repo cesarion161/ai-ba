@@ -19,10 +19,10 @@ export function useGraphSSE(projectId: string | null) {
         const parsed = JSON.parse(event.data);
         const eventType = parsed.event || "message";
 
-        if (eventType.startsWith("node.")) {
-          // Invalidate graph data on any node event
+        if (eventType.startsWith("node.") || eventType.startsWith("workflow.")) {
           qc.invalidateQueries({ queryKey: ["graph", projectId] });
           qc.invalidateQueries({ queryKey: ["graph-status", projectId] });
+          qc.invalidateQueries({ queryKey: ["project", projectId] });
         }
       } catch {
         // ignore

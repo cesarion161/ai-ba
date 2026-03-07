@@ -25,6 +25,12 @@ export function NodeActions({ projectId, node }: NodeActionsProps) {
   const retryMutation = useRetryNode(projectId);
   const skipMutation = useSkipNode(projectId);
 
+  const anyPending =
+    approveMutation.isPending ||
+    rejectMutation.isPending ||
+    retryMutation.isPending ||
+    skipMutation.isPending;
+
   if (node.status === "awaiting_review") {
     return (
       <div className="space-y-2">
@@ -32,14 +38,22 @@ export function NodeActions({ projectId, node }: NodeActionsProps) {
           <Button
             size="sm"
             onClick={() => approveMutation.mutate(node.slug)}
-            disabled={approveMutation.isPending}
+            disabled={anyPending}
           >
-            Approve
+            {approveMutation.isPending ? (
+              <>
+                <span className="mr-1.5 inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Approving...
+              </>
+            ) : (
+              "Approve"
+            )}
           </Button>
           <Button
             size="sm"
             variant="destructive"
             onClick={() => setShowReject(!showReject)}
+            disabled={anyPending}
           >
             Reject
           </Button>
@@ -58,9 +72,9 @@ export function NodeActions({ projectId, node }: NodeActionsProps) {
               onClick={() =>
                 rejectMutation.mutate({ slug: node.slug, feedback })
               }
-              disabled={!feedback.trim() || rejectMutation.isPending}
+              disabled={!feedback.trim() || anyPending}
             >
-              Submit Rejection
+              {rejectMutation.isPending ? "Submitting..." : "Submit Rejection"}
             </Button>
           </div>
         )}
