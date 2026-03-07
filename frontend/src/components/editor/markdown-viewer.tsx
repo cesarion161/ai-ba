@@ -17,10 +17,10 @@ interface MarkdownViewerProps {
  *   \( ... \)  (inline math) → $ ... $
  */
 function normalizeLatex(text: string): string {
-  // \[ ... \] → $$ ... $$
-  let result = text.replace(/\\\[(.+?)\\\]/gs, (_, math) => `$$${math}$$`);
+  // \[ ... \] → $$ ... $$ (handle multiline by replacing line by line isn't needed — these are typically single line)
+  let result = text.replace(new RegExp("\\\\\\[(.+?)\\\\\\]", "g"), (_, math) => `$$${math}$$`);
   // \( ... \) → $ ... $
-  result = result.replace(/\\\((.+?)\\\)/gs, (_, math) => `$${math}$`);
+  result = result.replace(new RegExp("\\\\\\((.+?)\\\\\\)", "g"), (_, math) => `$${math}$`);
   // Standalone [ \text{...} ... ] on its own line (LLM-style display math)
   result = result.replace(
     /^\[\s*(\\(?:text|frac|sqrt|times|div|cdot|sum|prod|int|lim|log|ln|sin|cos|tan)\b.+?)\s*\]$/gm,

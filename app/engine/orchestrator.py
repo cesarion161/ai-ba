@@ -94,11 +94,21 @@ async def execute_node(
             {"slug": slug, "status": "running"},
         )
 
-        # Gather input from upstream outputs
-        node_results = state.get("node_results", {})
+        # Gather input from actual upstream node outputs (via DB edges)
+        from sqlalchemy import select as sa_select
+        from app.models.workflow_node import NodeEdge, WorkflowNode as WFNode
+
+        upstream_edges = await session.execute(
+            sa_select(NodeEdge.from_node_id).where(NodeEdge.to_node_id == node.id)
+        )
+        upstream_ids = [row[0] for row in upstream_edges.all()]
+
         input_data: dict[str, Any] = {}
-        for dep_slug, dep_output in node_results.items():
-            input_data[dep_slug] = dep_output
+        for uid in upstream_ids:
+            upstream_node = await session.get(WFNode, uid)
+            if upstream_node and upstream_node.output_data:
+                input_data[upstream_node.slug] = upstream_node.output_data
+
         node.input_data = input_data
         await session.commit()
 

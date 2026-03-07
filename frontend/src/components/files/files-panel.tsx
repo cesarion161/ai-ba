@@ -15,10 +15,15 @@ interface FilesPanelProps {
 function getFileContent(node: Node): string | null {
   if (!node.output_data) return null;
   if (typeof node.output_data === "string") return node.output_data;
+  // Skip ask_user nodes that only have questions (no real content)
+  if (node.node_type === "ask_user") return null;
+  // Skip critic nodes with no real feedback
+  if (node.node_type === "critic_review" && node.output_data.feedback === "No document provided for review.") return null;
   const doc =
     (node.output_data.document as string | undefined) ||
     (node.output_data.summary as string | undefined) ||
-    (node.output_data.result as string | undefined);
+    (node.output_data.result as string | undefined) ||
+    (node.output_data.feedback as string | undefined);
   return doc || null;
 }
 

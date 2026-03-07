@@ -167,7 +167,8 @@ async def skip_node(session: AsyncSession, node: WorkflowNode) -> WorkflowNode:
 
 
 async def submit_answers(session: AsyncSession, node: WorkflowNode, answers: dict) -> WorkflowNode:
-    node.output_data = {"answers": answers}
+    questions = (node.config or {}).get("questions", [])
+    node.output_data = {"answers": answers, "questions": questions}
     node.status = NodeStatus.APPROVED
     node.completed_at = datetime.now(UTC)
     await audit_service.record(
