@@ -45,7 +45,8 @@ async def scheduler_node(
     if not slugs:
         logger.info("scheduler: no ready nodes, ending", project_id=state["project_id"])
         await event_bus.publish(
-            state["project_id"], WORKFLOW_COMPLETED,
+            state["project_id"],
+            WORKFLOW_COMPLETED,
             {"status": "paused_or_complete"},
         )
     else:
@@ -60,10 +61,7 @@ def _fan_out_ready(state: WorkflowState) -> list[Send] | str:
     if not slugs:
         return END
 
-    return [
-        Send("execute_node", {**state, "current_node_slug": slug})
-        for slug in slugs
-    ]
+    return [Send("execute_node", {**state, "current_node_slug": slug}) for slug in slugs]
 
 
 async def execute_node(
@@ -90,13 +88,16 @@ async def execute_node(
         node.started_at = datetime.now(UTC)
         await session.commit()
         await event_bus.publish(
-            state["project_id"], NODE_STATUS_CHANGED,
+            state["project_id"],
+            NODE_STATUS_CHANGED,
             {"slug": slug, "status": "running"},
         )
 
         # Gather input from actual upstream node outputs (via DB edges)
         from sqlalchemy import select as sa_select
-        from app.models.workflow_node import NodeEdge, WorkflowNode as WFNode
+
+        from app.models.workflow_node import NodeEdge
+        from app.models.workflow_node import WorkflowNode as WFNode
 
         upstream_edges = await session.execute(
             sa_select(NodeEdge.from_node_id).where(NodeEdge.to_node_id == node.id)
@@ -108,9 +109,7 @@ async def execute_node(
 
         input_data: dict[str, Any] = {}
         for uid in upstream_ids:
-            result = await session.execute(
-                sa_select(WFNode).where(WFNode.id == uid)
-            )
+            result = await session.execute(sa_select(WFNode).where(WFNode.id == uid))
             upstream_node = result.scalar_one_or_none()
             if upstream_node and upstream_node.output_data:
                 input_data[upstream_node.slug] = upstream_node.output_data
@@ -140,7 +139,8 @@ async def execute_node(
             await session.commit()
             logger.error("node execution failed", slug=slug, error=str(e))
             await event_bus.publish(
-                state["project_id"], NODE_FAILED,
+                state["project_id"],
+                NODE_FAILED,
                 {"slug": slug, "status": "failed", "error": str(e)},
             )
             return {"error": str(e)}
@@ -153,7 +153,8 @@ async def execute_node(
             node.status = NodeStatus.AWAITING_REVIEW
             await session.commit()
             await event_bus.publish(
-                state["project_id"], NODE_STATUS_CHANGED,
+                state["project_id"],
+                NODE_STATUS_CHANGED,
                 {"slug": slug, "status": "awaiting_review"},
             )
             # LangGraph interrupt — graph pauses here
@@ -179,7 +180,8 @@ async def execute_node(
             node.completed_at = datetime.now(UTC)
             await session.commit()
             await event_bus.publish(
-                state["project_id"], NODE_COMPLETED,
+                state["project_id"],
+                NODE_COMPLETED,
                 {"slug": slug, "status": "approved"},
             )
 
@@ -200,8 +202,8 @@ def build_workflow_graph(session_factory: Any = None) -> StateGraph:
     from functools import partial
 
     if session_factory is not None:
-        bound_scheduler = partial(scheduler_node, session_factory=session_factory)
-        bound_execute = partial(execute_node, session_factory=session_factory)
+        bound_scheduler: Any = partial(scheduler_node, session_factory=session_factory)
+        bound_execute: Any = partial(execute_node, session_factory=session_factory)
     else:
         bound_scheduler = scheduler_node
         bound_execute = execute_node

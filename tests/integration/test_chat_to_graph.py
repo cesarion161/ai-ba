@@ -10,7 +10,6 @@ Tests the full lifecycle:
 from __future__ import annotations
 
 from collections.abc import AsyncIterator
-from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -26,6 +25,7 @@ pytestmark = pytest.mark.asyncio
 # LLM mock helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_complete_mock(responses: list[str]) -> AsyncMock:
     """Return a mock for llm_gateway.complete that yields responses in order."""
     mock = AsyncMock(side_effect=list(responses))
@@ -40,6 +40,7 @@ async def _fake_stream(tokens: list[str]) -> AsyncIterator[str]:
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 async def seeded_client(client: AsyncClient, db_session: AsyncSession):
@@ -57,8 +58,9 @@ async def test_requirements_complete_transitions_phase(
     seeded_client: AsyncClient,
     db_session: AsyncSession,
 ) -> None:
-    """When is_requirements_complete returns True, the project phase transitions to selecting_documents."""
+    """Requirements complete transitions phase to selecting_documents."""
     import uuid
+
     from app.models.chat import ChatMessage, ChatRole
     from app.models.project import Project
 
@@ -96,8 +98,10 @@ async def test_requirements_complete_transitions_phase(
 
     # Mock the LLM: streaming response + completeness check returns true
     mock_publish = AsyncMock()
-    with patch("app.services.llm_gateway.llm_gateway") as mock_gw, \
-         patch("app.services.event_bus.EventBus.publish", mock_publish):
+    with (
+        patch("app.services.llm_gateway.llm_gateway") as mock_gw,
+        patch("app.services.event_bus.EventBus.publish", mock_publish),
+    ):
         mock_gw.complete_stream = AsyncMock(
             return_value=_fake_stream(["Sounds like a solid plan!"])
         )
@@ -159,11 +163,11 @@ async def test_select_documents_generates_graph(
     db_session: AsyncSession,
 ) -> None:
     """Selecting document types after requirements are complete builds a valid graph."""
-    from app.models.chat import ChatMessage, ChatRole
-    from app.models.project import Project
-
     # Manually create a project in "selecting_documents" phase
     import uuid
+
+    from app.models.chat import ChatMessage, ChatRole
+    from app.models.project import Project
 
     project = Project(
         user_id=uuid.UUID("00000000-0000-0000-0000-000000000001"),
@@ -182,16 +186,16 @@ async def test_select_documents_generates_graph(
         (ChatRole.USER, "Fashion-conscious millennials, aged 25-35"),
         (ChatRole.ASSISTANT, "I have enough information to proceed."),
     ]:
-        db_session.add(
-            ChatMessage(project_id=project.id, role=role, content=content)
-        )
+        db_session.add(ChatMessage(project_id=project.id, role=role, content=content))
     await db_session.commit()
 
     # Mock the LLM for requirements reorganization and the event bus (no Redis in tests)
     mock_publish = AsyncMock()
-    with patch("app.engine.agents.graph_generator.llm_gateway") as mock_gw, \
-         patch("app.api.routes.chat.event_bus") as mock_bus_route, \
-         patch("app.services.event_bus.EventBus.publish", mock_publish):
+    with (
+        patch("app.engine.agents.graph_generator.llm_gateway") as mock_gw,
+        patch("app.api.routes.chat.event_bus") as mock_bus_route,
+        patch("app.services.event_bus.EventBus.publish", mock_publish),
+    ):
         mock_gw.complete = AsyncMock(
             return_value=(
                 "Business: Vintage clothing marketplace. "
@@ -240,6 +244,7 @@ async def test_select_documents_wrong_phase_rejected(
 ) -> None:
     """Selecting documents when not in selecting_documents phase returns 400."""
     import uuid
+
     from app.models.project import Project
 
     project = Project(

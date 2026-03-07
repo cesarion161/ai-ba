@@ -37,8 +37,9 @@ async def _ensure_test_db() -> None:
 
 def _run_migrations():
     """Run Alembic migrations against the test database."""
-    from alembic import command
     from alembic.config import Config
+
+    from alembic import command
 
     alembic_cfg = Config("alembic.ini")
     sync_url = TEST_DB_URL.replace("+asyncpg", "")

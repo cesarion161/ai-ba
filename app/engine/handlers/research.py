@@ -7,7 +7,6 @@ import structlog
 from app.engine.handlers.base import register_handler
 from app.models.workflow_node import NodeType
 from app.services.llm_gateway import llm_gateway
-from app.services.prompt_engine import prompt_engine
 from app.services.tools.web_search import search_web
 
 logger = structlog.get_logger()
@@ -47,22 +46,27 @@ class ResearchHandler:
 
         # Synthesize with LLM
         research_context = "\n".join(
-            f"- [{r['title']}]({r['url']}): {r['content'][:300]}"
-            for r in all_results[:10]
+            f"- [{r['title']}]({r['url']}): {r['content'][:300]}" for r in all_results[:10]
         )
 
         focus_instruction = {
-            "competitors": "Focus on competitive landscape, strengths/weaknesses, market positioning.",
-            "technology": "Focus on technology stack choices, architecture patterns, tools.",
-            "features": "Focus on feature landscape, what similar products offer, gaps.",
-            "pricing": "Focus on pricing models, strategies, benchmarks in this space.",
-            "ux_patterns": "Focus on UX patterns, user experience best practices, design trends.",
+            "competitors": (
+                "Focus on competitive landscape, strengths/weaknesses, market positioning."
+            ),
+            "technology": ("Focus on technology stack choices, architecture patterns, tools."),
+            "features": ("Focus on feature landscape, what similar products offer, gaps."),
+            "pricing": ("Focus on pricing models, strategies, benchmarks in this space."),
+            "ux_patterns": ("Focus on UX patterns, user experience best practices, design trends."),
         }.get(focus, "Provide a comprehensive market analysis.")
 
+        sys_content = (
+            "You are a market research analyst."
+            " Synthesize the research results into actionable insights."
+        )
         messages = [
             {
                 "role": "system",
-                "content": "You are a market research analyst. Synthesize the research results into actionable insights.",
+                "content": sys_content,
             },
             {
                 "role": "user",

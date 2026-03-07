@@ -17,7 +17,7 @@ from app.api.schemas.chat import (
     DocumentSelectionRequest,
     ProjectFromChatRequest,
 )
-from app.models.database import get_db, async_session
+from app.models.database import async_session, get_db
 from app.services import audit_service, chat_service, document_type_service
 from app.services.event_bus import event_bus
 
@@ -112,9 +112,7 @@ async def send_chat_message(
         # 2. Stream AI response tokens, then the final saved message
         async with async_session() as bg_session:
             try:
-                async for sse_event in chat_service.stream_response_events(
-                    project_id, bg_session
-                ):
+                async for sse_event in chat_service.stream_response_events(project_id, bg_session):
                     yield sse_event
             except Exception:
                 logger.exception("stream_error", project_id=str(project_id))

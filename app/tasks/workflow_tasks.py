@@ -16,7 +16,7 @@ WORKFLOW_LOCK_TTL = 300  # 5 minutes max lock
 
 
 @contextmanager
-def _workflow_lock(project_id: str):
+def _workflow_lock(project_id: str) -> Any:
     """Redis-based lock to prevent concurrent workflow runs for the same project."""
     settings = get_settings()
     r = redis.from_url(settings.REDIS_URL)
@@ -82,7 +82,7 @@ def resume_workflow_task(self: Any, project_id: str, node_slug: str, decision: s
         loop.close()
 
 
-def _make_session_factory():
+def _make_session_factory() -> Any:
     """Create a fresh async engine + session factory for the current event loop."""
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -94,10 +94,9 @@ def _make_session_factory():
 
 
 async def _run_workflow(project_id: str) -> dict:
-    from app.engine.orchestrator import build_workflow_graph
-
     import uuid as _uuid
 
+    from app.engine.orchestrator import build_workflow_graph
     from app.models.project import Project
 
     session_factory = _make_session_factory()
@@ -144,16 +143,22 @@ async def _run_workflow(project_id: str) -> dict:
     # Update project phase based on final state
     import uuid
 
+    from sqlalchemy import and_, func, select
+
     from app.models.project import Project
     from app.models.workflow_node import NodeStatus, WorkflowNode
-    from sqlalchemy import select, func, and_
 
     async with session_factory() as session:
         pid = uuid.UUID(project_id)
         # Check if any nodes are still awaiting review (HITL paused)
         awaiting = await session.execute(
-            select(func.count()).select_from(WorkflowNode).where(
-                and_(WorkflowNode.project_id == pid, WorkflowNode.status == NodeStatus.AWAITING_REVIEW)
+            select(func.count())
+            .select_from(WorkflowNode)
+            .where(
+                and_(
+                    WorkflowNode.project_id == pid,
+                    WorkflowNode.status == NodeStatus.AWAITING_REVIEW,
+                )
             )
         )
         project = await session.get(Project, pid)

@@ -159,19 +159,21 @@ async def answer_node(
 
 async def _continue_workflow(db: AsyncSession, project_id: uuid.UUID) -> None:
     """If there are newly READY nodes, kick off a Celery task to process them."""
-    from sqlalchemy import select, func, and_
+    from sqlalchemy import and_, func, select
 
     from app.models.workflow_node import NodeStatus, WorkflowNode
 
     ready_count_result = await db.execute(
-        select(func.count()).select_from(WorkflowNode).where(
+        select(func.count())
+        .select_from(WorkflowNode)
+        .where(
             and_(
                 WorkflowNode.project_id == project_id,
                 WorkflowNode.status == NodeStatus.READY,
             )
         )
     )
-    ready_count = ready_count_result.scalar()
+    ready_count = ready_count_result.scalar() or 0
 
     if ready_count > 0:
         from app.services import project_service
@@ -188,13 +190,19 @@ async def _continue_workflow(db: AsyncSession, project_id: uuid.UUID) -> None:
         from app.services import project_service
 
         incomplete = await db.execute(
-            select(func.count()).select_from(WorkflowNode).where(
+            select(func.count())
+            .select_from(WorkflowNode)
+            .where(
                 and_(
                     WorkflowNode.project_id == project_id,
-                    WorkflowNode.status.in_([
-                        NodeStatus.PENDING, NodeStatus.READY,
-                        NodeStatus.RUNNING, NodeStatus.AWAITING_REVIEW,
-                    ]),
+                    WorkflowNode.status.in_(
+                        [
+                            NodeStatus.PENDING,
+                            NodeStatus.READY,
+                            NodeStatus.RUNNING,
+                            NodeStatus.AWAITING_REVIEW,
+                        ]
+                    ),
                 )
             )
         )

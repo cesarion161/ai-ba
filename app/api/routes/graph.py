@@ -76,16 +76,25 @@ async def preflight_check(
 
     # Research nodes need Tavily
     if "research" in node_types and not settings.TAVILY_API_KEY:
-        issues.append("Research nodes require TAVILY_API_KEY. Set it in .env or remove research nodes.")
+        issues.append(
+            "Research nodes require TAVILY_API_KEY. Set it in .env or remove research nodes."
+        )
 
     # Calculate nodes need E2B for sandbox execution
     if "calculate" in node_types and not settings.E2B_API_KEY:
-        issues.append("Calculate nodes require E2B_API_KEY for secure code execution. Set it in .env or remove calculate nodes.")
+        issues.append(
+            "Calculate nodes require E2B_API_KEY for secure code execution."
+            " Set it in .env or remove calculate nodes."
+        )
 
     # LLM key needed for everything
-    has_llm_key = bool(settings.OPENAI_API_KEY or settings.ANTHROPIC_API_KEY or settings.GOOGLE_API_KEY)
+    has_llm_key = bool(
+        settings.OPENAI_API_KEY or settings.ANTHROPIC_API_KEY or settings.GOOGLE_API_KEY
+    )
     if not has_llm_key:
-        issues.append("No LLM API key configured. Set OPENAI_API_KEY, ANTHROPIC_API_KEY, or GOOGLE_API_KEY.")
+        issues.append(
+            "No LLM API key configured. Set OPENAI_API_KEY, ANTHROPIC_API_KEY, or GOOGLE_API_KEY."
+        )
 
     return {
         "can_run": len(issues) == 0,
