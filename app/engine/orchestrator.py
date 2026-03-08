@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import uuid
 from datetime import UTC, datetime
 from typing import Any
@@ -10,9 +11,13 @@ import structlog
 from langgraph.graph import END, StateGraph
 from langgraph.types import Send, interrupt
 
+from app.engine.errors import NonRetryableError, is_non_retryable
 from app.engine.handlers.base import get_handler
 from app.engine.state import WorkflowState
 from app.models.workflow_node import NodeStatus
+
+MAX_NODE_RETRIES = 3
+RETRY_BACKOFF = [2, 5, 10]
 from app.services.event_bus import (
     NODE_COMPLETED,
     NODE_FAILED,
@@ -136,14 +141,60 @@ async def execute_node(
             handler = get_handler(node.node_type)
             output = await handler.execute(node_config, input_data, node.user_feedback)
         except Exception as e:
+            # Classify the error: non-retryable → fail immediately
+            if is_non_retryable(e):
+                node.status = NodeStatus.FAILED
+                node.completed_at = datetime.now(UTC)
+                await session.commit()
+                logger.error(
+                    "node failed permanently",
+                    slug=slug,
+                    error=str(e),
+                )
+                await event_bus.publish(
+                    state["project_id"],
+                    NODE_FAILED,
+                    {"slug": slug, "status": "failed", "error": str(e), "retryable": False},
+                )
+                return {"error": str(e)}
+
+            # Retryable: check retry budget
+            if node.retry_count < MAX_NODE_RETRIES:
+                node.retry_count += 1
+                backoff = RETRY_BACKOFF[min(node.retry_count - 1, len(RETRY_BACKOFF) - 1)]
+                logger.warning(
+                    "node failed, will retry",
+                    slug=slug,
+                    attempt=node.retry_count,
+                    max_retries=MAX_NODE_RETRIES,
+                    backoff=backoff,
+                    error=str(e),
+                )
+                await asyncio.sleep(backoff)
+                node.status = NodeStatus.READY
+                node.started_at = None
+                await session.commit()
+                await event_bus.publish(
+                    state["project_id"],
+                    NODE_STATUS_CHANGED,
+                    {"slug": slug, "status": "ready", "retry": node.retry_count},
+                )
+                return {"error": None}
+
+            # Retries exhausted → fail
             node.status = NodeStatus.FAILED
             node.completed_at = datetime.now(UTC)
             await session.commit()
-            logger.error("node execution failed", slug=slug, error=str(e))
+            logger.error(
+                "node failed after max retries",
+                slug=slug,
+                retries=node.retry_count,
+                error=str(e),
+            )
             await event_bus.publish(
                 state["project_id"],
                 NODE_FAILED,
-                {"slug": slug, "status": "failed", "error": str(e)},
+                {"slug": slug, "status": "failed", "error": str(e), "retryable": False},
             )
             return {"error": str(e)}
 

@@ -9,6 +9,7 @@ from litellm import acompletion
 
 from app.core.config import get_settings
 from app.core.llm_config import get_model_config
+from app.engine.errors import NonRetryableError, is_non_retryable, should_skip_model
 
 logger = structlog.get_logger()
 
@@ -34,8 +35,12 @@ class LLMGateway:
         temperature: float,
         max_tokens: int,
         **kwargs: Any,
-    ) -> str | None:
-        """Try a single model with retry logic for transient errors."""
+    ) -> tuple[str | None, Exception | None]:
+        """Try a single model with retry logic for transient errors.
+
+        Returns (content, last_error) — content is None on failure.
+        """
+        last_error: Exception | None = None
         for attempt in range(MAX_RETRIES):
             try:
                 response = await acompletion(
@@ -52,8 +57,13 @@ class LLMGateway:
                     input_tokens=response.usage.prompt_tokens,
                     output_tokens=response.usage.completion_tokens,
                 )
-                return cast(str, content)
+                return cast(str, content), None
             except Exception as e:
+                last_error = e
+                # Non-retryable or model-specific: bail to next fallback
+                if is_non_retryable(e) or should_skip_model(e):
+                    logger.warning("llm_skip_model", model=model, error=str(e))
+                    return None, e
                 if _is_transient(e) and attempt < MAX_RETRIES - 1:
                     wait = BACKOFF_SECONDS[attempt]
                     logger.warning(
@@ -66,8 +76,8 @@ class LLMGateway:
                     await asyncio.sleep(wait)
                     continue
                 logger.warning("llm_model_failed", model=model, error=str(e))
-                return None
-        return None
+                return None, e
+        return None, last_error
 
     async def complete(
         self,
@@ -92,13 +102,19 @@ class LLMGateway:
             fallbacks = self.settings.FALLBACK_MODELS
 
         models_to_try = [model] + fallbacks
+        last_error: Exception | None = None
 
         for m in models_to_try:
-            result = await self._complete_with_retry(m, messages, temperature, max_tokens, **kwargs)
+            result, err = await self._complete_with_retry(m, messages, temperature, max_tokens, **kwargs)
             if result is not None:
                 return result
+            last_error = err
+            # Content/request-level errors apply to all models — stop immediately
+            if last_error and is_non_retryable(last_error):
+                raise NonRetryableError(f"Permanent failure: {last_error}") from last_error
+            # Model-specific errors (auth, model_not_found) — continue to fallback
 
-        raise RuntimeError("All models failed after retries")
+        raise RuntimeError(f"All models failed after retries: {last_error}")
 
     async def complete_stream(
         self,

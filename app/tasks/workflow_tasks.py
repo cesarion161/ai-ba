@@ -36,9 +36,12 @@ def _workflow_lock(project_id: str) -> Any:
             pass
 
 
+MAX_TASK_RETRIES = 3
+
+
 @celery_app.task(
     bind=True,
-    max_retries=5,
+    max_retries=MAX_TASK_RETRIES + 2,  # extra headroom for lock contention retries
     default_retry_delay=5,
 )
 def run_workflow_task(self: Any, project_id: str) -> dict:
@@ -47,7 +50,6 @@ def run_workflow_task(self: Any, project_id: str) -> dict:
 
     with _workflow_lock(project_id) as acquired:
         if not acquired:
-            # Another task is already running; retry after a delay
             raise self.retry(countdown=3)
 
         loop = asyncio.new_event_loop()
@@ -55,6 +57,33 @@ def run_workflow_task(self: Any, project_id: str) -> dict:
         try:
             result = loop.run_until_complete(_run_workflow(project_id))
             return result
+        except Exception as e:
+            # The LangGraph execution crashed — reset stuck RUNNING nodes
+            # so the next attempt can pick them up.
+            logger.error(
+                "workflow task failed, resetting running nodes",
+                project_id=project_id,
+                error=str(e),
+                attempt=self.request.retries,
+            )
+            try:
+                loop.run_until_complete(_reset_running_nodes(project_id))
+            except Exception:
+                logger.exception("failed to reset running nodes", project_id=project_id)
+
+            from app.engine.errors import is_non_retryable
+
+            if is_non_retryable(e):
+                logger.error("workflow failed permanently", project_id=project_id, error=str(e))
+                loop.run_until_complete(_mark_project_failed(project_id))
+                return {"status": "failed", "project_id": project_id, "error": str(e)}
+
+            if self.request.retries < MAX_TASK_RETRIES:
+                raise self.retry(exc=e, countdown=5 * (self.request.retries + 1))
+
+            logger.error("workflow retries exhausted", project_id=project_id, error=str(e))
+            loop.run_until_complete(_mark_project_failed(project_id))
+            return {"status": "failed", "project_id": project_id, "error": str(e)}
         finally:
             loop.close()
 
@@ -91,6 +120,45 @@ def _make_session_factory() -> Any:
     settings = get_settings()
     engine = create_async_engine(settings.DATABASE_URL, echo=settings.DEBUG)
     return async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+
+async def _reset_running_nodes(project_id: str) -> None:
+    """Reset any RUNNING nodes back to READY so they can be retried."""
+    import uuid as _uuid
+
+    session_factory = _make_session_factory()
+    async with session_factory() as session:
+        from sqlalchemy import select
+
+        from app.models.workflow_node import NodeStatus, WorkflowNode
+
+        pid = _uuid.UUID(project_id)
+        stale = await session.execute(
+            select(WorkflowNode).where(
+                WorkflowNode.project_id == pid,
+                WorkflowNode.status == NodeStatus.RUNNING,
+            )
+        )
+        for node in stale.scalars().all():
+            logger.info("resetting crashed running node", slug=node.slug)
+            node.status = NodeStatus.READY
+            node.started_at = None
+        await session.commit()
+
+
+async def _mark_project_failed(project_id: str) -> None:
+    """Mark the project as failed after retries exhausted."""
+    import uuid as _uuid
+
+    session_factory = _make_session_factory()
+    async with session_factory() as session:
+        from app.models.project import Project
+
+        pid = _uuid.UUID(project_id)
+        project = await session.get(Project, pid)
+        if project:
+            project.status = "failed"
+            await session.commit()
 
 
 async def _run_workflow(project_id: str) -> dict:
