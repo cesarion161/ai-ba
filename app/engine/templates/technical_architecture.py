@@ -14,8 +14,8 @@ TECHNICAL_ARCHITECTURE = WorkflowTemplate(
             config={
                 "questions": [
                     "Describe the product and its core functionality.",
-                    "What is your team's technical expertise? (Languages, frameworks, cloud platforms)",
-                    "What are your scalability requirements? (Expected users at launch, 6 months, 1 year)",
+                    "What is your team's technical expertise?",
+                    "What are your scalability requirements? (Users at launch, 6mo, 1yr)",
                     "What external systems or APIs must be integrated?",
                     "What are your availability/uptime requirements?",
                     "Are there data residency or compliance constraints on infrastructure?",

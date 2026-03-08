@@ -16,12 +16,12 @@ BUSINESS_REQUIREMENTS = WorkflowTemplate(
             config={
                 "questions": [
                     "Describe your product or service idea in detail.",
-                    "Describe the key business processes that the product will support or automate.",
-                    "What business rules govern your domain? (e.g., approval thresholds, pricing rules, eligibility criteria)",
+                    "Describe the key business processes to support or automate.",
+                    "What business rules govern your domain? (e.g., approvals, pricing)",
                     "What compliance or regulatory requirements apply?",
                     "Who are the key user roles and what actions can each role perform?",
                     "What are the critical data entities in your business?",
-                    "What constraints exist? (Budget, timeline, regulations, technical limitations)",
+                    "What constraints exist? (Budget, timeline, regulations, team)",
                 ]
             },
         ),

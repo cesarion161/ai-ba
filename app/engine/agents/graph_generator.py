@@ -27,18 +27,28 @@ _SIZING_SLUGS = [
     "competitor_analysis",
     "market_sizing",
 ]
+_FEASIBILITY_SLUGS = [
+    "intake_questions",
+    "web_search",
+    "competitor_analysis",
+    "market_sizing",
+    "lean_canvas",
+    "lean_canvas_critic",
+    "feasibility_assessment",
+    "feasibility_critic",
+]
 _ROADMAP_SLUGS = [
     "product_questions",
     "feature_research",
     "pricing_research",
     "product_roadmap",
-    "roadmap_critic",
+    "product_roadmap_critic",
 ]
 _STORIES_SLUGS = [
     "ux_questions",
     "ux_research",
     "user_stories",
-    "stories_critic",
+    "user_stories_critic",
 ]
 _ARCH_SLUGS = [
     "tech_questions",
@@ -50,17 +60,59 @@ _EXEC_SLUGS = [
     "execution_questions",
     "cost_estimation",
     "execution_plan",
-    "plan_critic",
+    "execution_plan_critic",
+]
+_BRD_SLUGS = [
+    "brd_questions",
+    "business_rules",
+    "process_model",
+    "brd",
+    "brd_critic",
+]
+_BUSINESS_RULES_SLUGS = [
+    "brd_questions",
+    "business_rules",
+]
+_PROCESS_MODEL_SLUGS = [
+    "brd_questions",
+    "process_model",
+]
+_API_CONTRACTS_SLUGS = [
+    "delivery_questions",
+    "api_contracts",
+]
+_DATA_MODEL_SLUGS = [
+    "delivery_questions",
+    "data_model_spec",
+]
+_QA_STRATEGY_SLUGS = [
+    "delivery_questions",
+    "qa_strategy",
+]
+_TRACEABILITY_SLUGS = [
+    "delivery_questions",
+    "api_contracts",
+    "data_model_spec",
+    "qa_strategy",
+    "traceability_matrix",
 ]
 
 DOC_TYPE_TO_TEMPLATE: dict[str, list[tuple[str, list[str]]]] = {
     "lean_canvas": [("market_research", _LEAN_CANVAS_SLUGS)],
     "competitor_analysis": [("market_research", _COMPETITOR_SLUGS)],
     "market_sizing": [("market_research", _SIZING_SLUGS)],
+    "feasibility_assessment": [("market_research", _FEASIBILITY_SLUGS)],
     "product_roadmap": [("product_strategy", _ROADMAP_SLUGS)],
     "user_stories": [("ux_requirements", _STORIES_SLUGS)],
     "architecture_doc": [("technical_architecture", _ARCH_SLUGS)],
     "execution_plan": [("execution_planning", _EXEC_SLUGS)],
+    "brd": [("business_requirements", _BRD_SLUGS)],
+    "business_rules": [("business_requirements", _BUSINESS_RULES_SLUGS)],
+    "process_model": [("business_requirements", _PROCESS_MODEL_SLUGS)],
+    "api_contracts": [("delivery", _API_CONTRACTS_SLUGS)],
+    "data_model_spec": [("delivery", _DATA_MODEL_SLUGS)],
+    "qa_strategy": [("delivery", _QA_STRATEGY_SLUGS)],
+    "traceability_matrix": [("delivery", _TRACEABILITY_SLUGS)],
 }
 
 

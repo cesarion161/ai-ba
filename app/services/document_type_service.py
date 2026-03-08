@@ -87,6 +87,94 @@ DEFAULT_DOCUMENT_TYPES: list[dict[str, Any]] = [
         "category": "planning",
         "default_dependencies": ["market_sizing", "product_roadmap"],
     },
+    {
+        "key": "feasibility_assessment",
+        "label": "Feasibility Assessment",
+        "description": (
+            "Seven-axis viability stress test covering business, "
+            "technical, legal, operational, financial, schedule, "
+            "and strategic feasibility with go/no-go recommendation."
+        ),
+        "category": "strategy",
+        "default_dependencies": ["lean_canvas"],
+    },
+    {
+        "key": "brd",
+        "label": "Business Requirements Document",
+        "description": (
+            "Formal BRD with numbered requirements, measurable "
+            "acceptance criteria, business rules catalog, and "
+            "traceability to business objectives."
+        ),
+        "category": "requirements",
+        "default_dependencies": ["lean_canvas"],
+    },
+    {
+        "key": "business_rules",
+        "label": "Business Rules Catalog",
+        "description": (
+            "Comprehensive catalog of business rules across "
+            "access control, validation, pricing, notifications, "
+            "compliance, and operational categories."
+        ),
+        "category": "requirements",
+        "default_dependencies": [],
+    },
+    {
+        "key": "process_model",
+        "label": "Business Process Model",
+        "description": (
+            "Current and future-state process flows with "
+            "Mermaid diagrams, service blueprint, RACI matrix, "
+            "and process improvement opportunities."
+        ),
+        "category": "requirements",
+        "default_dependencies": [],
+    },
+    {
+        "key": "api_contracts",
+        "label": "API & Event Contracts",
+        "description": (
+            "API endpoint specifications with request/response "
+            "schemas, error codes, rate limits, versioning "
+            "strategy, and event contracts."
+        ),
+        "category": "technical",
+        "default_dependencies": ["architecture_doc"],
+    },
+    {
+        "key": "data_model_spec",
+        "label": "Data Model Specification",
+        "description": (
+            "Entity definitions with field-level detail, PII "
+            "classification, retention policies, ER diagrams, "
+            "and migration strategy."
+        ),
+        "category": "technical",
+        "default_dependencies": ["architecture_doc"],
+    },
+    {
+        "key": "qa_strategy",
+        "label": "QA & Test Strategy",
+        "description": (
+            "Test pyramid, performance and security testing "
+            "plans, UAT procedures, quality gates, and "
+            "environment strategy."
+        ),
+        "category": "delivery",
+        "default_dependencies": ["user_stories", "architecture_doc"],
+    },
+    {
+        "key": "traceability_matrix",
+        "label": "Traceability Matrix",
+        "description": (
+            "Cross-reference matrix linking business objectives "
+            "to requirements, features, user stories, test "
+            "cases, and acceptance criteria."
+        ),
+        "category": "delivery",
+        "default_dependencies": ["brd", "user_stories", "qa_strategy"],
+    },
 ]
 
 

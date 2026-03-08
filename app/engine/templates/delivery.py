@@ -15,11 +15,11 @@ DELIVERY = WorkflowTemplate(
             requires_approval=False,
             config={
                 "questions": [
-                    "Describe the product architecture at a high level. (Services, databases, external integrations)",
+                    "Describe the product architecture at a high level.",
                     "What are the core API endpoints or service interfaces?",
                     "What are the main data entities and their relationships?",
                     "What are the critical user stories and acceptance criteria?",
-                    "What are the non-functional requirements? (Performance, security, availability targets)",
+                    "What are the non-functional requirements? (Performance, security)",
                     "What is the team's testing approach and tooling preferences?",
                 ]
             },

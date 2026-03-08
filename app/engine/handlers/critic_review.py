@@ -21,18 +21,30 @@ _REVIEW_CONFIGS: dict[str, dict[str, str]] = {
         "criteria": """\
 ## Evaluation Criteria for Architecture Document
 
-1. **Specificity**: Does it name exact services, tools, libraries, and configurations — or does it hand-wave with "use a cache" / "use a message queue"?
-2. **Trade-off analysis**: Does every major decision include alternatives considered and trade-offs? Or are choices presented without justification?
-3. **Failure modes**: Does it address what happens when things break? Circuit breakers, retries, dead letter queues, failover, graceful degradation?
-4. **Cost awareness**: Are there cost estimates? Does it consider the difference between $50/mo and $5000/mo choices?
-5. **Scalability realism**: Does it identify specific bottlenecks and how to address them at 10x and 100x scale?
-6. **Diagrams**: Are there Mermaid diagrams for system architecture, data flow, and ER? Are they detailed or superficial?
-7. **Security**: Authentication, authorization, encryption, secrets management, compliance — all addressed?
-8. **Operational readiness**: CI/CD, monitoring, logging, alerting, runbooks — would an ops team know what to do?
-9. **Data architecture**: Database choices justified? Schema design? Caching strategy multi-level? Event/message patterns?
-10. **Patterns**: Are relevant patterns (circuit breaker, saga, outbox, CQRS, bulkhead) discussed — either used with justification or explicitly excluded with reasoning?
-11. **Completeness**: Could a senior engineering team start implementation from this document alone?
-12. **Implementation readiness**: Are API endpoints specified? Data models defined? Service boundaries clear?""",
+1. **Specificity**: Does it name exact services, tools, libraries,
+and configurations — or hand-wave with vague suggestions?
+2. **Trade-off analysis**: Does every major decision include
+alternatives and trade-offs? Or are choices unjustified?
+3. **Failure modes**: Does it address what happens when things break?
+Retries, circuit breakers, failover, graceful degradation?
+4. **Cost awareness**: Are there cost estimates?
+Does it distinguish $50/mo vs $5000/mo choices?
+5. **Scalability realism**: Does it identify bottlenecks
+and how to address them at 10x and 100x scale?
+6. **Diagrams**: Are there Mermaid diagrams for architecture,
+data flow, and ER? Are they detailed or superficial?
+7. **Security**: Auth, encryption, secrets management,
+compliance — all addressed?
+8. **Operational readiness**: CI/CD, monitoring, logging,
+alerting, runbooks — would an ops team know what to do?
+9. **Data architecture**: Database choices justified?
+Schema design? Caching strategy? Event patterns?
+10. **Patterns**: Are relevant patterns (circuit breaker, saga,
+CQRS, bulkhead) discussed with justification?
+11. **Completeness**: Could an engineering team start
+implementation from this document alone?
+12. **Implementation readiness**: Are API endpoints specified?
+Data models defined? Service boundaries clear?""",
     },
     "execution_planning": {
         "system": (
@@ -74,10 +86,14 @@ _REVIEW_CONFIGS: dict[str, dict[str, str]] = {
         "criteria": """\
 ## Evaluation Criteria for Market Research / Feasibility Document
 
-1. **Evidence quality**: Are claims grounded in research data or are they assumptions stated as facts?
-2. **Market sizing rigor**: Are TAM/SAM/SOM calculations specific with stated methodology, or vague investor-style claims?
-3. **Competitor coverage**: Are real competitors identified with specific strengths/weaknesses, or is the analysis superficial?
-4. **Feasibility honesty**: Does the assessment flag real risks and RED/AMBER ratings where warranted, or is everything green?
+1. **Evidence quality**: Are claims grounded in research data
+or are they assumptions stated as facts?
+2. **Market sizing rigor**: Are TAM/SAM/SOM calculations
+specific with stated methodology, or vague claims?
+3. **Competitor coverage**: Are real competitors identified
+with specific strengths/weaknesses?
+4. **Feasibility honesty**: Does the assessment flag real risks
+and RED/AMBER ratings, or is everything green?
 5. **Unit economics**: Are CAC, LTV, payback period calculated with stated assumptions?
 6. **Assumptions visibility**: Are key assumptions explicitly listed with validation methods?
 7. **Go/no-go clarity**: Is the recommendation clear and actionable with specific conditions?""",
@@ -91,16 +107,25 @@ _REVIEW_CONFIGS: dict[str, dict[str, str]] = {
         "criteria": """\
 ## Evaluation Criteria for Business Requirements Package
 
-1. **Measurability**: Does every business requirement have a measurable outcome? "User-friendly" is not a requirement.
-2. **Traceability**: Do requirements trace to business objectives? Can you follow the chain from goal to requirement?
-3. **Business rules completeness**: Are business rules specific and unambiguous? Do they cover failure/exception cases, not just happy paths?
-4. **Process coverage**: Are current-state and future-state processes documented? Are exception flows and handoffs identified?
-5. **Service blueprint**: Does the process model connect frontstage UX to backstage systems and operations?
-6. **Constraints and assumptions**: Are constraints, assumptions, and dependencies explicitly stated — not hidden?
+1. **Measurability**: Does every requirement have a measurable
+outcome? "User-friendly" is not a requirement.
+2. **Traceability**: Do requirements trace to business
+objectives? Can you follow goal to requirement?
+3. **Business rules completeness**: Are rules specific and
+unambiguous? Do they cover failure cases, not just happy paths?
+4. **Process coverage**: Are current/future-state processes
+documented? Are exception flows identified?
+5. **Service blueprint**: Does the process model connect
+frontstage UX to backstage systems?
+6. **Constraints and assumptions**: Are constraints and
+dependencies explicitly stated — not hidden?
 7. **Scope boundaries**: Is it clear what is in-scope and out-of-scope, and why?
-8. **Operational coverage**: Are support, admin, billing, and incident processes documented — not just product features?
-9. **Testability**: Could a QA team write test cases from these requirements without asking questions?
-10. **Consistency**: Do the BRD, business rules, and process model align — or do they contradict each other?""",
+8. **Operational coverage**: Are support, admin, billing, and
+incident processes documented — not just product features?
+9. **Testability**: Could a QA team write test cases from these
+requirements without asking questions?
+10. **Consistency**: Do the BRD, business rules, and process
+model align — or do they contradict each other?""",
     },
     "delivery": {
         "system": (
@@ -111,14 +136,22 @@ _REVIEW_CONFIGS: dict[str, dict[str, str]] = {
         "criteria": """\
 ## Evaluation Criteria for Delivery Documentation
 
-1. **API completeness**: Are all endpoints defined with request/response schemas, error codes, auth, and validation rules?
-2. **Data model precision**: Are entities defined with field types, constraints, PII classification, and retention policies?
-3. **Test coverage mapping**: Does the QA strategy map test scenarios to specific requirements and business rules?
-4. **Traceability**: Can you trace from business objective → requirement → feature → story → test case?
-5. **Performance targets**: Are performance test scenarios specific with target numbers (latency, throughput, concurrent users)?
-6. **Security testing**: Does the QA strategy go beyond "run a scanner" to include specific attack scenarios?
-7. **Gap identification**: Does the traceability matrix honestly identify coverage gaps?
-8. **Implementation readiness**: Could two independent teams build compatible systems from these specifications?""",
+1. **API completeness**: Are all endpoints defined with
+request/response schemas, error codes, and auth?
+2. **Data model precision**: Are entities defined with field
+types, constraints, PII classification, and retention?
+3. **Test coverage mapping**: Does the QA strategy map test
+scenarios to specific requirements and business rules?
+4. **Traceability**: Can you trace from business objective
+to requirement to feature to story to test case?
+5. **Performance targets**: Are performance test scenarios
+specific with target numbers (latency, throughput)?
+6. **Security testing**: Does QA go beyond "run a scanner"
+to include specific attack scenarios?
+7. **Gap identification**: Does the traceability matrix
+honestly identify coverage gaps?
+8. **Implementation readiness**: Could two independent teams
+build compatible systems from these specs?""",
     },
 }
 
@@ -168,7 +201,7 @@ class CriticReviewHandler:
 ## Document to Review
 {document}
 
-{review_config['criteria']}
+{review_config["criteria"]}
 
 Provide:
 - A verdict: "pass" (score >= 7) or "fail" (score < 7)

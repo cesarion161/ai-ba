@@ -14,7 +14,7 @@ UX_REQUIREMENTS = WorkflowTemplate(
             config={
                 "questions": [
                     "Describe your product and the problem it solves.",
-                    "Describe your primary user personas in detail. (Who, what role, what frustrates them?)",
+                    "Describe your primary user personas. (Role, goals, frustrations)",
                     "What are the 3-5 critical user journeys? Walk through each step-by-step.",
                     "What platforms must be supported? (Web, iOS, Android, desktop, API-only)",
                     "What accessibility requirements apply? (WCAG level, screen reader support)",

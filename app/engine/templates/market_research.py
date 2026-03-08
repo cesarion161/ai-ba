@@ -15,7 +15,7 @@ MARKET_RESEARCH = WorkflowTemplate(
                 "questions": [
                     "Describe your product or service idea in detail. What does it do?",
                     "What specific problem does it solve, and how painful is this problem today?",
-                    "Who is your target customer? (Be specific: role, company size, industry, demographics)",
+                    "Who is your target customer? (Role, company size, industry)",
                     "What alternatives or competitors exist today?",
                     "Why now? What market or technology shift makes this the right time?",
                     "What is your expected pricing model and price range?",

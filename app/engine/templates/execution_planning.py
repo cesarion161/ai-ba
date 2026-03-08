@@ -14,11 +14,11 @@ EXECUTION_PLANNING = WorkflowTemplate(
             config={
                 "questions": [
                     "Describe the product to be built and its core features.",
-                    "What is your current team size and composition? (Engineers, designers, PMs, QA)",
+                    "What is your team size and composition? (Engineers, designers, PMs)",
                     "What is your total budget for the build phase? (Include range if uncertain)",
                     "What is your target launch date or timeline constraint?",
                     "Do you have existing infrastructure, CI/CD, or development environments?",
-                    "What is your risk tolerance? (Aggressive timeline vs conservative with buffers)",
+                    "What is your risk tolerance? (Aggressive vs conservative)",
                     "What are the biggest risks you foresee?",
                 ]
             },

@@ -15,7 +15,7 @@ PRODUCT_STRATEGY = WorkflowTemplate(
                 "questions": [
                     "Describe your product idea and the problem it solves.",
                     "What are the core features? List the top 5-10 capabilities.",
-                    "What is your monetization strategy? (subscription, freemium, usage-based, etc.)",
+                    "What is your monetization strategy? (subscription, freemium, etc.)",
                     "What is your product's key differentiator — what makes it 10x better?",
                     "What does the user's 'aha moment' look like? When do they first get value?",
                     "What distribution channels will you use to reach customers?",

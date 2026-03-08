@@ -5,7 +5,7 @@ Flow:
   Phase 2: Business Requirements — BRD questions → business rules + process model → BRD
   Phase 3: Product Strategy — product questions → feature/pricing research → roadmap
   Phase 4: UX & Requirements — UX questions → UX research → user stories
-  Phase 5: Technical Architecture — tech questions → research → architecture → API contracts + data model
+  Phase 5: Technical Architecture — tech questions → research → architecture
   Phase 6: Execution Planning — execution questions → cost estimation → execution plan
   Phase 7: Delivery — QA strategy → traceability matrix
   Phase 8: Densification — role-specific dense references
@@ -42,12 +42,12 @@ FULL_ANALYSIS = WorkflowTemplate(
             config={
                 "questions": [
                     "Describe your product or service idea in detail. What does it do?",
-                    "What specific problem does it solve, and how painful is this problem today? (How much time/money does the current approach cost?)",
-                    "Who is your target customer? (Be specific: role, company size, industry, demographics)",
-                    "What alternatives or competitors exist today? How do people solve this problem without your product?",
-                    "Why now? What market, technology, or regulatory shift makes this the right time?",
+                    "What problem does it solve? How painful is it today?",
+                    "Who is your target customer? (Role, company size, industry)",
+                    "What alternatives or competitors exist today?",
+                    "Why now? What market or technology shift makes this timely?",
                     "What is your expected pricing model and price range?",
-                    "What constraints already exist? (Budget, timeline, regulations, technical limitations, team size)",
+                    "What constraints exist? (Budget, timeline, regulations, team)",
                     "What would make this project fail? (Top 3 risks you're most worried about)",
                 ]
             },
@@ -121,11 +121,11 @@ FULL_ANALYSIS = WorkflowTemplate(
             requires_approval=False,
             config={
                 "questions": [
-                    "Describe the key business processes that the product will support or automate. What does the workflow look like today?",
-                    "What business rules govern your domain? (e.g., approval thresholds, pricing rules, eligibility criteria, retry policies)",
-                    "What compliance or regulatory requirements apply? (GDPR, HIPAA, SOC 2, industry-specific)",
+                    "Describe the key business processes to support or automate.",
+                    "What business rules govern your domain? (e.g., approvals, pricing)",
+                    "What compliance or regulatory requirements apply?",
                     "Who are the key user roles and what actions can each role perform?",
-                    "What are the critical data entities in your business? (e.g., orders, customers, products, transactions)",
+                    "What are the critical data entities in your business?",
                 ]
             },
         ),
@@ -176,10 +176,10 @@ FULL_ANALYSIS = WorkflowTemplate(
             config={
                 "questions": [
                     "What are the core features of your product? List the top 5-10 capabilities.",
-                    "What is your monetization strategy? (subscription, freemium, usage-based, marketplace, etc.)",
-                    "What is your product's key differentiator — what makes it 10x better than alternatives?",
+                    "What is your monetization strategy? (subscription, freemium, etc.)",
+                    "What is your product's key differentiator?",
                     "What does the user's 'aha moment' look like? When do they first get value?",
-                    "What distribution channels will you use to reach customers? (PLG, sales-led, partnerships, content, etc.)",
+                    "What distribution channels will you use to reach customers?",
                 ]
             },
         ),
@@ -227,11 +227,11 @@ FULL_ANALYSIS = WorkflowTemplate(
             requires_approval=False,
             config={
                 "questions": [
-                    "Describe your primary user personas in detail. (Who are they, what do they do, what frustrates them?)",
+                    "Describe your primary user personas. (Role, goals, frustrations)",
                     "What are the 3-5 critical user journeys? Walk through each step-by-step.",
                     "What platforms must be supported? (Web, iOS, Android, desktop app, API-only)",
-                    "What accessibility requirements apply? (WCAG level, screen reader support, etc.)",
-                    "What does a successful first-time user experience look like? What should happen in the first 5 minutes?",
+                    "What accessibility requirements apply? (WCAG level, etc.)",
+                    "What does a successful first-time user experience look like?",
                 ]
             },
         ),
@@ -271,11 +271,11 @@ FULL_ANALYSIS = WorkflowTemplate(
             requires_approval=False,
             config={
                 "questions": [
-                    "What is your team's technical expertise? (Languages, frameworks, cloud platforms)",
-                    "What are your scalability requirements? (Expected users at launch, 6 months, 1 year)",
-                    "What external systems or APIs must be integrated? (Payment, auth, CRM, analytics, etc.)",
+                    "What is your team's technical expertise?",
+                    "What are your scalability requirements? (Users at launch, 6mo, 1yr)",
+                    "What external systems or APIs must be integrated?",
                     "What are your availability/uptime requirements? (99.9%? 99.99%?)",
-                    "Are there data residency or compliance constraints on infrastructure? (EU-only, HIPAA, etc.)",
+                    "Are there data residency or compliance constraints?",
                 ]
             },
         ),
@@ -332,11 +332,11 @@ FULL_ANALYSIS = WorkflowTemplate(
             requires_approval=False,
             config={
                 "questions": [
-                    "What is your current team size and composition? (Engineers, designers, PMs, QA)",
-                    "What is your total budget for the build phase? (Include range if uncertain)",
+                    "What is your team size and composition? (Engineers, designers, PMs)",
+                    "What is your total budget for the build phase?",
                     "What is your target launch date or timeline constraint?",
-                    "Do you have existing infrastructure, CI/CD, or development environments?",
-                    "What is your risk tolerance? (Aggressive timeline vs conservative with buffers)",
+                    "Do you have existing infrastructure or CI/CD?",
+                    "What is your risk tolerance? (Aggressive vs conservative)",
                 ]
             },
         ),
