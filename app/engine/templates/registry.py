@@ -1,4 +1,6 @@
 from app.engine.templates.base import WorkflowTemplate
+from app.engine.templates.business_requirements import BUSINESS_REQUIREMENTS
+from app.engine.templates.delivery import DELIVERY
 from app.engine.templates.densification import DENSIFICATION
 from app.engine.templates.execution_planning import EXECUTION_PLANNING
 from app.engine.templates.export import EXPORT
@@ -14,6 +16,8 @@ TEMPLATE_REGISTRY: dict[str, WorkflowTemplate] = {
     UX_REQUIREMENTS.key: UX_REQUIREMENTS,
     TECHNICAL_ARCHITECTURE.key: TECHNICAL_ARCHITECTURE,
     EXECUTION_PLANNING.key: EXECUTION_PLANNING,
+    BUSINESS_REQUIREMENTS.key: BUSINESS_REQUIREMENTS,
+    DELIVERY.key: DELIVERY,
     DENSIFICATION.key: DENSIFICATION,
     EXPORT.key: EXPORT,
     FULL_ANALYSIS.key: FULL_ANALYSIS,

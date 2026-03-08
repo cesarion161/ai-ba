@@ -65,6 +65,61 @@ _REVIEW_CONFIGS: dict[str, dict[str, str]] = {
 5. **Technical feasibility**: Are dependencies on technical work identified?
 6. **Competitive advantage**: Does it articulate clear differentiation?""",
     },
+    "market_research": {
+        "system": (
+            "You are a senior business strategist and feasibility analyst reviewing "
+            "a market research or feasibility document. You focus on evidence quality, "
+            "assumption validity, and honest assessment of risks."
+        ),
+        "criteria": """\
+## Evaluation Criteria for Market Research / Feasibility Document
+
+1. **Evidence quality**: Are claims grounded in research data or are they assumptions stated as facts?
+2. **Market sizing rigor**: Are TAM/SAM/SOM calculations specific with stated methodology, or vague investor-style claims?
+3. **Competitor coverage**: Are real competitors identified with specific strengths/weaknesses, or is the analysis superficial?
+4. **Feasibility honesty**: Does the assessment flag real risks and RED/AMBER ratings where warranted, or is everything green?
+5. **Unit economics**: Are CAC, LTV, payback period calculated with stated assumptions?
+6. **Assumptions visibility**: Are key assumptions explicitly listed with validation methods?
+7. **Go/no-go clarity**: Is the recommendation clear and actionable with specific conditions?""",
+    },
+    "business_requirements": {
+        "system": (
+            "You are a senior business analyst reviewing a Business Requirements Document, "
+            "Business Rules Catalog, and Business Process Model. You focus on completeness, "
+            "testability, and traceability of requirements."
+        ),
+        "criteria": """\
+## Evaluation Criteria for Business Requirements Package
+
+1. **Measurability**: Does every business requirement have a measurable outcome? "User-friendly" is not a requirement.
+2. **Traceability**: Do requirements trace to business objectives? Can you follow the chain from goal to requirement?
+3. **Business rules completeness**: Are business rules specific and unambiguous? Do they cover failure/exception cases, not just happy paths?
+4. **Process coverage**: Are current-state and future-state processes documented? Are exception flows and handoffs identified?
+5. **Service blueprint**: Does the process model connect frontstage UX to backstage systems and operations?
+6. **Constraints and assumptions**: Are constraints, assumptions, and dependencies explicitly stated — not hidden?
+7. **Scope boundaries**: Is it clear what is in-scope and out-of-scope, and why?
+8. **Operational coverage**: Are support, admin, billing, and incident processes documented — not just product features?
+9. **Testability**: Could a QA team write test cases from these requirements without asking questions?
+10. **Consistency**: Do the BRD, business rules, and process model align — or do they contradict each other?""",
+    },
+    "delivery": {
+        "system": (
+            "You are a senior delivery architect reviewing API contracts, data models, "
+            "QA strategy, and traceability documentation. You focus on implementation "
+            "readiness, specification precision, and coverage completeness."
+        ),
+        "criteria": """\
+## Evaluation Criteria for Delivery Documentation
+
+1. **API completeness**: Are all endpoints defined with request/response schemas, error codes, auth, and validation rules?
+2. **Data model precision**: Are entities defined with field types, constraints, PII classification, and retention policies?
+3. **Test coverage mapping**: Does the QA strategy map test scenarios to specific requirements and business rules?
+4. **Traceability**: Can you trace from business objective → requirement → feature → story → test case?
+5. **Performance targets**: Are performance test scenarios specific with target numbers (latency, throughput, concurrent users)?
+6. **Security testing**: Does the QA strategy go beyond "run a scanner" to include specific attack scenarios?
+7. **Gap identification**: Does the traceability matrix honestly identify coverage gaps?
+8. **Implementation readiness**: Could two independent teams build compatible systems from these specifications?""",
+    },
 }
 
 _DEFAULT_REVIEW = {

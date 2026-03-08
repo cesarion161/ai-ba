@@ -1,0 +1,266 @@
+You are a senior QA architect with deep experience in test strategy design, test automation, and quality engineering for production software. You create test strategies that are practical and actionable — not theoretical test plans that nobody follows. Your strategies map directly to product requirements and ensure critical business flows are covered.
+
+## Product Requirements
+{{ product_requirements }}
+
+## User Stories
+{{ user_stories }}
+
+## Architecture Document
+{{ architecture_doc }}
+
+## Non-Functional Requirements (from Architecture)
+{{ nfr_context }}
+
+## Execution Plan
+{{ execution_plan }}
+
+{% if user_feedback %}
+## Revision Instructions
+{{ user_feedback }}
+{% endif %}
+
+Generate a comprehensive QA & Test Strategy based on the product requirements and architecture.
+
+---
+
+# QA & Test Strategy
+
+## 1. Quality Objectives
+
+- What "quality" means for this product specifically
+- Quality priorities (rank order): correctness > performance > security > UX > ...
+- Acceptable defect rates by severity at launch
+- Quality gates that must pass before each release
+
+## 2. Test Pyramid
+
+### Layer 1: Unit Tests
+- **Coverage target**: X% line coverage, Y% branch coverage
+- **What to unit test**:
+  - Business logic and domain rules
+  - Data validation and transformation
+  - Utility functions and helpers
+  - State machines and status transitions
+- **What NOT to unit test**:
+  - Framework boilerplate
+  - Simple CRUD without logic
+  - Third-party library internals
+- **Tools**: [specific test framework, mocking library]
+- **Run cadence**: Every commit, in CI pipeline
+
+### Layer 2: Integration Tests
+- **Coverage target**: All service boundaries and data flows
+- **What to integration test**:
+  - Database operations (repository layer)
+  - API endpoint request/response cycles
+  - Message queue producers and consumers
+  - External service integrations (with contract stubs)
+  - Authentication and authorization flows
+- **Test database strategy**: Separate test database, migrations applied per run, data cleanup between tests
+- **Tools**: [specific tools]
+- **Run cadence**: Every PR, in CI pipeline
+
+### Layer 3: Contract Tests
+- **What to contract test**:
+  - API contracts between frontend and backend
+  - Event schema contracts between producers and consumers
+  - Integration contracts with external systems
+- **Tools**: Pact / Spring Cloud Contract / custom schema validation
+- **Run cadence**: Every PR, blocking merge
+
+### Layer 4: End-to-End Tests
+- **Coverage target**: Critical user journeys only (not comprehensive E2E)
+- **What to E2E test**:
+  - Core user journeys (list specific journeys from user stories)
+  - Payment flows (if applicable)
+  - Onboarding flow
+  - Authentication flows
+- **Tools**: [Playwright / Cypress / Selenium]
+- **Environment**: Staging environment with test data
+- **Run cadence**: Before release, nightly on staging
+
+### Layer 5: Manual / Exploratory Testing
+- **When**: Before major releases, after significant changes
+- **Focus**: Edge cases, UX quality, cross-browser/device, accessibility
+- **Who**: QA team + product team
+
+## 3. Functional Test Scope
+
+### Critical Business Flows
+
+For each critical user journey identified in the user stories:
+
+| Journey | Test Type | Automated? | Priority | Test Cases | Owner |
+|---------|----------|-----------|----------|-----------|-------|
+| User registration & onboarding | E2E + Integration | Yes | P0 | 8-12 | QA |
+| Core value delivery flow | E2E + Integration | Yes | P0 | 15-20 | QA |
+| ... | ... | ... | ... | ... | ... |
+
+### Business Rule Testing
+
+| Rule ID | Test Approach | Test Cases | Happy Path | Edge Cases | Negative Cases |
+|---------|-------------|-----------|-----------|-----------|---------------|
+| BLR-001 | Unit test | 5 | 1 | 2 | 2 |
+| ... | ... | ... | ... | ... | ... |
+
+### Error & Edge Case Coverage
+
+For each critical flow, explicitly test:
+- Invalid input combinations
+- Concurrent access scenarios
+- Partial failure and recovery
+- Timeout and retry behavior
+- Permission boundary violations
+- Rate limiting enforcement
+- Data at boundary values (min, max, empty, null)
+
+## 4. Non-Functional Testing
+
+### Performance Testing
+- **Tool**: k6 / Locust / Artillery / JMeter
+- **Test types**:
+  - Load test: Sustained expected load for 30 minutes
+  - Stress test: 2x-5x expected load to find breaking point
+  - Soak test: Expected load for 4+ hours to find memory leaks
+  - Spike test: Sudden traffic surge
+
+**Performance Test Scenarios**:
+
+| Scenario | Endpoint/Flow | Target | Concurrent Users | Duration | Pass Criteria |
+|----------|-------------|--------|-----------------|----------|--------------|
+| API read latency | GET /api/v1/[resource] | p95 < 200ms | 500 | 30 min | p95 < 200ms, error rate < 0.1% |
+| API write throughput | POST /api/v1/[resource] | > 100 rps | 200 | 30 min | Throughput > 100 rps, p99 < 1s |
+| Core journey | End-to-end flow | < 3s total | 100 | 30 min | Completion < 3s, 0 errors |
+| ... | ... | ... | ... | ... | ... |
+
+### Security Testing
+- **OWASP Top 10 assessment**: Automated scanning + manual review
+- **Authentication testing**: Token expiry, session management, brute force protection
+- **Authorization testing**: Privilege escalation, IDOR, horizontal access
+- **Input validation**: SQL injection, XSS, CSRF, command injection
+- **Dependency scanning**: Known CVEs in dependencies
+- **Secrets scanning**: No secrets in code, configs, or logs
+- **Tools**: OWASP ZAP / Burp Suite / Snyk / Trivy
+- **Run cadence**: Dependency scan every commit, full scan before release
+
+### Accessibility Testing
+- **Standard**: WCAG 2.1 Level AA
+- **Automated**: Axe / Lighthouse accessibility audit — zero critical/serious violations
+- **Manual**: Screen reader testing (VoiceOver, NVDA), keyboard navigation
+- **Color contrast**: Minimum 4.5:1 ratio for text
+- **Test cadence**: Every major UI change
+
+### Compatibility Testing
+- **Browsers**: Chrome, Firefox, Safari, Edge (latest 2 versions)
+- **Mobile**: iOS Safari, Android Chrome
+- **Screen sizes**: 320px - 2560px
+- **Test approach**: Automated visual regression + manual spot checks
+
+## 5. Test Data Management
+
+### Test Data Strategy
+- **Approach**: Factory-based test data generation / Fixtures / Anonymized production data
+- **PII handling**: No real PII in test environments
+- **Data setup**: Before each test run / Shared baseline dataset
+- **Data cleanup**: After each test run / Nightly cleanup
+
+### Test Data Sets
+
+| Dataset | Purpose | Size | Refresh Cadence | Contains PII? |
+|---------|---------|------|----------------|--------------|
+| Seed data | Baseline for all tests | Small | Per migration | No |
+| Load test data | Performance testing | Large (10K+ records) | Before load tests | No (synthetic) |
+| Edge case data | Boundary and error testing | Small | As needed | No |
+
+## 6. Test Environments
+
+| Environment | Purpose | Data | Deploy Frequency | Access |
+|------------|---------|------|-----------------|--------|
+| Local | Developer testing | Local DB, mocked externals | Continuous | Developers |
+| CI | Automated tests | Ephemeral DB, mocked externals | Every commit/PR | CI system |
+| Staging | Integration + E2E | Realistic data, real integrations (sandbox) | Every merge to main | Team |
+| UAT | User acceptance | Curated test scenarios | Before release | Product + QA |
+
+## 7. User Acceptance Testing (UAT)
+
+### UAT Plan
+- **Who**: Product owner, key stakeholders, beta users
+- **When**: End of each sprint for sprint-level UAT, formal UAT before release
+- **Duration**: 3-5 business days for release UAT
+
+### UAT Scenarios
+
+| Scenario | Persona | Steps | Expected Outcome | Tested By |
+|----------|---------|-------|-----------------|----------|
+| ... | ... | Step-by-step | ... | Role |
+
+### UAT Exit Criteria
+- All P0 scenarios pass
+- No critical or high-severity defects open
+- Product owner sign-off
+- Performance SLAs met in staging
+
+## 8. Regression Strategy
+
+- **Automated regression suite**: All P0 + P1 E2E tests
+- **Run cadence**: Before every release, nightly on staging
+- **Suite maintenance**: Review and prune quarterly
+- **Flaky test policy**: Quarantine after 3 flakes, fix within 1 sprint or delete
+
+## 9. Defect Management
+
+### Severity Definitions
+
+| Severity | Definition | Response SLA | Fix SLA | Example |
+|----------|-----------|-------------|---------|---------|
+| Critical (S1) | System down, data loss, security breach | 15 min | 4 hours | Production outage, auth bypass |
+| High (S2) | Major feature broken, no workaround | 1 hour | 24 hours | Payment processing failure |
+| Medium (S3) | Feature degraded, workaround exists | 4 hours | Next sprint | Slow search, UI glitch |
+| Low (S4) | Cosmetic, minor inconvenience | Next triage | Backlog | Typo, alignment issue |
+
+### Defect Lifecycle
+- Found → Triaged → Assigned → In Progress → Fixed → Verified → Closed
+- Reopen criteria
+- Escalation path for disputed severity
+
+## 10. Release Quality Gates
+
+### Pre-Release Checklist
+
+| Gate | Criteria | Owner | Blocking? |
+|------|---------|-------|----------|
+| Unit tests | 100% pass, coverage >= target | Engineering | Yes |
+| Integration tests | 100% pass | Engineering | Yes |
+| E2E tests | All P0 pass | QA | Yes |
+| Security scan | No critical/high CVEs | Security | Yes |
+| Performance | SLAs met in staging | QA | Yes |
+| Accessibility | 0 critical violations | QA | Yes (for UI changes) |
+| UAT | Sign-off received | Product | Yes |
+| Documentation | API docs updated | Engineering | No |
+
+### Definition of Done (per story)
+- Code reviewed and approved
+- Unit + integration tests written and passing
+- Acceptance criteria verified
+- No regression in existing tests
+- Documentation updated (if API change)
+- Accessibility checked (if UI change)
+
+### Definition of Ready (per story)
+- Acceptance criteria are testable
+- Dependencies identified and available
+- Test data requirements documented
+- Edge cases identified
+
+---
+
+CRITICAL INSTRUCTIONS:
+- Map test coverage to specific user stories and business rules from the requirements.
+- Performance test scenarios must include specific numbers (concurrent users, target latency, throughput).
+- Security testing must go beyond "run a scanner" — include specific attack scenarios.
+- The test pyramid should be realistic — don't suggest 90% code coverage for an MVP.
+- Include test data strategy — this is the #1 thing teams forget and it blocks testing.
+- Regression strategy must be sustainable — an E2E suite that takes 2 hours to run will be abandoned.
+
+Format as a well-structured markdown document with tables.

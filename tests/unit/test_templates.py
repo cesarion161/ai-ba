@@ -8,7 +8,7 @@ from app.models.workflow_node import NodeType
 
 def test_market_research_template_valid():
     assert MARKET_RESEARCH.key == "market_research"
-    assert len(MARKET_RESEARCH.nodes) == 6
+    assert len(MARKET_RESEARCH.nodes) == 8  # includes feasibility assessment + review
 
 
 def test_template_root_slugs():

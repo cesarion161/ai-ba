@@ -13,9 +13,12 @@ EXECUTION_PLANNING = WorkflowTemplate(
             requires_approval=False,
             config={
                 "questions": [
-                    "What is your team size and composition?",
-                    "What is your total budget?",
-                    "What is your target launch date?",
+                    "Describe the product to be built and its core features.",
+                    "What is your current team size and composition? (Engineers, designers, PMs, QA)",
+                    "What is your total budget for the build phase? (Include range if uncertain)",
+                    "What is your target launch date or timeline constraint?",
+                    "Do you have existing infrastructure, CI/CD, or development environments?",
+                    "What is your risk tolerance? (Aggressive timeline vs conservative with buffers)",
                     "What are the biggest risks you foresee?",
                 ]
             },
@@ -34,7 +37,7 @@ EXECUTION_PLANNING = WorkflowTemplate(
             branch="execution_planning",
             node_type=NodeType.GENERATE_DOCUMENT,
             depends_on=["cost_estimation"],
-            config={"template": "execution_plan"},
+            config={"template": "execution_plan", "branch": "execution_planning"},
         ),
         NodeTemplate(
             slug="execution_plan_critic",
@@ -42,7 +45,7 @@ EXECUTION_PLANNING = WorkflowTemplate(
             branch="execution_planning",
             node_type=NodeType.CRITIC_REVIEW,
             depends_on=["execution_plan"],
-            config={"max_cycles": 2},
+            config={"max_cycles": 2, "branch": "execution_planning"},
         ),
     ],
 )

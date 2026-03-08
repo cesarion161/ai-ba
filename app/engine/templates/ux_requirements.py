@@ -13,10 +13,12 @@ UX_REQUIREMENTS = WorkflowTemplate(
             requires_approval=False,
             config={
                 "questions": [
-                    "Who are the primary user personas?",
-                    "What are the critical user journeys?",
-                    "Are there any accessibility requirements?",
-                    "What platforms should be supported?",
+                    "Describe your product and the problem it solves.",
+                    "Describe your primary user personas in detail. (Who, what role, what frustrates them?)",
+                    "What are the 3-5 critical user journeys? Walk through each step-by-step.",
+                    "What platforms must be supported? (Web, iOS, Android, desktop, API-only)",
+                    "What accessibility requirements apply? (WCAG level, screen reader support)",
+                    "What does a successful first-time user experience look like?",
                 ]
             },
         ),
@@ -34,7 +36,7 @@ UX_REQUIREMENTS = WorkflowTemplate(
             branch="ux_requirements",
             node_type=NodeType.GENERATE_DOCUMENT,
             depends_on=["ux_research"],
-            config={"template": "user_stories"},
+            config={"template": "user_stories", "branch": "ux_requirements"},
         ),
         NodeTemplate(
             slug="user_stories_critic",

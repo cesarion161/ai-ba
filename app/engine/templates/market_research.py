@@ -3,27 +3,30 @@ from app.models.workflow_node import NodeType
 
 MARKET_RESEARCH = WorkflowTemplate(
     key="market_research",
-    label="Market Research",
+    label="Market Research & Viability",
     nodes=[
         NodeTemplate(
             slug="intake_questions",
-            label="Intake Questions",
+            label="Discovery & Intake Questions",
             branch="market_research",
             node_type=NodeType.ASK_USER,
             requires_approval=False,
             config={
                 "questions": [
-                    "What is your product or service idea?",
-                    "Who is your target audience?",
-                    "What problem does it solve?",
-                    "What is your expected price range?",
-                    "Who are your known competitors?",
+                    "Describe your product or service idea in detail. What does it do?",
+                    "What specific problem does it solve, and how painful is this problem today?",
+                    "Who is your target customer? (Be specific: role, company size, industry, demographics)",
+                    "What alternatives or competitors exist today?",
+                    "Why now? What market or technology shift makes this the right time?",
+                    "What is your expected pricing model and price range?",
+                    "What constraints already exist? (Budget, timeline, regulations, team size)",
+                    "What would make this project fail? (Top 3 risks)",
                 ]
             },
         ),
         NodeTemplate(
             slug="web_search",
-            label="Web Research",
+            label="Market & Industry Research",
             branch="market_research",
             node_type=NodeType.RESEARCH,
             depends_on=["intake_questions"],
@@ -39,7 +42,7 @@ MARKET_RESEARCH = WorkflowTemplate(
         ),
         NodeTemplate(
             slug="market_sizing",
-            label="Market Sizing",
+            label="Market Sizing (TAM/SAM/SOM)",
             branch="market_research",
             node_type=NodeType.CALCULATE,
             depends_on=["web_search"],
@@ -51,7 +54,7 @@ MARKET_RESEARCH = WorkflowTemplate(
             branch="market_research",
             node_type=NodeType.GENERATE_DOCUMENT,
             depends_on=["web_search", "competitor_analysis", "market_sizing"],
-            config={"template": "lean_canvas"},
+            config={"template": "lean_canvas", "branch": "market_research"},
         ),
         NodeTemplate(
             slug="lean_canvas_critic",
@@ -59,7 +62,23 @@ MARKET_RESEARCH = WorkflowTemplate(
             branch="market_research",
             node_type=NodeType.CRITIC_REVIEW,
             depends_on=["lean_canvas"],
-            config={"max_cycles": 2},
+            config={"max_cycles": 2, "branch": "market_research"},
+        ),
+        NodeTemplate(
+            slug="feasibility_assessment",
+            label="Feasibility Assessment",
+            branch="market_research",
+            node_type=NodeType.GENERATE_DOCUMENT,
+            depends_on=["lean_canvas_critic"],
+            config={"template": "feasibility", "branch": "market_research"},
+        ),
+        NodeTemplate(
+            slug="feasibility_critic",
+            label="Feasibility Review",
+            branch="market_research",
+            node_type=NodeType.CRITIC_REVIEW,
+            depends_on=["feasibility_assessment"],
+            config={"max_cycles": 2, "branch": "market_research"},
         ),
     ],
 )

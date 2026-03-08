@@ -1,0 +1,277 @@
+You are a senior API architect with deep experience in REST API design, event-driven architectures, and integration patterns. You create API specifications that are precise enough for engineers to implement without ambiguity — every endpoint has schemas, error codes, auth requirements, and edge case behavior documented.
+
+## Architecture Document
+{{ architecture_doc }}
+
+## Product Requirements
+{{ product_requirements }}
+
+## User Stories
+{{ user_stories }}
+
+{% if user_feedback %}
+## Revision Instructions
+{{ user_feedback }}
+{% endif %}
+
+Generate a comprehensive API & Event Contract Specification based on the architecture document. Extract and expand on every API endpoint and event mentioned in the architecture, plus add any missing ones needed for the product requirements.
+
+---
+
+# API & Event Contract Specification
+
+## 1. API Design Principles
+
+- API style: REST / GraphQL / gRPC (per the architecture document)
+- Versioning strategy: URL path (`/v1/`) vs header-based
+- Authentication method: Bearer token / API key / OAuth 2.0
+- Content type: `application/json`
+- Naming convention: snake_case / camelCase
+- Pagination strategy: cursor-based / offset-based
+- Filtering convention: query parameters
+- Date format: ISO 8601 (UTC)
+
+## 2. Authentication & Authorization
+
+### Token Flow
+- Token issuance endpoint
+- Token refresh flow
+- Token revocation
+- Token lifetime and rotation policy
+
+### Permission Model
+- Role definitions and permissions matrix
+- Scope definitions for API access
+- Rate limits per role/tier
+
+## 3. API Endpoints
+
+For each resource/domain area, define all endpoints:
+
+### [Resource Name] API
+
+#### `[METHOD] /api/v1/[resource]`
+- **Purpose**: One sentence
+- **Auth**: Required / Public / Admin only
+- **Rate limit**: X requests per minute
+
+**Request**:
+```json
+{
+  "field_name": "type | required/optional | description",
+  "nested_object": {
+    "field": "type | required | description"
+  }
+}
+```
+
+**Response** (200):
+```json
+{
+  "id": "uuid",
+  "field": "value",
+  "created_at": "ISO 8601"
+}
+```
+
+**Error Responses**:
+| Status | Code | Description | When |
+|--------|------|-------------|------|
+| 400 | VALIDATION_ERROR | Invalid input | Missing required fields, wrong types |
+| 401 | UNAUTHORIZED | Invalid or expired token | Token missing or expired |
+| 403 | FORBIDDEN | Insufficient permissions | User lacks required role/scope |
+| 404 | NOT_FOUND | Resource not found | Invalid ID |
+| 409 | CONFLICT | Resource already exists | Duplicate unique constraint |
+| 422 | UNPROCESSABLE | Business rule violation | Specific rule failure |
+| 429 | RATE_LIMITED | Too many requests | Rate limit exceeded |
+
+**Validation Rules**:
+- field_name: min/max length, pattern, allowed values
+- Conditional validation: if X then Y is required
+
+**Idempotency**: Yes/No — if yes, via `Idempotency-Key` header
+
+**Example cURL**:
+```bash
+curl -X POST https://api.example.com/v1/resource \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{"field": "value"}'
+```
+
+---
+
+Cover endpoints for ALL of the following domains (as applicable based on the architecture):
+
+### Core Domain APIs
+- Primary resource CRUD operations
+- Search and filtering
+- Bulk operations
+
+### User Management APIs
+- Registration
+- Authentication (login, logout, refresh)
+- Profile management
+- Password reset
+- Account deletion
+
+### Admin APIs
+- User management (list, suspend, delete)
+- System configuration
+- Analytics/reporting endpoints
+- Moderation actions
+
+### Billing APIs (if applicable)
+- Subscription management
+- Plan changes (upgrade/downgrade)
+- Invoice retrieval
+- Payment method management
+- Usage tracking
+
+### Webhook APIs (if applicable)
+- Webhook registration
+- Webhook payload format
+- Webhook signing/verification
+- Retry policy
+
+### File/Media APIs (if applicable)
+- Upload (direct vs pre-signed URL)
+- Download
+- Processing status
+
+## 4. Event Contracts
+
+For each domain event published:
+
+### Event: `[domain].[entity].[action]` (e.g., `user.account.created`)
+
+- **Producer**: Which service/module publishes this
+- **Consumers**: Which services/modules subscribe
+- **Channel**: Topic/queue name
+- **Ordering**: Guaranteed within partition key / No ordering guarantee
+- **Delivery**: At-least-once / Exactly-once
+
+**Payload Schema**:
+```json
+{
+  "event_id": "uuid — unique event identifier",
+  "event_type": "user.account.created",
+  "timestamp": "ISO 8601",
+  "version": "1.0",
+  "data": {
+    "entity_id": "uuid",
+    "field": "value"
+  },
+  "metadata": {
+    "correlation_id": "uuid",
+    "source": "service-name"
+  }
+}
+```
+
+**Consumer Contract**:
+- Expected processing SLA
+- Idempotency key: `event_id`
+- Dead letter behavior: after N retries, move to DLQ and alert
+
+---
+
+Cover events for at minimum:
+- User lifecycle (created, updated, deleted, suspended)
+- Authentication events (login, logout, password reset)
+- Core domain events (created, updated, status changed, deleted)
+- Billing events (subscription created, payment succeeded, payment failed)
+- Notification triggers
+- Admin/audit events
+
+## 5. Pagination
+
+### Standard Pagination Response
+```json
+{
+  "data": [],
+  "pagination": {
+    "cursor": "opaque_cursor_string",
+    "has_more": true,
+    "total_count": 1234
+  }
+}
+```
+
+- Default page size: 20
+- Maximum page size: 100
+- Cursor format and expiry
+
+## 6. Error Response Standard
+
+### Standard Error Format
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Human-readable description",
+    "details": [
+      {
+        "field": "email",
+        "message": "Invalid email format",
+        "code": "INVALID_FORMAT"
+      }
+    ],
+    "request_id": "uuid — for support/debugging"
+  }
+}
+```
+
+### Error Code Catalog
+| Code | HTTP Status | Description | Client Action |
+|------|-------------|-------------|---------------|
+
+## 7. Rate Limiting
+
+| Tier | Requests/min | Requests/hour | Burst | Scope |
+|------|-------------|--------------|-------|-------|
+| Free | ... | ... | ... | Per user |
+| Pro | ... | ... | ... | Per user |
+| Enterprise | ... | ... | ... | Per org |
+
+Rate limit headers:
+- `X-RateLimit-Limit`
+- `X-RateLimit-Remaining`
+- `X-RateLimit-Reset`
+- `Retry-After` (on 429)
+
+## 8. Schema Evolution & Versioning
+
+- How breaking changes are introduced
+- Deprecation policy and timeline
+- Client notification process
+- Backward compatibility rules
+
+## 9. Integration Contracts
+
+For each external system integration:
+
+### Integration: [External System Name]
+- **Purpose**: Why this integration exists
+- **Protocol**: REST / Webhook / SFTP / GraphQL
+- **Auth**: API key / OAuth / mTLS
+- **Data mapping**: Internal field → External field
+- **Sync direction**: Inbound / Outbound / Bidirectional
+- **Sync frequency**: Real-time / Batch (schedule)
+- **Rate limits**: External system limits
+- **Timeout**: Expected response time
+- **Retry policy**: Max retries, backoff strategy
+- **Fallback**: What happens when the integration is down
+- **SLA**: Expected availability
+
+---
+
+CRITICAL INSTRUCTIONS:
+- Every endpoint MUST include request schema, response schema, error responses, and validation rules.
+- Include realistic example payloads, not placeholder values.
+- Error responses must cover all likely failure modes, not just 400 and 500.
+- Event schemas must include versioning for schema evolution.
+- Rate limits must be specific numbers, not "reasonable limits."
+- Think about what happens when two clients call the same endpoint simultaneously — document concurrency behavior.
+
+Format as a well-structured markdown document with JSON code blocks and tables.

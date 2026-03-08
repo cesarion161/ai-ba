@@ -18,10 +18,12 @@ def test_full_analysis_has_all_branches():
     branches = {n.branch for n in full.nodes}
     expected = {
         "market_research",
+        "business_requirements",
         "product_strategy",
         "ux_requirements",
         "technical_architecture",
         "execution_planning",
+        "delivery",
         "densification",
         "export",
     }
@@ -121,6 +123,93 @@ def test_all_prompts_render():
             },
         ),
     ]
+
+    # New templates added for business requirements, feasibility, and delivery
+    new_templates = [
+        (
+            "market_research/feasibility",
+            {
+                "lean_canvas": "lc",
+                "research_summary": "rs",
+                "competitor_analysis": "ca",
+                "market_sizing": "ms",
+                "user_answers": "ua",
+                "user_feedback": None,
+            },
+        ),
+        (
+            "business_requirements/brd",
+            {
+                "lean_canvas": "lc",
+                "feasibility_assessment": "fa",
+                "process_model": "pm",
+                "business_rules": "br",
+                "user_answers": "ua",
+                "user_feedback": None,
+            },
+        ),
+        (
+            "business_requirements/business_rules",
+            {
+                "lean_canvas": "lc",
+                "feasibility_assessment": "fa",
+                "user_answers": "ua",
+                "user_feedback": None,
+            },
+        ),
+        (
+            "business_requirements/process_model",
+            {
+                "lean_canvas": "lc",
+                "feasibility_assessment": "fa",
+                "user_answers": "ua",
+                "user_feedback": None,
+            },
+        ),
+        (
+            "delivery/api_contracts",
+            {
+                "architecture_doc": "ad",
+                "product_requirements": "pr",
+                "user_stories": "us",
+                "user_feedback": None,
+            },
+        ),
+        (
+            "delivery/data_model",
+            {
+                "architecture_doc": "ad",
+                "product_requirements": "pr",
+                "business_rules": "br",
+                "user_feedback": None,
+            },
+        ),
+        (
+            "delivery/qa_strategy",
+            {
+                "product_requirements": "pr",
+                "user_stories": "us",
+                "architecture_doc": "ad",
+                "nfr_context": "nfr",
+                "execution_plan": "ep",
+                "user_feedback": None,
+            },
+        ),
+        (
+            "delivery/traceability_matrix",
+            {
+                "lean_canvas": "lc",
+                "brd": "brd",
+                "product_roadmap": "prm",
+                "user_stories": "us",
+                "architecture_doc": "ad",
+                "execution_plan": "ep",
+                "qa_strategy": "qa",
+                "user_feedback": None,
+            },
+        ),
+    ]
+    templates_to_test.extend(new_templates)
 
     for template_key, context in templates_to_test:
         result = prompt_engine.render(template_key, **context)

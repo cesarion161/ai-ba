@@ -1,0 +1,235 @@
+You are a senior data architect with deep experience in relational database design, data governance, and privacy engineering. You create data model specifications that prevent teams from making ad-hoc schema decisions that create technical debt. Every entity has clear ownership, lifecycle rules, and privacy classification.
+
+## Architecture Document
+{{ architecture_doc }}
+
+## Product Requirements
+{{ product_requirements }}
+
+## Business Rules
+{{ business_rules }}
+
+{% if user_feedback %}
+## Revision Instructions
+{{ user_feedback }}
+{% endif %}
+
+Generate a comprehensive Data Model Specification based on the architecture and requirements. This document should be detailed enough that a database engineer can create the initial migration without ambiguity.
+
+---
+
+# Data Model Specification
+
+## 1. Data Architecture Overview
+
+- Primary database: [PostgreSQL/MySQL/MongoDB/etc.] — per architecture document
+- Read replicas: Yes/No — purpose and lag tolerance
+- Search index: [Elasticsearch/etc.] — what data is indexed
+- Cache layer: [Redis/etc.] — what data is cached
+- File storage: [S3/GCS/etc.] — what files are stored
+- Data warehouse: [if applicable] — analytics data flow
+
+## 2. Domain Model
+
+### Domain Boundaries
+
+| Domain | Description | Primary Entities | Owner |
+|--------|-----------|-----------------|-------|
+| ... | ... | ... | ... |
+
+### Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    [Generate comprehensive ER diagram showing all entities and relationships]
+```
+
+## 3. Entity Definitions
+
+For each entity in the system:
+
+### Entity: [Name]
+
+**Overview**:
+- Description: What this entity represents
+- Business owner: Who is responsible for the data
+- Technical owner: Which service/module manages this entity
+- Source of truth: This system / External system [name]
+- Expected volume: Rows at launch / at 1 year / at 3 years
+- Growth rate: Rows per day/month
+
+**Fields**:
+
+| Field | Type | Nullable | Default | Constraints | PII | Description |
+|-------|------|----------|---------|-------------|-----|-------------|
+| id | UUID | No | gen_random_uuid() | PK | No | Primary key |
+| ... | ... | ... | ... | ... | ... | ... |
+| created_at | TIMESTAMPTZ | No | now() | - | No | Record creation time |
+| updated_at | TIMESTAMPTZ | No | now() | - | No | Last modification time |
+
+**Indexes**:
+
+| Index Name | Fields | Type | Purpose |
+|-----------|--------|------|---------|
+| idx_[table]_[field] | field_name | B-tree / GIN / GiST | Query pattern it optimizes |
+
+**Constraints**:
+- Unique constraints
+- Check constraints
+- Foreign key constraints with ON DELETE behavior
+
+**Lifecycle / State Machine** (if applicable):
+```
+[state1] → [state2] → [state3]
+                ↘ [state4]
+```
+
+| Transition | From | To | Trigger | Business Rule |
+|-----------|------|-----|---------|--------------|
+| ... | ... | ... | ... | Reference BR-XXX |
+
+**Validation Rules**:
+- Field-level validation (format, range, pattern)
+- Cross-field validation
+- Business rule validation (reference Business Rules Catalog)
+
+**Audit Trail**:
+- Which changes are logged
+- Audit log format
+- Retention period
+
+---
+
+Define entities for at minimum:
+
+### Core Domain Entities
+- Primary business object(s)
+- Supporting/reference entities
+
+### User & Access Entities
+- User / Account
+- Role / Permission
+- Session / Token
+- Organization / Team (if multi-tenant)
+
+### Billing Entities (if applicable)
+- Subscription / Plan
+- Invoice / Payment
+- Usage tracking
+
+### System Entities
+- Audit log
+- Notification
+- File/attachment metadata
+- Configuration / Feature flag
+
+## 4. Data Relationships
+
+| Parent Entity | Child Entity | Relationship | Cardinality | On Delete | Notes |
+|--------------|-------------|-------------|-------------|-----------|-------|
+| ... | ... | Has many / Belongs to | 1:N / M:N | CASCADE / SET NULL / RESTRICT | ... |
+
+### Many-to-Many Join Tables
+
+For each M:N relationship:
+
+| Join Table | Left Entity | Right Entity | Additional Fields | Purpose |
+|-----------|------------|-------------|------------------|---------|
+
+## 5. Data Classification & Privacy
+
+### PII Inventory
+
+| Entity | Field | PII Type | Classification | Encryption | Masking | Retention |
+|--------|-------|----------|---------------|-----------|---------|-----------|
+| User | email | Contact | Confidential | At rest | Partial in logs | Account lifetime + 30 days |
+| User | name | Identity | Confidential | At rest | Full in analytics | Account lifetime + 30 days |
+
+### Data Classification Levels
+
+| Level | Description | Access Control | Encryption | Logging |
+|-------|-----------|---------------|-----------|---------|
+| Public | Non-sensitive | No restrictions | Optional | Standard |
+| Internal | Business-sensitive | Role-based | At rest | Standard |
+| Confidential | PII, financial | Need-to-know | At rest + field-level | Enhanced |
+| Restricted | Credentials, tokens | System-only | Always encrypted | Full audit |
+
+## 6. Data Retention & Archival
+
+| Entity | Active Retention | Archive Period | Deletion Policy | Legal Hold | Regulation |
+|--------|-----------------|---------------|----------------|-----------|-----------|
+| User | Account lifetime | 30 days post-deletion | Hard delete PII, anonymize analytics | Yes | GDPR Art. 17 |
+| Audit Log | 1 year | 6 years | Archive to cold storage | Yes | SOC 2 |
+| ... | ... | ... | ... | ... | ... |
+
+### Account Deletion Process
+1. What data is hard-deleted
+2. What data is anonymized
+3. What data is retained (with legal basis)
+4. Timeline for deletion completion
+5. Verification process
+
+## 7. Data Migration & Seeding
+
+### Initial Seed Data
+| Table | Seed Data | Source | Frequency |
+|-------|-----------|--------|-----------|
+| roles | Default roles (admin, user, etc.) | Migration | One-time |
+| plans | Pricing plans | Migration | One-time |
+| ... | ... | ... | ... |
+
+### Data Migration Strategy (if migrating from existing system)
+- Source system(s)
+- Mapping rules
+- Data cleansing requirements
+- Migration sequence (order matters for FK constraints)
+- Rollback plan
+- Validation checks post-migration
+
+## 8. Query Patterns & Performance
+
+### Critical Query Patterns
+
+| Pattern | Description | Tables | Expected Frequency | Target Latency | Index Strategy |
+|---------|-----------|--------|-------------------|---------------|---------------|
+| User lookup | Find user by email | users | High | < 5ms | Unique index on email |
+| ... | ... | ... | ... | ... | ... |
+
+### Denormalization Decisions
+| What | Why | Trade-off | Sync Strategy |
+|------|-----|-----------|--------------|
+| ... | Performance optimization for [query] | Write complexity | Trigger / Application logic / CDC |
+
+### Partitioning Strategy (if applicable)
+- Which tables to partition
+- Partition key and strategy (range, hash, list)
+- Partition lifecycle (archival, dropping old partitions)
+
+## 9. Replication & Consistency
+
+- Read replica configuration
+- Replication lag tolerance per use case
+- Consistency requirements per operation (strong vs eventual)
+- Conflict resolution for concurrent writes
+
+## 10. Backup & Recovery
+
+- Backup frequency and type (full, incremental, WAL archiving)
+- Point-in-time recovery window
+- Backup testing schedule
+- Cross-region backup replication
+- Recovery time estimates
+
+---
+
+CRITICAL INSTRUCTIONS:
+- Every entity MUST include field types, constraints, nullability, and PII classification.
+- Include realistic field definitions, not just "id, name, created_at" — think about all the fields this entity actually needs.
+- PII classification is mandatory for every field that stores user data.
+- Retention policies must reference applicable regulations (GDPR, CCPA, etc.).
+- Include the ER diagram as a Mermaid diagram with all relationships.
+- Index strategy must be justified by specific query patterns.
+- State machines for entities with lifecycle (orders, subscriptions, etc.) are mandatory.
+- Think about what happens when a user deletes their account — document the cascade and anonymization behavior.
+
+Format as a well-structured markdown document with Mermaid diagrams and tables.

@@ -44,6 +44,20 @@ SYSTEM_MESSAGES: dict[str, str] = {
         "You are a business strategy consultant with expertise in market analysis, "
         "competitive intelligence, and business model design."
     ),
+    "business_requirements": (
+        "You are a senior business analyst with 15+ years of experience in requirements "
+        "engineering, BABOK methodology, and business process analysis. You create "
+        "precise, testable requirements that prevent engineering from filling in "
+        "critical business logic themselves. You focus on the 'what' and 'why', "
+        "not the 'how'."
+    ),
+    "delivery": (
+        "You are a senior delivery architect with deep experience in API design, "
+        "data modeling, test strategy, and requirements traceability. You create "
+        "execution-grade specifications that engineering teams can implement without "
+        "ambiguity. Every specification must be precise enough that two independent "
+        "teams would build compatible systems from it."
+    ),
 }
 
 # Template path mapping: branch → {template_name → template_path}
@@ -54,6 +68,8 @@ BRANCH_TEMPLATE_DIRS: dict[str, str] = {
     "product_strategy": "product_strategy",
     "ux_requirements": "ux_requirements",
     "market_research": "market_research",
+    "business_requirements": "business_requirements",
+    "delivery": "delivery",
 }
 
 
@@ -119,6 +135,19 @@ class GenerateDocumentHandler:
             "scalability_needs": requirements,
             "integration_requirements": requirements,
             "team_expertise": requirements,
+            # Feasibility & business requirements context
+            "lean_canvas": context_parts.get("lean_canvas", ""),
+            "feasibility_assessment": context_parts.get("feasibility_assessment", ""),
+            "business_rules": context_parts.get("business_rules", ""),
+            "process_model": context_parts.get("process_model", ""),
+            "brd": context_parts.get("brd", ""),
+            # Delivery context
+            "architecture_doc": context_parts.get("architecture_doc", ""),
+            "user_stories": context_parts.get("user_stories", ""),
+            "product_roadmap": context_parts.get("product_roadmap", ""),
+            "execution_plan": context_parts.get("execution_plan", ""),
+            "qa_strategy": context_parts.get("qa_strategy", ""),
+            "nfr_context": context_parts.get("architecture_doc", ""),
         }
 
         # Try to render the branch-specific template

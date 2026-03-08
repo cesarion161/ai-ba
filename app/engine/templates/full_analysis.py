@@ -1,32 +1,60 @@
-"""Full analysis composite template — combines all branches with cross-branch dependencies."""
+"""Full analysis composite template — combines all branches with cross-branch dependencies.
+
+Flow:
+  Phase 1: Market Research — intake → research → lean canvas → feasibility assessment
+  Phase 2: Business Requirements — BRD questions → business rules + process model → BRD
+  Phase 3: Product Strategy — product questions → feature/pricing research → roadmap
+  Phase 4: UX & Requirements — UX questions → UX research → user stories
+  Phase 5: Technical Architecture — tech questions → research → architecture → API contracts + data model
+  Phase 6: Execution Planning — execution questions → cost estimation → execution plan
+  Phase 7: Delivery — QA strategy → traceability matrix
+  Phase 8: Densification — role-specific dense references
+  Phase 9: Export — ZIP archive
+"""
 
 from app.engine.templates.base import NodeTemplate, WorkflowTemplate
 from app.models.workflow_node import NodeType
+
+# Common dependency lists used by multiple nodes
+_ALL_CRITIC_NODES = [
+    "lean_canvas_critic",
+    "feasibility_critic",
+    "brd_critic",
+    "product_roadmap_critic",
+    "user_stories_critic",
+    "architecture_critic",
+    "execution_plan_critic",
+]
 
 FULL_ANALYSIS = WorkflowTemplate(
     key="full_analysis",
     label="Full Business Analysis",
     nodes=[
-        # ===== Market Research Branch =====
+        # ===================================================================
+        # PHASE 1: Market Research & Viability
+        # ===================================================================
         NodeTemplate(
             slug="intake_questions",
-            label="Intake Questions",
+            label="Discovery & Intake Questions",
             branch="market_research",
             node_type=NodeType.ASK_USER,
             requires_approval=False,
             config={
                 "questions": [
-                    "What is your product or service idea?",
-                    "Who is your target audience?",
-                    "What problem does it solve?",
-                    "What is your expected price range?",
-                    "Who are your known competitors?",
+                    "Describe your product or service idea in detail. What does it do?",
+                    "What specific problem does it solve, and how painful is this problem today? (How much time/money does the current approach cost?)",
+                    "Who is your target customer? (Be specific: role, company size, industry, demographics)",
+                    "What alternatives or competitors exist today? How do people solve this problem without your product?",
+                    "Why now? What market, technology, or regulatory shift makes this the right time?",
+                    "What is your expected pricing model and price range?",
+                    "What constraints already exist? (Budget, timeline, regulations, technical limitations, team size)",
+                    "What would make this project fail? (Top 3 risks you're most worried about)",
                 ]
             },
         ),
         NodeTemplate(
             slug="web_search",
-            label="Web Research",
+            label="Market & Industry Research",
             branch="market_research",
             node_type=NodeType.RESEARCH,
             depends_on=["intake_questions"],
@@ -42,7 +70,7 @@ FULL_ANALYSIS = WorkflowTemplate(
         ),
         NodeTemplate(
             slug="market_sizing",
-            label="Market Sizing",
+            label="Market Sizing (TAM/SAM/SOM)",
             branch="market_research",
             node_type=NodeType.CALCULATE,
             depends_on=["web_search"],
@@ -54,7 +82,7 @@ FULL_ANALYSIS = WorkflowTemplate(
             branch="market_research",
             node_type=NodeType.GENERATE_DOCUMENT,
             depends_on=["web_search", "competitor_analysis", "market_sizing"],
-            config={"template": "lean_canvas"},
+            config={"template": "lean_canvas", "branch": "market_research"},
         ),
         NodeTemplate(
             slug="lean_canvas_critic",
@@ -62,21 +90,96 @@ FULL_ANALYSIS = WorkflowTemplate(
             branch="market_research",
             node_type=NodeType.CRITIC_REVIEW,
             depends_on=["lean_canvas"],
-            config={"max_cycles": 2},
+            config={"max_cycles": 2, "branch": "market_research"},
         ),
-        # ===== Product Strategy Branch =====
+        # --- Feasibility Assessment (gates further investment) ---
+        NodeTemplate(
+            slug="feasibility_assessment",
+            label="Feasibility Assessment",
+            branch="market_research",
+            node_type=NodeType.GENERATE_DOCUMENT,
+            depends_on=["lean_canvas_critic"],
+            config={"template": "feasibility", "branch": "market_research"},
+        ),
+        NodeTemplate(
+            slug="feasibility_critic",
+            label="Feasibility Review",
+            branch="market_research",
+            node_type=NodeType.CRITIC_REVIEW,
+            depends_on=["feasibility_assessment"],
+            config={"max_cycles": 2, "branch": "market_research"},
+        ),
+        # ===================================================================
+        # PHASE 2: Business Requirements
+        # ===================================================================
+        NodeTemplate(
+            slug="brd_questions",
+            label="Business Requirements Questions",
+            branch="business_requirements",
+            node_type=NodeType.ASK_USER,
+            depends_on=["feasibility_critic"],
+            requires_approval=False,
+            config={
+                "questions": [
+                    "Describe the key business processes that the product will support or automate. What does the workflow look like today?",
+                    "What business rules govern your domain? (e.g., approval thresholds, pricing rules, eligibility criteria, retry policies)",
+                    "What compliance or regulatory requirements apply? (GDPR, HIPAA, SOC 2, industry-specific)",
+                    "Who are the key user roles and what actions can each role perform?",
+                    "What are the critical data entities in your business? (e.g., orders, customers, products, transactions)",
+                ]
+            },
+        ),
+        # Business rules and process model run in parallel
+        NodeTemplate(
+            slug="business_rules",
+            label="Business Rules Catalog",
+            branch="business_requirements",
+            node_type=NodeType.GENERATE_DOCUMENT,
+            depends_on=["brd_questions"],
+            config={"template": "business_rules", "branch": "business_requirements"},
+        ),
+        NodeTemplate(
+            slug="process_model",
+            label="Business Process Model",
+            branch="business_requirements",
+            node_type=NodeType.GENERATE_DOCUMENT,
+            depends_on=["brd_questions"],
+            config={"template": "process_model", "branch": "business_requirements"},
+        ),
+        # BRD synthesizes business rules and process model
+        NodeTemplate(
+            slug="brd",
+            label="Business Requirements Document",
+            branch="business_requirements",
+            node_type=NodeType.GENERATE_DOCUMENT,
+            depends_on=["brd_questions", "business_rules", "process_model"],
+            config={"template": "brd", "branch": "business_requirements"},
+        ),
+        NodeTemplate(
+            slug="brd_critic",
+            label="Business Requirements Review",
+            branch="business_requirements",
+            node_type=NodeType.CRITIC_REVIEW,
+            depends_on=["brd"],
+            config={"max_cycles": 2, "branch": "business_requirements"},
+        ),
+        # ===================================================================
+        # PHASE 3: Product Strategy (depends on BRD)
+        # ===================================================================
         NodeTemplate(
             slug="product_questions",
             label="Product Strategy Questions",
             branch="product_strategy",
             node_type=NodeType.ASK_USER,
-            depends_on=["lean_canvas_critic"],
+            depends_on=["brd_critic"],
             requires_approval=False,
             config={
                 "questions": [
-                    "What are the core features of your product?",
-                    "What is your monetization strategy?",
-                    "What is your product's key differentiator?",
+                    "What are the core features of your product? List the top 5-10 capabilities.",
+                    "What is your monetization strategy? (subscription, freemium, usage-based, marketplace, etc.)",
+                    "What is your product's key differentiator — what makes it 10x better than alternatives?",
+                    "What does the user's 'aha moment' look like? When do they first get value?",
+                    "What distribution channels will you use to reach customers? (PLG, sales-led, partnerships, content, etc.)",
                 ]
             },
         ),
@@ -102,7 +205,7 @@ FULL_ANALYSIS = WorkflowTemplate(
             branch="product_strategy",
             node_type=NodeType.GENERATE_DOCUMENT,
             depends_on=["feature_research", "pricing_research"],
-            config={"template": "product_roadmap"},
+            config={"template": "product_roadmap", "branch": "product_strategy"},
         ),
         NodeTemplate(
             slug="product_roadmap_critic",
@@ -110,21 +213,25 @@ FULL_ANALYSIS = WorkflowTemplate(
             branch="product_strategy",
             node_type=NodeType.CRITIC_REVIEW,
             depends_on=["product_roadmap"],
-            config={"max_cycles": 2},
+            config={"max_cycles": 2, "branch": "product_strategy"},
         ),
-        # ===== UX & Requirements Branch =====
+        # ===================================================================
+        # PHASE 4: UX & Requirements (depends on BRD, parallel with product)
+        # ===================================================================
         NodeTemplate(
             slug="ux_questions",
             label="UX & Requirements Questions",
             branch="ux_requirements",
             node_type=NodeType.ASK_USER,
-            depends_on=["lean_canvas_critic"],
+            depends_on=["brd_critic"],
             requires_approval=False,
             config={
                 "questions": [
-                    "Who are the primary user personas?",
-                    "What are the critical user journeys?",
-                    "What platforms should be supported?",
+                    "Describe your primary user personas in detail. (Who are they, what do they do, what frustrates them?)",
+                    "What are the 3-5 critical user journeys? Walk through each step-by-step.",
+                    "What platforms must be supported? (Web, iOS, Android, desktop app, API-only)",
+                    "What accessibility requirements apply? (WCAG level, screen reader support, etc.)",
+                    "What does a successful first-time user experience look like? What should happen in the first 5 minutes?",
                 ]
             },
         ),
@@ -142,7 +249,7 @@ FULL_ANALYSIS = WorkflowTemplate(
             branch="ux_requirements",
             node_type=NodeType.GENERATE_DOCUMENT,
             depends_on=["ux_research"],
-            config={"template": "user_stories"},
+            config={"template": "user_stories", "branch": "ux_requirements"},
         ),
         NodeTemplate(
             slug="user_stories_critic",
@@ -152,19 +259,23 @@ FULL_ANALYSIS = WorkflowTemplate(
             depends_on=["user_stories"],
             config={"max_cycles": 2},
         ),
-        # ===== Technical Architecture Branch =====
+        # ===================================================================
+        # PHASE 5: Technical Architecture
+        # ===================================================================
         NodeTemplate(
             slug="tech_questions",
-            label="Technical Questions",
+            label="Technical Architecture Questions",
             branch="technical_architecture",
             node_type=NodeType.ASK_USER,
             depends_on=["product_roadmap_critic", "user_stories_critic"],
             requires_approval=False,
             config={
                 "questions": [
-                    "What is your team's tech stack expertise?",
-                    "What are your scalability requirements?",
-                    "Are there integration requirements?",
+                    "What is your team's technical expertise? (Languages, frameworks, cloud platforms)",
+                    "What are your scalability requirements? (Expected users at launch, 6 months, 1 year)",
+                    "What external systems or APIs must be integrated? (Payment, auth, CRM, analytics, etc.)",
+                    "What are your availability/uptime requirements? (99.9%? 99.99%?)",
+                    "Are there data residency or compliance constraints on infrastructure? (EU-only, HIPAA, etc.)",
                 ]
             },
         ),
@@ -182,7 +293,7 @@ FULL_ANALYSIS = WorkflowTemplate(
             branch="technical_architecture",
             node_type=NodeType.GENERATE_DOCUMENT,
             depends_on=["tech_stack_research"],
-            config={"template": "architecture"},
+            config={"template": "architecture", "branch": "technical_architecture"},
         ),
         NodeTemplate(
             slug="architecture_critic",
@@ -190,9 +301,28 @@ FULL_ANALYSIS = WorkflowTemplate(
             branch="technical_architecture",
             node_type=NodeType.CRITIC_REVIEW,
             depends_on=["architecture_doc"],
-            config={"max_cycles": 2},
+            config={"max_cycles": 2, "branch": "technical_architecture"},
         ),
-        # ===== Execution Planning Branch =====
+        # --- Detailed Technical Specs (derived from architecture) ---
+        NodeTemplate(
+            slug="api_contracts",
+            label="API & Event Contract Specification",
+            branch="delivery",
+            node_type=NodeType.GENERATE_DOCUMENT,
+            depends_on=["architecture_critic", "user_stories_critic"],
+            config={"template": "api_contracts", "branch": "delivery"},
+        ),
+        NodeTemplate(
+            slug="data_model_spec",
+            label="Data Model Specification",
+            branch="delivery",
+            node_type=NodeType.GENERATE_DOCUMENT,
+            depends_on=["architecture_critic", "brd_critic"],
+            config={"template": "data_model", "branch": "delivery"},
+        ),
+        # ===================================================================
+        # PHASE 6: Execution Planning
+        # ===================================================================
         NodeTemplate(
             slug="execution_questions",
             label="Execution Planning Questions",
@@ -202,9 +332,11 @@ FULL_ANALYSIS = WorkflowTemplate(
             requires_approval=False,
             config={
                 "questions": [
-                    "What is your team size?",
-                    "What is your total budget?",
-                    "What is your target launch date?",
+                    "What is your current team size and composition? (Engineers, designers, PMs, QA)",
+                    "What is your total budget for the build phase? (Include range if uncertain)",
+                    "What is your target launch date or timeline constraint?",
+                    "Do you have existing infrastructure, CI/CD, or development environments?",
+                    "What is your risk tolerance? (Aggressive timeline vs conservative with buffers)",
                 ]
             },
         ),
@@ -222,7 +354,7 @@ FULL_ANALYSIS = WorkflowTemplate(
             branch="execution_planning",
             node_type=NodeType.GENERATE_DOCUMENT,
             depends_on=["cost_estimation"],
-            config={"template": "execution_plan"},
+            config={"template": "execution_plan", "branch": "execution_planning"},
         ),
         NodeTemplate(
             slug="execution_plan_critic",
@@ -230,20 +362,49 @@ FULL_ANALYSIS = WorkflowTemplate(
             branch="execution_planning",
             node_type=NodeType.CRITIC_REVIEW,
             depends_on=["execution_plan"],
-            config={"max_cycles": 2},
+            config={"max_cycles": 2, "branch": "execution_planning"},
         ),
-        # ===== Densification Branch =====
+        # ===================================================================
+        # PHASE 7: Delivery — QA Strategy & Traceability
+        # ===================================================================
+        NodeTemplate(
+            slug="qa_strategy",
+            label="QA & Test Strategy",
+            branch="delivery",
+            node_type=NodeType.GENERATE_DOCUMENT,
+            depends_on=["execution_plan_critic", "user_stories_critic", "architecture_critic"],
+            config={"template": "qa_strategy", "branch": "delivery"},
+        ),
+        NodeTemplate(
+            slug="traceability_matrix",
+            label="Traceability Matrix",
+            branch="delivery",
+            node_type=NodeType.GENERATE_DOCUMENT,
+            depends_on=[
+                "lean_canvas_critic",
+                "brd_critic",
+                "product_roadmap_critic",
+                "user_stories_critic",
+                "architecture_critic",
+                "execution_plan_critic",
+                "qa_strategy",
+            ],
+            config={"template": "traceability_matrix", "branch": "delivery"},
+        ),
+        # ===================================================================
+        # PHASE 8: Densification
+        # ===================================================================
         NodeTemplate(
             slug="densify_developer",
             label="Densify for Developer",
             branch="densification",
             node_type=NodeType.DENSIFY,
             depends_on=[
-                "lean_canvas_critic",
-                "product_roadmap_critic",
-                "user_stories_critic",
-                "architecture_critic",
-                "execution_plan_critic",
+                *_ALL_CRITIC_NODES,
+                "api_contracts",
+                "data_model_spec",
+                "qa_strategy",
+                "traceability_matrix",
             ],
             config={"role": "developer"},
         ),
@@ -253,11 +414,8 @@ FULL_ANALYSIS = WorkflowTemplate(
             branch="densification",
             node_type=NodeType.DENSIFY,
             depends_on=[
-                "lean_canvas_critic",
-                "product_roadmap_critic",
-                "user_stories_critic",
-                "architecture_critic",
-                "execution_plan_critic",
+                *_ALL_CRITIC_NODES,
+                "traceability_matrix",
             ],
             config={"role": "designer"},
         ),
@@ -267,15 +425,15 @@ FULL_ANALYSIS = WorkflowTemplate(
             branch="densification",
             node_type=NodeType.DENSIFY,
             depends_on=[
-                "lean_canvas_critic",
-                "product_roadmap_critic",
-                "user_stories_critic",
-                "architecture_critic",
-                "execution_plan_critic",
+                *_ALL_CRITIC_NODES,
+                "qa_strategy",
+                "traceability_matrix",
             ],
             config={"role": "product_manager"},
         ),
-        # ===== Export Branch =====
+        # ===================================================================
+        # PHASE 9: Export
+        # ===================================================================
         NodeTemplate(
             slug="format_export",
             label="Format & Export Archive",

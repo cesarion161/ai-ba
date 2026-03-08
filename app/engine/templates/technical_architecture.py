@@ -7,15 +7,18 @@ TECHNICAL_ARCHITECTURE = WorkflowTemplate(
     nodes=[
         NodeTemplate(
             slug="tech_questions",
-            label="Technical Questions",
+            label="Technical Architecture Questions",
             branch="technical_architecture",
             node_type=NodeType.ASK_USER,
             requires_approval=False,
             config={
                 "questions": [
-                    "What is your team's tech stack expertise?",
-                    "What are your scalability requirements?",
-                    "Are there integration requirements with existing systems?",
+                    "Describe the product and its core functionality.",
+                    "What is your team's technical expertise? (Languages, frameworks, cloud platforms)",
+                    "What are your scalability requirements? (Expected users at launch, 6 months, 1 year)",
+                    "What external systems or APIs must be integrated?",
+                    "What are your availability/uptime requirements?",
+                    "Are there data residency or compliance constraints on infrastructure?",
                     "What is your infrastructure budget?",
                 ]
             },
@@ -34,7 +37,7 @@ TECHNICAL_ARCHITECTURE = WorkflowTemplate(
             branch="technical_architecture",
             node_type=NodeType.GENERATE_DOCUMENT,
             depends_on=["tech_stack_research"],
-            config={"template": "architecture"},
+            config={"template": "architecture", "branch": "technical_architecture"},
         ),
         NodeTemplate(
             slug="architecture_critic",
@@ -42,7 +45,7 @@ TECHNICAL_ARCHITECTURE = WorkflowTemplate(
             branch="technical_architecture",
             node_type=NodeType.CRITIC_REVIEW,
             depends_on=["architecture_doc"],
-            config={"max_cycles": 2},
+            config={"max_cycles": 2, "branch": "technical_architecture"},
         ),
     ],
 )

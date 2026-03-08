@@ -13,9 +13,12 @@ PRODUCT_STRATEGY = WorkflowTemplate(
             requires_approval=False,
             config={
                 "questions": [
-                    "What are the core features of your product?",
-                    "What is your monetization strategy?",
-                    "What is your product's key differentiator?",
+                    "Describe your product idea and the problem it solves.",
+                    "What are the core features? List the top 5-10 capabilities.",
+                    "What is your monetization strategy? (subscription, freemium, usage-based, etc.)",
+                    "What is your product's key differentiator — what makes it 10x better?",
+                    "What does the user's 'aha moment' look like? When do they first get value?",
+                    "What distribution channels will you use to reach customers?",
                     "What is your development timeline?",
                 ]
             },
@@ -42,7 +45,7 @@ PRODUCT_STRATEGY = WorkflowTemplate(
             branch="product_strategy",
             node_type=NodeType.GENERATE_DOCUMENT,
             depends_on=["feature_research", "pricing_research"],
-            config={"template": "product_roadmap"},
+            config={"template": "product_roadmap", "branch": "product_strategy"},
         ),
         NodeTemplate(
             slug="product_roadmap_critic",
@@ -50,7 +53,7 @@ PRODUCT_STRATEGY = WorkflowTemplate(
             branch="product_strategy",
             node_type=NodeType.CRITIC_REVIEW,
             depends_on=["product_roadmap"],
-            config={"max_cycles": 2},
+            config={"max_cycles": 2, "branch": "product_strategy"},
         ),
     ],
 )
