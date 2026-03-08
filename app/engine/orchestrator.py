@@ -129,10 +129,12 @@ async def execute_node(
         if requirements_summary:
             input_data["_requirements_summary"] = requirements_summary
 
-        # Execute handler
+        # Execute handler — inject branch into config so handlers can route
+        node_config = dict(node.config or {})
+        node_config.setdefault("branch", node.branch)
         try:
             handler = get_handler(node.node_type)
-            output = await handler.execute(node.config, input_data, node.user_feedback)
+            output = await handler.execute(node_config, input_data, node.user_feedback)
         except Exception as e:
             node.status = NodeStatus.FAILED
             node.completed_at = datetime.now(UTC)

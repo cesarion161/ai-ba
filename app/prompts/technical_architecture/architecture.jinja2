@@ -1,18 +1,13 @@
-You are a senior software architect. Design the technical architecture for the following product.
+You are designing a production-grade system architecture document for the product described below. This document must be detailed and specific enough that a senior engineering team can begin implementation immediately — no hand-waving, no vague "use best practices" statements. Every recommendation must include concrete justification with trade-offs, costs, and failure modes considered.
+
+Think like a principal architect who has shipped systems serving millions of users. Consider operational realities: on-call burden, deployment complexity, debugging difficulty, vendor lock-in, and total cost of ownership.
+
+---
 
 ## Product Requirements
 {{ product_requirements }}
 
-## Tech Stack Expertise
-{{ tech_expertise }}
-
-## Scalability Requirements
-{{ scalability }}
-
-## Integration Requirements
-{{ integrations }}
-
-## Tech Stack Research
+## Tech Stack Research & Expertise
 {{ tech_research }}
 
 {% if user_feedback %}
@@ -20,40 +15,208 @@ You are a senior software architect. Design the technical architecture for the f
 {{ user_feedback }}
 {% endif %}
 
-Generate a comprehensive architecture document:
+---
 
-## 1. System Overview
-- High-level architecture diagram (describe in Mermaid syntax)
-- Key components and their responsibilities
+Generate a comprehensive, implementation-ready architecture document covering ALL of the following sections. Be specific — name exact services, APIs, protocols, and configurations. Include Mermaid diagrams where indicated.
 
-## 2. Technology Stack
-- Frontend, backend, database, infrastructure
-- Justification for each choice (Architecture Decision Records)
+---
 
-## 3. Data Architecture
-- Entity Relationship Diagram (Mermaid syntax)
-- Data dictionary
-- Data flow diagrams
+# 1. Executive Summary & Architecture Decision Record
 
-## 4. API Design
-- REST/GraphQL endpoints
-- Authentication & authorization
-- Rate limiting strategy
+- One-paragraph summary of the system and its core architectural style
+- **Monolith vs Microservices vs Modular Monolith**: Explicit decision with justification. Consider team size, deployment complexity, debugging overhead, and operational maturity. If microservices: justify each service boundary using domain-driven design principles. If monolith: explain the modular decomposition strategy and when/how to extract services later.
+- **Architecture style**: Event-driven, request-response, CQRS, or hybrid? Why?
+- List the top 5 Architecture Decision Records (ADRs) as a table: Decision | Context | Options Considered | Chosen | Trade-offs
 
-## 5. Infrastructure
-- Deployment architecture
-- CI/CD pipeline
-- Monitoring & observability
+# 2. High-Level System Architecture
 
-## 6. Security
-- Authentication mechanism
-- Authorization model
-- Data encryption
-- Security compliance checklist
+- **System context diagram** (Mermaid C4 or flowchart): Show the system, its users, and external dependencies
+- **Container diagram** (Mermaid): Show major deployable units (services, databases, queues, CDNs, etc.)
+- Describe each component's responsibility in 1-2 sentences
+- Show all communication paths with protocols (REST, gRPC, WebSocket, async messaging)
 
-## 7. Scalability Plan
-- Horizontal vs vertical scaling strategy
-- Caching strategy
-- Database scaling approach
+```mermaid
+[Generate a detailed architecture diagram here]
+```
+
+# 3. Cloud Provider & Infrastructure
+
+- **Cloud provider recommendation** (AWS / GCP / Azure / multi-cloud): Justify based on specific services needed, pricing, team expertise, and vendor lock-in risk
+- **Compute**: Serverless (Lambda/Cloud Functions) vs containers (ECS/EKS/Cloud Run/GKE) vs VMs — choose and justify per service. Include expected instance types/sizes.
+- **Networking**: VPC design, subnets (public/private), NAT gateways, load balancers (ALB/NLB), DNS (Route 53 / Cloud DNS)
+- **CDN**: CloudFront / Cloud CDN / Cloudflare — for static assets and API edge caching
+- **Region strategy**: Single region vs multi-region. Latency requirements and disaster recovery implications.
+- **Infrastructure as Code**: Terraform / Pulumi / CloudFormation — recommendation with rationale
+- **Cost estimation**: Rough monthly cost breakdown by service tier (startup scale → growth scale → at-scale). Identify the top 3 cost drivers.
+
+# 4. Service Design & Communication
+
+- For each service/module:
+  - Responsibility and bounded context
+  - API surface (REST endpoints or gRPC service definitions) with example routes
+  - Input/output contracts
+  - Dependencies (upstream/downstream)
+
+- **API Gateway**: Kong / AWS API Gateway / Envoy / custom — recommendation with features needed (rate limiting, auth, request transformation, observability)
+- **gRPC vs REST**: Decision per service pair. gRPC for internal high-throughput service-to-service. REST for external/mobile APIs. Justify.
+- **Service discovery**: DNS-based (Cloud Map/Consul) vs sidecar proxy (Envoy/Istio) — choose based on complexity budget
+- **API versioning strategy**: URL path vs header-based. Breaking change policy.
+
+# 5. Data Architecture
+
+### 5.1 Primary Database
+- **Database choice**: PostgreSQL / MySQL / MongoDB / DynamoDB / CockroachDB — justify based on data model, query patterns, consistency requirements, and operational complexity
+- **Schema design**: Entity Relationship Diagram (Mermaid) for core entities. Include indexes, partitioning strategy, and estimated table sizes.
+
+```mermaid
+[Generate an ER diagram here]
+```
+
+### 5.2 Data Flow
+- **Data flow diagram** (Mermaid): Show how data moves from user action through services to storage and back
+- Read vs write path separation if using CQRS
+- Eventual consistency boundaries and how to handle them (compensation, idempotency)
+
+### 5.3 Storage Strategy
+- **Hot storage**: Primary database for transactional data
+- **Warm storage**: Read replicas, materialized views, search indexes (Elasticsearch/OpenSearch)
+- **Cold storage**: S3/GCS for archives, logs, ML training data
+- **Blob/file storage**: S3/GCS with pre-signed URLs for user uploads
+- **Search**: Elasticsearch / OpenSearch / Meilisearch — if full-text search is needed, specify index design
+
+### 5.4 Database Scaling
+- Connection pooling (PgBouncer / RDS Proxy)
+- Read replicas and replication lag tolerance
+- Sharding strategy if needed (by tenant, by geography, by time)
+- Backup and point-in-time recovery strategy
+
+# 6. Caching Strategy (Multi-Level)
+
+- **Client-side cache**: HTTP cache headers (Cache-Control, ETag), service worker caching for mobile/PWA
+- **CDN cache**: Static assets, API responses for public data. Cache invalidation strategy.
+- **API gateway cache**: Response caching for idempotent GET requests. TTL policies.
+- **Application-level cache**: Redis / Memcached — what to cache (session data, computed results, hot queries). Cache-aside vs write-through vs write-behind pattern selection with justification.
+- **Database query cache**: Materialized views, query result caching
+- **Cache invalidation**: TTL-based, event-based invalidation, cache stampede prevention (lock/probabilistic early expiry)
+- Estimated cache hit ratios and memory sizing
+
+# 7. Asynchronous Processing & Event Architecture
+
+- **Message broker**: Kafka / RabbitMQ / SQS / Redis Streams / Google Pub/Sub — justify choice based on throughput needs, ordering guarantees, replay capability, and operational complexity
+- **Event schema**: Define key domain events with example payloads. Schema registry (Avro/Protobuf) if using Kafka.
+- **Event-driven patterns used**:
+  - Event sourcing (if applicable, with snapshot strategy)
+  - Pub/sub for cross-service notifications
+  - Task queues for background jobs (Celery / Bull / SQS workers)
+- **Dead letter queues**: Configuration and alerting for failed messages
+- **Idempotency**: How to handle duplicate message delivery (idempotency keys, deduplication windows)
+- **Backpressure handling**: What happens when consumers fall behind? Rate limiting producers? Scaling consumers?
+
+# 8. Reliability & Resilience Patterns
+
+### 8.1 Circuit Breakers
+- Where to apply circuit breakers (external API calls, inter-service calls, database connections)
+- Configuration: failure threshold, timeout, half-open state behavior
+- Library/tool: Resilience4j / Polly / Hystrix successor / custom
+
+### 8.2 Retry Strategy
+- Per-dependency retry configuration: max retries, backoff (exponential with jitter), timeout budgets
+- Distinguish retryable (5xx, timeout, connection reset) vs non-retryable (4xx) errors
+- Total request deadline budget across retry chains
+
+### 8.3 Bulkhead Pattern
+- Thread pool / connection pool isolation per dependency
+- Prevent cascade failures from one slow dependency affecting others
+
+### 8.4 Transaction Outbox Pattern
+- Where needed: any service that must atomically update its database AND publish an event
+- Implementation: polling publisher vs CDC (Debezium) from database WAL
+- Delivery guarantees: at-least-once with consumer idempotency
+
+### 8.5 Saga Pattern
+- For distributed transactions spanning multiple services
+- Choreography (event-based) vs orchestration (central coordinator) — choose and justify
+- Compensating transactions for rollback scenarios
+- Specific sagas needed for this system (e.g., order processing, payment + inventory)
+
+### 8.6 Rate Limiting
+- **External API rate limiting**: Token bucket / sliding window per API key, per user, per IP
+- **Internal rate limiting**: Between services to prevent noisy-neighbor problems
+- Implementation: Redis-based (rate limiter in API gateway) or service mesh sidecar
+- Rate limit headers in responses (X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After)
+
+### 8.7 Timeouts & Deadlines
+- Per-service timeout budget
+- Deadline propagation across service calls
+- Graceful degradation when dependencies are slow (return cached data, partial responses, feature flags)
+
+# 9. Security Architecture
+
+- **Authentication**: OAuth 2.0 + OIDC / JWT — token issuance, refresh flow, token storage on client
+- **Authorization**: RBAC / ABAC — permission model, policy engine (OPA / Cedar / custom)
+- **API security**: HTTPS everywhere, CORS policy, CSRF protection, input validation
+- **Data encryption**: At rest (AES-256, KMS managed keys), in transit (TLS 1.3), field-level encryption for PII
+- **Secrets management**: AWS Secrets Manager / HashiCorp Vault / GCP Secret Manager
+- **Dependency security**: Dependabot / Snyk for vulnerability scanning, SBOM generation
+- **Compliance**: GDPR / SOC 2 / HIPAA (as applicable) — data residency, right to erasure, audit logging
+- **DDoS protection**: WAF (AWS WAF / Cloudflare), rate limiting, geo-blocking if needed
+
+# 10. Observability & Monitoring
+
+- **Structured logging**: JSON logs, correlation IDs across services, log levels policy
+- **Metrics**: Prometheus / CloudWatch / Datadog — key metrics (RED: Rate, Errors, Duration per service)
+- **Distributed tracing**: OpenTelemetry / Jaeger / X-Ray — trace propagation, sampling strategy
+- **Alerting**: PagerDuty / OpsGenie integration, alert severity levels, runbooks for top alerts
+- **Dashboards**: Per-service health dashboard, business metrics dashboard, infrastructure dashboard
+- **SLIs/SLOs**: Define Service Level Indicators and Objectives (e.g., p99 latency < 200ms, availability > 99.9%)
+- **Error tracking**: Sentry / Bugsnag for application errors with source maps
+
+# 11. CI/CD & Deployment
+
+- **Pipeline**: GitHub Actions / GitLab CI / CircleCI — stages (lint, test, build, security scan, deploy)
+- **Deployment strategy**: Blue-green / canary / rolling — per service. Automated rollback triggers.
+- **Environment strategy**: dev → staging → production. Feature flags (LaunchDarkly / Unleash / custom) for gradual rollout.
+- **Container registry**: ECR / GCR / Docker Hub — image tagging and retention policy
+- **Database migrations**: Flyway / Alembic — zero-downtime migration strategy (expand-contract pattern)
+- **Artifact versioning**: Semantic versioning, immutable artifacts, reproducible builds
+
+# 12. Scalability Analysis & Bottleneck Identification
+
+- **Expected load**: Users (DAU/MAU), requests per second, data volume growth
+- **Bottleneck analysis**: Identify the top 3-5 potential bottlenecks with reasoning:
+  - Database write throughput
+  - External API rate limits
+  - CPU-intensive operations (ML inference, media processing)
+  - Memory pressure from caching
+  - Network bandwidth for file uploads/downloads
+- **Scaling strategy per bottleneck**: Horizontal scaling, vertical scaling, caching, async offloading, partitioning
+- **Auto-scaling configuration**: Metrics to scale on (CPU, request count, queue depth), min/max instances, cooldown periods
+- **Load testing plan**: Tools (k6 / Locust / Artillery), key scenarios to test, expected breaking points
+
+# 13. Disaster Recovery & Business Continuity
+
+- **RPO / RTO targets**: Recovery Point Objective and Recovery Time Objective per tier
+- **Backup strategy**: Automated daily backups, cross-region replication for critical data
+- **Failover**: Active-passive or active-active. DNS failover or load balancer health checks.
+- **Chaos engineering**: Recommend fault injection tests (service failures, network partitions, database failovers)
+
+# 14. Development Experience & Standards
+
+- **Repository structure**: Monorepo vs polyrepo — decision with justification
+- **Code standards**: Linting, formatting, type checking, pre-commit hooks
+- **Testing strategy**: Unit / integration / contract / E2E — coverage targets per layer
+- **Local development**: Docker Compose or Tilt for local multi-service development
+- **Documentation**: API docs (OpenAPI/Swagger), architecture diagrams (auto-generated from code), ADRs
+
+---
+
+CRITICAL INSTRUCTIONS:
+- Be SPECIFIC. Name exact AWS/GCP/Azure services, exact library versions, exact configurations. Do not say "use a message queue" — say "use Amazon SQS Standard queues for task distribution because ordering is not required and the at-least-once delivery with visibility timeout matches our idempotent consumer design."
+- Every recommendation MUST include trade-offs and alternatives considered.
+- Include Mermaid diagrams for: system architecture, data flow, ER diagram, and deployment architecture.
+- If a pattern (circuit breaker, saga, outbox, etc.) is NOT needed for this specific system, say so explicitly and explain why — do not omit it silently.
+- Estimate costs where possible. A dev team needs to know if a choice is $50/mo or $5000/mo.
+- Think about what breaks first at 10x and 100x current scale.
+- The document should be 3000-5000 words minimum. This is a real architecture document, not a summary.
 
 Format as a well-structured markdown document with Mermaid diagrams.

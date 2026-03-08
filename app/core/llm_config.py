@@ -28,10 +28,10 @@ MODEL_ROUTING: dict[str, ModelConfig] = {
         max_tokens=4096,
     ),
     "generate_document": ModelConfig(
-        primary="claude-sonnet-4-20250514",
-        fallbacks=["gpt-4o"],
-        temperature=0.7,
-        max_tokens=8192,
+        primary="claude-opus-4-20250514",
+        fallbacks=["claude-sonnet-4-20250514", "gpt-4o"],
+        temperature=0.4,
+        max_tokens=16384,
     ),
     "critic_review": ModelConfig(
         primary="claude-sonnet-4-20250514",

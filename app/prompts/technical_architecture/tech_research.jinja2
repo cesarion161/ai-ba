@@ -1,4 +1,4 @@
-You are a technology advisor. Research the best tech stack for the following product.
+You are a principal software architect evaluating technology choices for a production system. Your analysis must be grounded in real-world operational experience, not marketing materials.
 
 ## Product Description
 {{ product_description }}
@@ -17,17 +17,67 @@ You are a technology advisor. Research the best tech stack for the following pro
 {{ user_feedback }}
 {% endif %}
 
-Research and compare:
-1. Frontend frameworks (React, Next.js, Vue, Svelte, etc.)
-2. Backend frameworks (Node.js, Python/FastAPI, Go, Rust, etc.)
-3. Database options (PostgreSQL, MongoDB, etc.)
-4. Cloud providers (AWS, GCP, Azure, Vercel, etc.)
-5. Key third-party services (auth, payments, email, etc.)
+Produce a detailed technology evaluation report covering:
 
-For each recommendation, provide:
-- Pros/cons
-- Fit for the specific requirements
-- Learning curve vs team expertise
-- Cost implications
+## 1. Frontend Framework Evaluation
+Compare viable options (React/Next.js, Vue/Nuxt, Svelte/SvelteKit, React Native, Flutter) against these criteria:
+- Performance characteristics (bundle size, TTI, runtime overhead)
+- Ecosystem maturity (libraries, tooling, community support)
+- Team ramp-up time given stated expertise
+- SSR/SSG capabilities if needed
+- Mobile considerations (React Native, Flutter, PWA, or native)
+- **Recommendation with specific version** and justification
 
-Provide a structured technology evaluation report.
+## 2. Backend Framework Evaluation
+Compare viable options (Node.js/Express/Fastify, Python/FastAPI/Django, Go/Gin, Rust/Actix, Java/Spring Boot, .NET) against:
+- Request throughput and latency characteristics
+- Async/concurrent processing capabilities
+- ORM and database driver maturity
+- Deployment and operational complexity
+- Hiring pool availability
+- **Recommendation with specific version** and justification
+
+## 3. Database Evaluation
+Compare options (PostgreSQL, MySQL, MongoDB, DynamoDB, CockroachDB, Supabase) for each storage need:
+- Data model fit (relational vs document vs key-value vs time-series)
+- Query pattern optimization (OLTP vs OLAP, full-text search, geospatial)
+- Scaling characteristics (read replicas, sharding, partitioning)
+- Operational complexity (backups, migrations, monitoring)
+- Managed service options and pricing at projected scale
+- Connection pooling and connection limit considerations
+- **Recommendation per storage tier** with justification
+
+## 4. Cloud Provider Evaluation
+Compare AWS, GCP, and Azure for this specific workload:
+- Service availability for required components (compute, database, ML, CDN, messaging)
+- Pricing comparison at startup scale ($0-1K/mo) and growth scale ($1K-10K/mo)
+- Free tier and startup credit programs
+- Vendor lock-in risk per service
+- Regional availability relevant to target market
+- **Recommendation** with specific services named
+
+## 5. Third-Party Service Evaluation
+For each integration need, compare 2-3 options:
+- **Authentication**: Auth0 vs Clerk vs Supabase Auth vs Firebase Auth vs self-hosted Keycloak
+- **Payments**: Stripe vs Paddle vs LemonSqueezy (consider region support, pricing, complexity)
+- **Email/Notifications**: SendGrid vs Resend vs Amazon SES + push notification service
+- **File storage / CDN**: S3+CloudFront vs Cloudflare R2+CDN vs GCS
+- **Search**: Elasticsearch vs Meilisearch vs Algolia vs Typesense
+- **Monitoring**: Datadog vs Grafana Cloud vs self-hosted Prometheus+Grafana
+- Include monthly cost estimates at projected scale
+
+## 6. AI/ML Infrastructure (if applicable)
+- Model hosting: self-hosted (GPU instances) vs managed (SageMaker, Vertex AI, Replicate)
+- Inference optimization: batching, caching, model quantization, edge deployment
+- Training pipeline: data labeling, experiment tracking (MLflow, W&B), model registry
+- Cost analysis: GPU instance pricing vs API-based pricing at projected inference volume
+
+## 7. Cost Projection Summary
+Table format: Service | Startup (0-1K users) | Growth (1K-50K users) | Scale (50K+ users) | Notes
+
+For each recommendation, clearly state:
+- Why this choice over alternatives (2-3 sentences, not generic)
+- What would make you reconsider this choice
+- Migration path if the choice doesn't scale
+
+Format as a well-structured markdown document.

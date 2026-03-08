@@ -1,4 +1,4 @@
-You are a business strategy consultant. Create a Lean Canvas based on the following inputs.
+You are a startup strategist and business model designer with deep experience in lean methodology, venture-backed startups, and product-market fit assessment. You don't create generic canvases — you create sharp, specific business model analyses that would hold up in a seed-stage investor pitch. Every section must be grounded in the research data provided, not assumptions.
 
 ## Research Summary
 {{ research_summary }}
@@ -17,15 +17,182 @@ You are a business strategy consultant. Create a Lean Canvas based on the follow
 {{ user_feedback }}
 {% endif %}
 
-Generate a complete Lean Canvas with these sections:
-1. **Problem** — Top 3 problems
-2. **Solution** — Top 3 solutions
-3. **Key Metrics** — Key activities you measure
-4. **Unique Value Proposition** — Single, clear message
-5. **Unfair Advantage** — Something that cannot be easily copied
-6. **Channels** — Path to customers
-7. **Customer Segments** — Target customers
-8. **Cost Structure** — Customer acquisition, distribution, hosting costs
-9. **Revenue Streams** — Revenue model, lifetime value, gross margin
+Generate a comprehensive Lean Canvas with deep analysis in each section:
 
-Format as a well-structured markdown document.
+---
+
+# Lean Canvas
+
+## 1. Problem (Top 3)
+For each problem:
+- **Problem statement**: One clear sentence
+- **Current alternatives**: How do people solve this today? (existing solutions, workarounds, "do nothing")
+- **Pain severity**: Is this a vitamin (nice to have) or painkiller (must solve)? How much time/money does the current approach cost?
+- **Who feels it most**: Which specific persona segment experiences this most acutely?
+- **Evidence**: Data from research that validates this is a real problem (market data, user complaints, competitor gaps)
+
+## 2. Solution (Top 3)
+For each solution (mapped to a problem above):
+- **Solution description**: How your product solves this specific problem
+- **Key differentiator**: Why this approach is better than current alternatives (faster, cheaper, more accurate, more convenient?)
+- **Minimum viable version**: The simplest version of this solution that delivers value
+- **Validation approach**: How to test if this solution actually works before building the full version (landing page test, Wizard of Oz, concierge MVP?)
+- **Technical feasibility**: High/Medium/Low — any technical risk?
+
+## 3. Key Metrics
+Define the metrics that matter at each stage:
+
+### Pre-Launch
+- Sign-up / waitlist conversion rate
+- Landing page engagement
+- Letter of intent / pre-orders
+
+### Launch (First 3 Months)
+- Activation rate (sign-up → first value moment)
+- D1/D7/D30 retention
+- NPS score
+- Time to value
+
+### Growth
+- MRR / ARR growth rate
+- LTV:CAC ratio (target > 3:1)
+- Churn rate (monthly)
+- Viral coefficient
+- Revenue per user (ARPU)
+
+### One Metric That Matters (OMTM)
+- At launch: [specific metric] because [reason]
+- At PMF stage: [specific metric] because [reason]
+
+## 4. Unique Value Proposition
+- **Headline**: One sentence that captures why this product is different AND desirable
+- **Sub-headline**: 2-3 sentences explaining what it does, for whom, and why it's better
+- **High-concept pitch**: "[Known thing] for [target market]" or "[Known thing] meets [known thing]" (e.g., "Uber for dog walking")
+- **Before/after comparison**: What the user's life looks like before vs after using this product
+- **Why now?**: What market/technology shift makes this the right time for this product?
+
+## 5. Unfair Advantage
+Things that CANNOT be easily copied or bought:
+- Network effects (does the product get better with more users?)
+- Proprietary data (does usage generate unique, defensible data?)
+- Community / brand (would users choose this over a cheaper clone?)
+- Switching costs (how painful is it to leave once invested?)
+- Technical moat (patents, proprietary algorithms, unique integrations?)
+- Team expertise (domain knowledge that takes years to build?)
+- Distribution advantage (existing audience, partnerships, platform placement?)
+
+Be honest: if there's no clear unfair advantage yet, state that and suggest how to build one.
+
+## 6. Channels
+### Acquisition Channels (ranked by expected efficiency)
+
+| Channel | Type | CAC Estimate | Volume Potential | Time to Results | Priority |
+|---------|------|-------------|-----------------|----------------|----------|
+| Organic search / SEO | Owned | Low | High | 6+ months | ... |
+| Content marketing | Owned | Low | Medium | 3-6 months | ... |
+| Social media (organic) | Owned | Low | Medium | 3+ months | ... |
+| Paid search (Google) | Paid | Medium | High | Immediate | ... |
+| Social ads (Meta, TikTok) | Paid | Medium | High | Immediate | ... |
+| Referral program | Viral | Low | Depends | 1-3 months | ... |
+| Partnerships / integrations | Earned | Medium | Medium | 3-6 months | ... |
+| App store optimization | Owned | Low | Medium | 1-3 months | ... |
+
+### Channel Strategy
+- **Phase 1 (Pre-launch)**: Which channels to focus on and why
+- **Phase 2 (Launch)**: Launch day distribution plan
+- **Phase 3 (Growth)**: Scaling channels that work, testing new ones
+
+## 7. Customer Segments
+### Primary Segment
+- Demographics, psychographics, behaviors
+- Size of segment (from market sizing data)
+- Where to find them (online communities, platforms, events)
+- Early adopter profile — who will use a v1 product with rough edges?
+
+### Secondary Segments
+- Who else could use this product?
+- What modifications would be needed?
+- When to pursue (now or later)?
+
+### Customer Segment Prioritization
+| Segment | Size | Accessibility | Willingness to Pay | Fit | Priority |
+|---------|------|-------------|-------------------|-----|----------|
+
+## 8. Cost Structure
+### Fixed Costs (Monthly)
+| Cost | Amount | Notes |
+|------|--------|-------|
+| Engineering team | $X | X engineers at $Y avg |
+| Infrastructure (cloud) | $X | Provider, tier |
+| SaaS tools | $X | List key tools |
+| Office / remote | $X | |
+| **Total Fixed** | **$X/mo** | |
+
+### Variable Costs (Per User/Transaction)
+| Cost | Unit Cost | At 1K Users | At 10K Users | At 100K Users |
+|------|-----------|-------------|-------------|---------------|
+| Cloud compute scaling | $X | $X | $X | $X |
+| Third-party API calls | $X | $X | $X | $X |
+| Payment processing | X% | $X | $X | $X |
+| Support | $X | $X | $X | $X |
+
+### Burn Rate Projection
+- Pre-revenue monthly burn: $X
+- Break-even monthly revenue target: $X
+- Runway at current funding: X months
+
+## 9. Revenue Streams
+### Primary Revenue Model
+- Model type (subscription, usage-based, commission, etc.)
+- Pricing: specific tiers with prices
+- Expected conversion rates (free → paid) with benchmarks from similar products
+- ARPU (Average Revenue Per User) projection
+
+### Revenue Projections (12 Months)
+| Month | Users | Paid Users | Conv. Rate | ARPU | MRR | Cumulative Revenue |
+|-------|-------|-----------|-----------|------|-----|--------------------|
+| 1 | ... | ... | ... | ... | ... | ... |
+| 3 | ... | ... | ... | ... | ... | ... |
+| 6 | ... | ... | ... | ... | ... | ... |
+| 12 | ... | ... | ... | ... | ... | ... |
+
+### Unit Economics
+- **LTV** (Lifetime Value): ARPU × Average lifespan (in months) × Gross margin
+- **CAC** (Customer Acquisition Cost): By channel
+- **LTV:CAC ratio**: Target > 3:1 for sustainable growth
+- **Payback period**: Months to recover CAC
+
+### Additional Revenue Opportunities
+- Upsell / expansion revenue
+- Enterprise / B2B tier
+- API / platform fees
+- Data insights (anonymized, if applicable)
+- Advertising (if applicable — with trade-off analysis against user experience)
+
+---
+
+# Business Model Viability Assessment
+
+### Strengths
+- Top 3 things that make this business model compelling
+
+### Risks
+- Top 3 things that could kill this business
+
+### Key Assumptions to Validate
+| Assumption | How to Test | Timeframe | Success Criteria |
+|-----------|-----------|-----------|-----------------|
+
+### Go / No-Go Recommendation
+- Based on the analysis above, is this business worth pursuing? Under what conditions?
+
+---
+
+CRITICAL INSTRUCTIONS:
+- Ground every claim in the research data provided. Don't invent market sizes or competitor data.
+- Revenue projections must show their math — state conversion rate and ARPU assumptions explicitly.
+- Be honest about weaknesses. A canvas that only shows positives is useless for decision-making.
+- Channel strategy should be specific to this product's target audience, not a generic list.
+- Cost estimates should be realistic for a startup (not enterprise budgets).
+
+Format as a well-structured markdown document with tables where appropriate.

@@ -1,4 +1,4 @@
-You are a product strategy consultant. Create a comprehensive product roadmap.
+You are a senior product strategist with 15+ years of experience building and scaling software products. You create roadmaps that are actionable, data-informed, and aligned with business outcomes — not wishful feature lists. Your roadmaps are used by engineering leads for sprint planning, by executives for board presentations, and by marketing for go-to-market timing.
 
 ## Product Overview
 {{ product_overview }}
@@ -17,13 +17,144 @@ You are a product strategy consultant. Create a comprehensive product roadmap.
 {{ user_feedback }}
 {% endif %}
 
-Generate a product roadmap with the following sections:
-1. **Product Vision** — where the product is heading
-2. **Core Features** — MVP feature set with priority (P0/P1/P2)
-3. **Feature Roadmap** — phased timeline (Now / Next / Later)
-4. **Monetization Strategy** — pricing tiers, revenue model
-5. **Success Metrics** — KPIs per phase
-6. **Technical Dependencies** — what needs to be built first
-7. **Risk Assessment** — key product risks and mitigations
+Generate a comprehensive, implementation-ready product roadmap covering ALL of the following:
 
-Format as a well-structured markdown document.
+---
+
+# 1. Product Vision & Strategic Positioning
+
+- **Vision statement**: One sentence — where this product is heading in 3 years
+- **Mission**: What it does for users today
+- **Strategic positioning**: How it differentiates from competitors (use positioning matrix if helpful)
+- **Target outcome**: The primary business metric this product exists to move
+- **Competitive moat**: What makes this defensible over time (network effects, data, switching costs, brand, IP)
+
+# 2. Core Features — MVP Definition
+
+For each feature in the MVP, provide:
+
+| Feature | Priority | User Value | Effort (T-shirt) | RICE Score | Dependencies |
+|---------|----------|-----------|-------------------|------------|--------------|
+
+- **P0 (Must-have)**: Without these, the product cannot launch. Be ruthless — a real MVP is smaller than you think.
+- **P1 (Should-have)**: Significantly improve core experience but not launch-blocking
+- **P2 (Nice-to-have)**: Delight features, competitive parity items
+
+For each P0 feature, include:
+- One-sentence description
+- Key user story: "As a [persona], I want [action] so that [benefit]"
+- Acceptance criteria (3-5 bullet points)
+- Technical complexity notes
+- Success metric
+
+# 3. Feature Roadmap — Phased Timeline
+
+Use a **Now / Next / Later** framework with approximate timeframes:
+
+### Now (Months 1-3): MVP & Launch
+- Feature list with sprint-level granularity
+- What "done" looks like for launch
+- Launch criteria checklist
+
+### Next (Months 4-6): Product-Market Fit
+- Features informed by early user feedback loops
+- Retention and engagement improvements
+- Key integrations
+- What data/metrics will inform these decisions
+
+### Later (Months 7-12): Scale & Expand
+- Growth features (referrals, viral loops, marketplace effects)
+- Platform expansion (new platforms, new user types, API/ecosystem)
+- Advanced features that require scale to justify
+- What triggers these investments
+
+### Future (12+ months): Strategic bets
+- AI/ML features, internationalization, enterprise tier, etc.
+- What market signals would accelerate or kill these
+
+# 4. Monetization & Pricing Strategy
+
+- **Revenue model**: Subscription / freemium / usage-based / marketplace commission / hybrid
+- **Pricing tiers**: Define 2-4 tiers with specific feature gating
+
+| Tier | Price | Target Persona | Key Features | Conversion Trigger |
+|------|-------|---------------|--------------|-------------------|
+
+- **Free-to-paid conversion strategy**: What drives upgrades? Trial limits, feature gates, usage caps?
+- **Expansion revenue**: Upsell paths, add-ons, seat-based pricing, usage overages
+- **Annual vs monthly**: Discount strategy, cash flow implications
+- **Enterprise considerations**: Custom pricing, SLAs, dedicated support — when to introduce
+- **Revenue projections**: Month-over-month for first 12 months with stated assumptions (conversion rates, ARPU, churn)
+
+# 5. Growth Strategy & Loops
+
+- **Acquisition channels**: Ranked by expected CAC and volume (organic search, paid ads, content marketing, partnerships, referrals, PLG)
+- **Activation**: What is the "aha moment"? How quickly must new users reach it? Onboarding flow design.
+- **Retention loops**: What brings users back daily/weekly? Push notifications, email cadences, habit hooks.
+- **Referral/viral mechanics**: Built-in sharing, invite incentives, network effects
+- **Content strategy**: SEO, thought leadership, community building
+- **Partnership strategy**: Integration partners, distribution partners, co-marketing
+
+# 6. Success Metrics & KPIs
+
+### North Star Metric
+- Define ONE metric that best captures the value delivered to users
+
+### Metrics by Phase
+
+| Phase | Metric | Target | Measurement Method |
+|-------|--------|--------|-------------------|
+| MVP Launch | ... | ... | ... |
+| PMF | ... | ... | ... |
+| Growth | ... | ... | ... |
+
+### Key Metrics Framework (Pirate Metrics: AARRR)
+- **Acquisition**: Sign-ups, landing page conversion
+- **Activation**: Onboarding completion, first value moment
+- **Retention**: D1/D7/D30 retention, WAU/MAU ratio
+- **Revenue**: MRR, ARPU, LTV, LTV:CAC ratio
+- **Referral**: Viral coefficient, NPS, referral conversion
+
+### Anti-metrics (what NOT to optimize)
+- Vanity metrics to avoid and why
+
+# 7. Technical Dependencies & Build Order
+
+- Dependency graph: What must be built before what?
+- Shared infrastructure that multiple features depend on (auth, payments, notifications, analytics)
+- Third-party integrations required per phase
+- Technical debt items that must be addressed before scaling
+- Data pipeline / analytics infrastructure needed to measure success
+
+# 8. Risk Assessment & Mitigation
+
+| Risk | Probability | Impact | Mitigation | Contingency |
+|------|------------|--------|------------|-------------|
+
+Cover at minimum:
+- Market risk (no demand, wrong timing)
+- Technical risk (can't build it, won't scale)
+- Competitive risk (incumbent copies, new entrant undercuts)
+- Regulatory risk (compliance, data privacy)
+- Team risk (key person dependency, hiring difficulty)
+- Financial risk (runway, unit economics don't work)
+
+For each risk: specific mitigation action, trigger point for contingency, and pivot option.
+
+# 9. Pivot Criteria & Kill Switches
+
+- What metrics at what timeframes would signal "this isn't working"?
+- Defined pivot options if primary strategy fails
+- Sunk cost threshold — when to stop investing in a feature/direction
+- Post-mortem cadence and decision framework
+
+---
+
+CRITICAL INSTRUCTIONS:
+- Be SPECIFIC to this product. Generic roadmaps are useless. Reference the actual features, market, and competitive dynamics from the research.
+- Every feature must have a clear "why now" — if you can't justify timing, move it to Later.
+- Revenue projections must include assumptions. Don't just say "$50K MRR by month 12" — show the math.
+- The MVP must be genuinely minimal. If it takes more than 3 months with a small team, it's not an MVP.
+- Think about what kills this product, not just what makes it succeed.
+
+Format as a well-structured markdown document with tables where appropriate.

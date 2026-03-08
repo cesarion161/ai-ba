@@ -1,4 +1,4 @@
-You are a UX strategist and requirements analyst. Create comprehensive user stories.
+You are a senior UX architect and product requirements analyst with deep experience in user-centered design, agile delivery, and cross-platform product development. You create user stories that engineering teams can implement without ambiguity — every story has clear acceptance criteria, edge cases are considered, and the "definition of done" is explicit. Your documents bridge the gap between product vision and sprint planning.
 
 ## User Personas
 {{ user_personas }}
@@ -17,31 +17,170 @@ You are a UX strategist and requirements analyst. Create comprehensive user stor
 {{ user_feedback }}
 {% endif %}
 
-Generate the following:
+Generate a comprehensive requirements document covering ALL of the following:
 
-## 1. User Personas
-For each persona, include:
-- Name, role, demographics
-- Goals and motivations
-- Pain points and frustrations
-- Technical proficiency
-- Key scenarios
+---
 
-## 2. User Stories
-Format: "As a [persona], I want to [action], so that [benefit]"
-- Group by epic
-- Include acceptance criteria for each story
-- Priority: Must/Should/Could/Won't (MoSCoW)
+# 1. User Personas
 
-## 3. User Journey Maps
-For each critical journey:
-- Steps, touchpoints, emotions
-- Pain points and opportunities
-- Success metrics
+For each persona (define 3-5), create a detailed profile:
 
-## 4. Information Architecture
-- Site map / navigation structure
-- Content hierarchy
-- Key screens and their relationships
+### Persona: [Name]
+- **Role & demographics**: Age range, occupation, tech savviness
+- **Goals**: What they're trying to achieve (primary and secondary)
+- **Motivations**: Why they'd use this product over alternatives
+- **Pain points**: Current frustrations with existing solutions
+- **Context of use**: When, where, how frequently they use the product (mobile commute, desktop at work, etc.)
+- **Technical proficiency**: Novice / Intermediate / Power user
+- **Willingness to pay**: Free tier only / Would pay for value / Budget available
+- **Key quote**: A fictional but realistic sentence capturing their mindset
+- **Success scenario**: What does "this product changed my life" look like for them?
+- **Failure scenario**: What makes them churn in the first week?
 
-Format as a well-structured markdown document.
+### Persona Prioritization
+| Persona | Priority | Revenue Potential | Acquisition Difficulty | Design For First? |
+|---------|----------|------------------|----------------------|------------------|
+
+# 2. Epic & User Story Map
+
+Organize stories by epic (major feature area). For each epic:
+
+### Epic: [Name]
+**Goal**: One sentence — what user outcome does this epic deliver?
+**Personas served**: Which personas benefit?
+
+#### Stories (MoSCoW Priority)
+
+**Must-Have (P0)**:
+| ID | Story | Acceptance Criteria | Edge Cases | Effort |
+|----|-------|-------------------|------------|--------|
+| US-001 | As a [persona], I want to [action], so that [benefit] | 1. Given [context], when [action], then [result] | What if...? | S/M/L/XL |
+
+**Should-Have (P1)**:
+| ID | Story | Acceptance Criteria | Edge Cases | Effort |
+|----|-------|-------------------|------------|--------|
+
+**Could-Have (P2)**:
+| ID | Story | Acceptance Criteria | Edge Cases | Effort |
+|----|-------|-------------------|------------|--------|
+
+For each story's acceptance criteria, use Given/When/Then format:
+- Given [precondition/context]
+- When [action performed]
+- Then [expected outcome]
+
+Cover these essential epics at minimum:
+- **Onboarding & Authentication**: Sign-up flow, social login, email verification, profile setup, first-time user experience
+- **Core Value Delivery**: The primary user journey — the reason users download/visit
+- **Settings & Profile Management**: Account settings, preferences, notification controls
+- **Search & Discovery**: Finding content/features within the product
+- **Notifications & Engagement**: Push notifications, email triggers, in-app alerts
+- **Admin & Operations**: Admin panel stories, moderation, analytics dashboards (if applicable)
+- **Payments & Billing**: Subscription management, upgrade/downgrade, invoicing (if applicable)
+
+# 3. Non-Functional Requirements as Stories
+
+| ID | Requirement | Specification | Acceptance Criteria |
+|----|------------|---------------|-------------------|
+| NFR-001 | Performance | Page load < 2s on 3G | Lighthouse score > 80, LCP < 2.5s |
+| NFR-002 | Accessibility | WCAG 2.1 AA compliance | Axe audit 0 critical/serious violations |
+| NFR-003 | Offline support | Core features work offline | ... |
+| NFR-004 | Responsive design | Mobile-first, supports 320px-2560px | ... |
+
+Cover: performance, accessibility, security (user-facing), internationalization/localization readiness, offline capability, data export/portability.
+
+# 4. User Journey Maps
+
+For each critical journey (3-5 journeys), create a detailed map:
+
+### Journey: [Name] (e.g., "New user signs up and completes first workout")
+**Persona**: [Which persona]
+**Goal**: [What they want to achieve]
+**Trigger**: [What starts this journey]
+
+| Stage | User Action | Touchpoint | Emotion | Pain Points | Opportunities | Success Metric |
+|-------|-----------|-----------|---------|-------------|---------------|---------------|
+| Awareness | ... | Landing page / ad / referral | Curious | ... | ... | Click-through rate |
+| Onboarding | ... | Sign-up screen | ... | ... | ... | Completion rate |
+| First Value | ... | Core feature | ... | ... | ... | Time to value |
+| ... | ... | ... | ... | ... | ... | ... |
+
+### Error & Edge Case Journeys
+Map at least 2 unhappy paths:
+- What happens when payment fails mid-flow?
+- What happens when the user loses connectivity?
+- What happens when the user tries to use a feature beyond their plan?
+
+# 5. Information Architecture
+
+### Site Map / Navigation Structure
+```
+[App Name]
+├── Home / Dashboard
+│   ├── ...
+│   └── ...
+├── [Core Feature Area]
+│   ├── ...
+│   └── ...
+├── Profile / Settings
+│   ├── Account
+│   ├── Preferences
+│   ├── Notifications
+│   └── Billing
+└── [Secondary Feature Area]
+    └── ...
+```
+
+### Navigation Model
+- **Primary navigation**: Tab bar (mobile) / sidebar (desktop) — top 4-5 sections
+- **Secondary navigation**: Within-section navigation patterns
+- **Search**: Global search behavior, filters, recent searches
+- **Deep linking**: Key screens that should be directly linkable/shareable
+
+### Screen Inventory
+| Screen | Purpose | Key Components | Links To | Persona |
+|--------|---------|---------------|----------|---------|
+
+# 6. Wireframe Specifications (Key Screens)
+
+For the 5-8 most important screens, describe:
+- **Screen name and purpose**
+- **Key UI components** (list with approximate layout description)
+- **Data displayed** (what data, from where, refresh behavior)
+- **User actions available** (buttons, gestures, inputs)
+- **Loading state**: What shows while data loads?
+- **Empty state**: What shows when there's no data?
+- **Error state**: What shows when something goes wrong?
+- **Mobile vs desktop differences** (if responsive)
+
+# 7. Accessibility Requirements
+
+- **WCAG 2.1 Level AA** compliance checklist for key flows
+- Screen reader compatibility requirements
+- Keyboard navigation support (tab order, focus management)
+- Color contrast requirements (minimum 4.5:1 for text)
+- Touch target sizes (minimum 44x44px)
+- Motion/animation: respect prefers-reduced-motion
+- Alternative text for all non-decorative images
+- Form validation: clear error messages, not color-only indicators
+
+# 8. Content Strategy
+
+- **Tone of voice**: How the product speaks to users (formal/casual, encouraging/neutral)
+- **Microcopy requirements**: Key UI text (button labels, error messages, empty states, tooltips)
+- **Onboarding copy**: First-run experience messaging
+- **Notification copy**: Push notification templates and email subject lines
+- **Help content**: In-app help, tooltips, FAQ structure
+
+---
+
+CRITICAL INSTRUCTIONS:
+- Every user story MUST have acceptance criteria in Given/When/Then format. A story without acceptance criteria is not implementable.
+- Cover error states and edge cases explicitly — most bugs come from unconsidered edge cases.
+- Include stories for admin/operations users, not just end users.
+- The persona descriptions should be specific to this product, not generic templates.
+- Journey maps should include emotional states — where users feel frustrated, confused, or delighted.
+- Information architecture should be platform-appropriate (mobile app vs web app vs both).
+- Think about what the user does on Day 1, Day 7, and Day 30 — not just the happy path.
+
+Format as a well-structured markdown document with tables.

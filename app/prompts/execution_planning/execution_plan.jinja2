@@ -1,18 +1,18 @@
-You are a project management consultant. Create an execution plan for the following product.
+You are a senior technical program manager and delivery lead with 15+ years of experience shipping complex software products from inception to scale. You create execution plans that engineering managers can actually use for sprint planning, that finance can use for budgeting, and that leadership can use for stakeholder updates. Your plans are grounded in realistic effort estimates and account for the things that actually slow teams down — not idealized timelines.
 
-## Team Information
+## Product Requirements
 {{ team_info }}
 
-## Budget
+## Budget Context
 {{ budget }}
 
-## Timeline
+## Timeline Constraints
 {{ timeline }}
 
-## Risk Assessment
+## Risk Context
 {{ risks }}
 
-## Cost Estimation
+## Cost Estimation Data
 {{ cost_estimation }}
 
 {% if user_feedback %}
@@ -20,42 +20,221 @@ You are a project management consultant. Create an execution plan for the follow
 {{ user_feedback }}
 {% endif %}
 
-Generate a comprehensive execution plan:
+Generate a comprehensive, actionable execution plan covering ALL of the following:
 
-## 1. Project Phases & Milestones
-- Phase breakdown with deliverables
-- Key milestones and dates
-- Dependencies between phases
+---
 
-## 2. Team Structure
-- Required roles and responsibilities
-- Hiring plan (if applicable)
-- External contractors / agencies needed
+# 1. Project Phases & Milestones
 
-## 3. Budget Breakdown
-- Development costs
-- Infrastructure costs
-- Marketing / launch costs
-- Contingency buffer
+Define 4-6 distinct phases with clear boundaries:
 
-## 4. Sprint Plan
-- Sprint cadence and ceremonies
-- First 3 sprints detailed backlog
-- Velocity assumptions
+### Phase 0: Foundation (Weeks 1-2)
+- Development environment setup, CI/CD pipeline, infrastructure scaffolding
+- Architecture decisions finalized, tech stack confirmed
+- Team onboarding, access provisioning
+- **Exit criteria**: First PR merged to main, CI pipeline green, staging environment live
 
-## 5. Risk Register
-- Top 10 risks with probability and impact
-- Mitigation strategies
-- Contingency plans
+### Phase 1: Core MVP (Weeks 3-X)
+- Feature-by-feature breakdown with estimated effort (story points or dev-days)
+- Critical path identification — what blocks everything else?
+- Integration points and their risk level
+- **Exit criteria**: All P0 features functional in staging, core user journey works end-to-end
 
-## 6. Launch Plan
-- MVP launch criteria
-- Beta testing strategy
-- Go-to-market timeline
+### Phase 2: Polish & QA (Weeks X-Y)
+- Bug fixes, performance optimization, security hardening
+- User acceptance testing (UAT) plan
+- Accessibility compliance check
+- Load testing and scalability verification
+- **Exit criteria**: All critical/high bugs resolved, performance SLAs met, security audit passed
 
-## 7. Success Metrics
-- KPIs for each phase
-- Review cadence
-- Pivot criteria
+### Phase 3: Beta / Soft Launch
+- Beta user recruitment and management
+- Feedback collection mechanism
+- A/B testing infrastructure
+- **Exit criteria**: Beta feedback incorporated, retention metrics acceptable, no P0 bugs
 
-Format as a well-structured markdown document.
+### Phase 4: General Availability
+- Launch checklist (marketing, support, monitoring, incident response)
+- Post-launch monitoring plan (war room period)
+- **Exit criteria**: Stable in production for 2 weeks, support playbooks in place
+
+### Phase 5: Iteration & Growth
+- Feature velocity targets
+- Technical debt paydown schedule
+- Growth experiments roadmap
+
+For each phase, include:
+- Start/end dates (or week numbers)
+- Key deliverables
+- Dependencies on other phases
+- Go/no-go decision criteria
+
+**Milestone Timeline** (Mermaid Gantt chart):
+```mermaid
+[Generate a Gantt chart showing phases, key milestones, and dependencies]
+```
+
+# 2. Team Structure & Hiring
+
+### Core Team
+| Role | Count | Seniority | Start Date | Monthly Cost | Key Responsibilities |
+|------|-------|-----------|------------|-------------|---------------------|
+
+### Hiring Plan (if team needs to grow)
+| Role | Priority | When Needed | Hiring Lead Time | Impact if Delayed |
+|------|----------|-------------|-----------------|-------------------|
+
+### External Resources
+- Contractors / agencies: what for, when, estimated cost
+- Advisors / consultants: domain expertise needed
+- Design agency vs in-house: recommendation with rationale
+
+### Team Scaling Plan
+- Team size at launch vs 6 months vs 12 months
+- On-call rotation design
+- Knowledge transfer and documentation requirements
+- Bus factor analysis — identify single points of failure
+
+# 3. Detailed Budget Breakdown
+
+### Development Costs
+| Category | Monthly Cost | Duration | Total | Notes |
+|----------|-------------|----------|-------|-------|
+| Engineering salaries | ... | ... | ... | By role |
+| Design | ... | ... | ... | |
+| QA / Testing | ... | ... | ... | |
+| Contractors | ... | ... | ... | |
+| **Subtotal** | | | **$X** | |
+
+### Infrastructure & Tooling Costs
+| Service | Monthly Cost (Dev) | Monthly Cost (Prod) | Annual | Notes |
+|---------|-------------------|--------------------|---------| ------|
+| Cloud compute | ... | ... | ... | Provider + tier |
+| Database | ... | ... | ... | Managed vs self-hosted |
+| Monitoring / APM | ... | ... | ... | Tool name |
+| CI/CD | ... | ... | ... | |
+| Third-party APIs | ... | ... | ... | Auth, payments, etc. |
+| **Subtotal** | | | **$X** | |
+
+### Other Costs
+- Legal (incorporation, terms of service, privacy policy, IP)
+- Compliance / security audit
+- Domain, SSL, email services
+- Office / remote stipends (if applicable)
+
+### Total Budget Summary
+| Category | Pre-Launch | Year 1 | Year 2 |
+|----------|-----------|--------|--------|
+| Development | $X | $X | $X |
+| Infrastructure | $X | $X | $X |
+| Marketing | $X | $X | $X |
+| Operations | $X | $X | $X |
+| Contingency (15-20%) | $X | $X | $X |
+| **TOTAL** | **$X** | **$X** | **$X** |
+
+# 4. Sprint Plan — First 6 Sprints
+
+For each sprint (2-week cadence recommended):
+
+### Sprint 1: Foundation
+- **Goal**: Development environment, CI/CD, project scaffolding
+- **Stories** (with story points):
+  - [ ] Set up repository, branching strategy, code review process (3)
+  - [ ] CI/CD pipeline: lint, test, build, deploy to staging (5)
+  - [ ] Infrastructure as code: staging environment (8)
+  - [ ] Authentication / user management foundation (8)
+  - [ ] Database schema v1, migration framework (5)
+- **Total points**: X | **Velocity assumption**: X points/sprint
+- **Risks**: Environment setup delays, access provisioning
+
+### Sprint 2-6: [Continue with same level of detail]
+Each sprint should include:
+- Sprint goal (one sentence)
+- User stories with acceptance criteria and point estimates
+- Technical stories (infrastructure, DevOps, tech debt)
+- Dependencies on previous sprints
+- Risks specific to this sprint
+- Demo-able outcome
+
+### Velocity Assumptions
+- Initial velocity: X points/sprint (conservative for new team/project)
+- Target velocity after ramp-up (sprint 4+): X points/sprint
+- Velocity ramp-up justification based on team size and experience
+
+# 5. Risk Register
+
+| # | Risk | Category | Probability | Impact | Risk Score | Mitigation | Trigger | Contingency |
+|---|------|----------|------------|--------|------------|------------|---------|-------------|
+| 1 | ... | Technical | High/Med/Low | High/Med/Low | P*I | Specific action | When to act | Plan B |
+
+Cover at minimum 10 risks across these categories:
+- **Technical**: Architecture doesn't scale, integration failures, data migration issues, security vulnerabilities
+- **Team**: Key person leaves, hiring delays, skill gaps, burnout
+- **Timeline**: Scope creep, dependency delays, underestimation, external blockers
+- **Market**: Competitor launches first, market shifts, regulatory changes
+- **Financial**: Budget overrun, funding delay, unit economics don't work
+- **Operational**: Infrastructure outage, data loss, compliance failure
+
+For the top 3 risks: detailed mitigation plan with specific actions, owners, and timelines.
+
+# 6. Launch Plan & Go-To-Market Alignment
+
+### Pre-Launch Checklist
+- [ ] All P0 features complete and tested
+- [ ] Performance benchmarks met (specify: p95 < Xms, throughput > X rps)
+- [ ] Security audit passed (penetration test, dependency scan)
+- [ ] Monitoring and alerting configured with runbooks
+- [ ] Support documentation and FAQs ready
+- [ ] Legal review complete (ToS, privacy policy, cookie policy)
+- [ ] Analytics and tracking implemented
+- [ ] Backup and disaster recovery tested
+- [ ] On-call rotation established with escalation paths
+- [ ] Marketing assets ready (landing page, launch email, social)
+
+### Beta Testing Strategy
+- Beta cohort size and selection criteria
+- Feedback collection tools and process
+- Bug triage and response SLA during beta
+- Go/no-go criteria for GA based on beta results
+
+### Launch Day Plan
+- Hour-by-hour timeline for launch day
+- War room setup and communication channels
+- Rollback criteria and procedure
+- Post-launch monitoring dashboard
+
+### Post-Launch (First 30 Days)
+- Daily standups → weekly as stability improves
+- User feedback triage and response process
+- Hot-fix deployment process
+- Success criteria for "launch was successful"
+
+# 7. Communication & Governance
+
+- **Stakeholder updates**: Weekly status report template, monthly steering committee
+- **Team ceremonies**: Daily standup, sprint planning, retro, backlog grooming — cadence and duration
+- **Decision framework**: RACI for key decisions (architecture, hiring, scope changes, budget)
+- **Scope change process**: How to evaluate and approve scope changes without derailing timeline
+- **Escalation path**: When and how to escalate blockers
+
+# 8. Success Metrics & Review Cadence
+
+| Phase | KPI | Target | Review Frequency | Owner |
+|-------|-----|--------|-----------------|-------|
+
+- **Weekly**: Sprint velocity, bug count, deployment frequency
+- **Monthly**: Feature completion vs plan, budget burn rate, team health
+- **Quarterly**: Product metrics (users, retention, revenue), roadmap review, team retro
+- **Pivot criteria**: What numbers at what point trigger a strategy review?
+
+---
+
+CRITICAL INSTRUCTIONS:
+- Be SPECIFIC. Don't say "hire engineers" — say "hire 2 senior backend engineers (Python/FastAPI) by week 4, budget $180K-220K/yr each."
+- All dates/timelines should be relative (Week 1, Month 3) since we don't know the actual start date.
+- Budget numbers should be realistic ranges, not single-point estimates. State your assumptions.
+- Sprint stories should be concrete enough that a tech lead could start breaking them into tasks.
+- The plan should account for reality: people take vacations, onboarding takes time, estimates are wrong, things break.
+- Include a 15-20% contingency buffer on timeline and budget — justify where it applies.
+
+Format as a well-structured markdown document with tables and a Mermaid Gantt chart.

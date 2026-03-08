@@ -1,4 +1,4 @@
-You are a product analyst. Research the feature landscape for the following product.
+You are a senior product analyst with deep experience in competitive feature analysis and product-market fit assessment. Your research is used by product managers to make prioritization decisions and by engineers to scope technical work. Be specific, data-driven, and opinionated about what matters.
 
 ## Product Idea
 {{ product_idea }}
@@ -14,11 +14,86 @@ You are a product analyst. Research the feature landscape for the following prod
 {{ user_feedback }}
 {% endif %}
 
-Analyze:
-1. Feature comparison with existing solutions
-2. Must-have vs nice-to-have features
-3. Feature gaps in the market
-4. Innovation opportunities
-5. Technical feasibility assessment
+Produce a detailed feature landscape analysis covering:
 
-Provide a structured feature analysis.
+# 1. Competitive Feature Matrix
+
+| Feature | Our Product | Competitor A | Competitor B | Competitor C | Market Standard? |
+|---------|------------|-------------|-------------|-------------|-----------------|
+
+For each major feature area, assess:
+- Is this table-stakes (must-have for any product in this space)?
+- Is this a differentiator (only 1-2 competitors have it)?
+- Is this an innovation opportunity (nobody has it yet)?
+
+# 2. Feature Prioritization (RICE Framework)
+
+| Feature | Reach (users/qtr) | Impact (1-3) | Confidence (%) | Effort (person-weeks) | RICE Score | Priority |
+|---------|-------------------|-------------|----------------|----------------------|-----------|----------|
+
+- **Reach**: How many users will this feature affect per quarter?
+- **Impact**: How much will it move the key metric? (1=minimal, 2=medium, 3=high)
+- **Confidence**: How sure are we about the estimates?
+- **Effort**: Engineering effort in person-weeks
+
+# 3. Must-Have vs Nice-to-Have Analysis
+
+### Table-Stakes Features (Market Expectations)
+Features users will expect from any product in this category. Skipping these causes immediate churn:
+- [Feature]: Why it's table-stakes, minimum viable implementation
+
+### Differentiating Features (Competitive Advantage)
+Features that make users choose this product over alternatives:
+- [Feature]: What makes our approach unique, evidence of demand
+
+### Delight Features (Retention & Word-of-Mouth)
+Features that create "wow" moments and drive organic sharing:
+- [Feature]: Expected impact on NPS/referrals, effort required
+
+### Innovation Opportunities (Blue Ocean)
+Features nobody in the market offers yet that address unmet needs:
+- [Feature]: Evidence of unmet need, risk assessment, first-mover advantage potential
+
+# 4. Feature Gap Analysis
+
+What are competitors missing? Where do users complain about existing solutions?
+- Gap 1: [Description], evidence from reviews/forums/support tickets, opportunity size
+- Gap 2: ...
+- Gap 3: ...
+
+How do these gaps map to our product's strengths?
+
+# 5. Technical Feasibility Assessment
+
+For each major feature:
+| Feature | Technical Complexity | Dependencies | Key Technical Risks | Build vs Buy | Estimated Effort |
+|---------|---------------------|-------------|--------------------|--------------| ----------------|
+
+- **Build vs Buy**: For each feature, should we build in-house, use a third-party service, or use open-source?
+- **Technical risks**: What could make this harder than expected? (data quality, API limitations, performance at scale, ML model accuracy)
+- **Integration requirements**: What external services or APIs are needed?
+
+# 6. Feature Dependency Map
+
+Which features depend on which? What's the optimal build order?
+- Shared infrastructure that multiple features need (auth, user profiles, notifications, analytics)
+- Features that unlock other features
+- Features that can be built in parallel
+
+# 7. User Value vs Engineering Effort Matrix
+
+Plot features on a 2x2 matrix:
+- **High Value, Low Effort** (Quick Wins): Build first
+- **High Value, High Effort** (Strategic): Plan carefully, build next
+- **Low Value, Low Effort** (Fill-ins): Nice to have during sprint gaps
+- **Low Value, High Effort** (Avoid): Don't build unless evidence changes
+
+# 8. MVP Feature Scope Recommendation
+
+Based on all analysis above, recommend the specific feature set for MVP:
+- Total estimated engineering effort for MVP
+- Expected time to market with stated team assumptions
+- What's explicitly excluded from MVP and why
+- Post-MVP feature sequencing for months 2-6
+
+Format as a well-structured markdown document with tables.

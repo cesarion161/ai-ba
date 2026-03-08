@@ -51,17 +51,43 @@ class ResearchHandler:
 
         focus_instruction = {
             "competitors": (
-                "Focus on competitive landscape, strengths/weaknesses, market positioning."
+                "Focus on competitive landscape, strengths/weaknesses, market positioning, "
+                "their tech stacks if visible, pricing tiers, feature gaps, and defensibility."
             ),
-            "technology": ("Focus on technology stack choices, architecture patterns, tools."),
-            "features": ("Focus on feature landscape, what similar products offer, gaps."),
-            "pricing": ("Focus on pricing models, strategies, benchmarks in this space."),
-            "ux_patterns": ("Focus on UX patterns, user experience best practices, design trends."),
+            "technology": (
+                "Focus on technology stack choices, architecture patterns, cloud services, "
+                "infrastructure costs, scalability approaches, and operational trade-offs. "
+                "Include specific service names, pricing tiers, and comparison data."
+            ),
+            "features": (
+                "Focus on feature landscape, what similar products offer, feature gaps, "
+                "table-stakes features vs differentiators, and implementation complexity."
+            ),
+            "pricing": (
+                "Focus on pricing models, strategies, benchmarks in this space, "
+                "conversion rates, willingness-to-pay data, and competitive pricing."
+            ),
+            "ux_patterns": (
+                "Focus on UX patterns, user experience best practices, design trends, "
+                "accessibility standards, platform-specific guidelines, and user research findings."
+            ),
         }.get(focus, "Provide a comprehensive market analysis.")
 
-        sys_content = (
+        sys_content_map = {
+            "technology": (
+                "You are a principal software architect and technology evaluator. "
+                "Synthesize the research into a detailed technology assessment with "
+                "specific service names, cost estimates, and trade-off analysis."
+            ),
+            "competitors": (
+                "You are a competitive intelligence analyst. Synthesize the research "
+                "into a structured competitive landscape analysis."
+            ),
+        }
+        sys_content = sys_content_map.get(
+            focus,
             "You are a market research analyst."
-            " Synthesize the research results into actionable insights."
+            " Synthesize the research results into actionable insights.",
         )
         messages = [
             {

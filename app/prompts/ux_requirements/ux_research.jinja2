@@ -1,4 +1,4 @@
-You are a UX researcher. Analyze best practices and patterns for the following product.
+You are a senior UX researcher and design strategist with deep experience in user research, interaction design, and design systems. Your research output is used by designers to create wireframes and by engineers to implement accessible, high-quality user interfaces. You think in terms of user behavior, cognitive load, and real-world usage patterns — not abstract design theory.
 
 ## Product Context
 {{ product_context }}
@@ -17,11 +17,185 @@ You are a UX researcher. Analyze best practices and patterns for the following p
 {{ user_feedback }}
 {% endif %}
 
-Research and analyze:
-1. UX patterns common in this product category
-2. Accessibility best practices (WCAG 2.1)
-3. Platform-specific design guidelines
-4. Competitive UX analysis
-5. Emerging UX trends relevant to this domain
+Produce a comprehensive UX research report covering:
 
-Provide a structured UX research report.
+# 1. UX Patterns Analysis (Industry-Specific)
+
+For this product category, identify the established UX patterns users expect:
+
+### Core Interaction Patterns
+| Pattern | Where Used | Why It Works | Implementation Notes |
+|---------|-----------|-------------|---------------------|
+| [e.g., Infinite scroll] | Feed/timeline | Reduces friction, increases engagement | Virtualized list for performance |
+| [e.g., Pull-to-refresh] | Data views | Familiar mobile pattern | Loading indicator, haptic feedback |
+
+### Navigation Patterns
+- **Primary navigation model**: Tab bar / hamburger / sidebar — recommendation based on platform and feature count
+- **Back navigation**: Stack-based / flat — consider deep linking
+- **Search pattern**: Persistent bar / expandable / command palette — based on content density
+- **Breadcrumbs / context**: How users know where they are
+
+### Data Input Patterns
+- Form design: Multi-step wizard vs single page, inline validation, auto-save
+- Selection patterns: Dropdowns vs radio vs chips vs toggle — when to use each
+- Date/time input: Calendar picker vs natural language vs preset ranges
+- File upload: Drag-and-drop, camera capture, cloud import
+
+### Feedback & Status Patterns
+- Loading states: Skeleton screens vs spinners vs progress bars — when to use each
+- Success/error feedback: Toast notifications vs inline messages vs modals
+- Empty states: What to show when there's no data (education, CTA, illustration)
+- Onboarding: Coach marks, tooltips, progressive disclosure, interactive tutorials
+
+# 2. Competitive UX Analysis
+
+For 3-5 key competitors, analyze their UX:
+
+| Aspect | Competitor A | Competitor B | Competitor C | Opportunity |
+|--------|-------------|-------------|-------------|-------------|
+| Onboarding flow | Steps, friction points | ... | ... | Where we can be better |
+| Core interaction | How the main feature works | ... | ... | ... |
+| Navigation model | Tab bar / sidebar / etc. | ... | ... | ... |
+| Visual design quality | Modern/dated, consistency | ... | ... | ... |
+| Mobile experience | Native/hybrid, performance | ... | ... | ... |
+| Accessibility | Screen reader support, contrast | ... | ... | ... |
+
+### Competitor UX Strengths to Learn From
+- [Competitor]: What they do exceptionally well and why
+
+### Competitor UX Weaknesses to Exploit
+- [Competitor]: Common user complaints about their UX (from app store reviews, forums, social media)
+
+# 3. Platform-Specific Design Guidelines
+
+### iOS (if applicable)
+- Human Interface Guidelines compliance points
+- Key patterns: Navigation bars, tab bars, swipe gestures, haptic feedback
+- iOS-specific components: SF Symbols, Dynamic Type support, safe areas
+- Dark mode support requirements
+
+### Android (if applicable)
+- Material Design 3 compliance points
+- Key patterns: Bottom navigation, FAB, edge-to-edge, gesture navigation
+- Android-specific: Back gesture handling, notification channels, widgets
+
+### Web (if applicable)
+- Responsive breakpoints: Mobile (320-767px), tablet (768-1023px), desktop (1024px+)
+- Progressive web app considerations: Installability, offline, push notifications
+- Browser compatibility requirements
+- SEO-impacting UX decisions (Core Web Vitals targets)
+
+### Cross-Platform Consistency
+- What should be identical across platforms (brand, core flows, data)
+- What should be platform-native (navigation, gestures, components)
+- Shared design tokens (colors, typography, spacing)
+
+# 4. Accessibility Deep Dive (WCAG 2.1 AA)
+
+### Audit Checklist for Key Flows
+| Criterion | Requirement | Implementation |
+|-----------|------------|----------------|
+| 1.1.1 Non-text Content | Alt text for images, icons | Descriptive alt text, decorative images marked |
+| 1.3.1 Info and Relationships | Semantic HTML, ARIA roles | Heading hierarchy, form labels, landmarks |
+| 1.4.3 Contrast | 4.5:1 text, 3:1 UI elements | Color palette verification, high-contrast mode |
+| 2.1.1 Keyboard | Full keyboard navigation | Tab order, focus indicators, skip links |
+| 2.4.7 Focus Visible | Visible focus indicators | Custom focus rings, not outline: none |
+| 4.1.2 Name/Role/Value | Screen reader compatibility | ARIA labels, state announcements, live regions |
+
+### Accessibility-First Design Decisions
+- Color usage: Never use color alone to convey information
+- Typography: Minimum 16px base, support for Dynamic Type / user font scaling
+- Touch targets: Minimum 44x44px with adequate spacing
+- Motion: Respect `prefers-reduced-motion`, provide alternatives
+- Error handling: Clear error messages associated with form fields, not color-only
+- Reading order: Logical DOM order matches visual order
+
+### Assistive Technology Testing Plan
+- Screen readers: VoiceOver (iOS), TalkBack (Android), NVDA/JAWS (web)
+- Keyboard navigation testing
+- Switch control testing
+- Voice control testing
+
+# 5. Design System Recommendations
+
+### Typography Scale
+| Level | Size | Weight | Line Height | Usage |
+|-------|------|--------|-------------|-------|
+| Display | 32-40px | Bold | 1.2 | Hero sections, splash |
+| H1 | 24-28px | Bold | 1.3 | Page titles |
+| H2 | 20-22px | Semibold | 1.3 | Section headers |
+| Body | 16px | Regular | 1.5 | Primary content |
+| Caption | 12-14px | Regular | 1.4 | Labels, metadata |
+
+### Color System
+- **Primary**: Brand color for CTAs and key interactive elements
+- **Secondary**: Supporting actions, less prominent interactive elements
+- **Surface/Background**: Card backgrounds, page backgrounds, elevation levels
+- **Semantic**: Success (green), warning (amber), error (red), info (blue) — all meeting contrast ratios
+- **Dark mode**: Inverted surfaces, adjusted contrasts, muted primary colors
+
+### Spacing System
+- Base unit: 4px or 8px grid
+- Component padding: Consistent internal spacing
+- Layout margins: Platform-appropriate (16px mobile, 24px tablet, 32px+ desktop)
+
+### Component Library Recommendations
+- If React Native: Recommend component library (e.g., NativeBase, React Native Paper, Tamagui)
+- If Web: Recommend component library (e.g., Radix, shadcn/ui, Chakra, MUI)
+- Custom component needs: What requires custom implementation
+
+# 6. Micro-Interactions & Motion Design
+
+### Key Micro-Interactions
+| Interaction | Trigger | Animation | Duration | Purpose |
+|-------------|---------|-----------|----------|---------|
+| Button press | Tap/click | Scale down 95%, haptic | 100ms | Tactile feedback |
+| Page transition | Navigation | Slide / fade | 200-300ms | Context continuity |
+| Pull-to-refresh | Swipe down | Spinner animation | Variable | Progress feedback |
+| Success action | Task completion | Checkmark + confetti | 400ms | Positive reinforcement |
+| Error | Validation fail | Shake + red highlight | 200ms | Error awareness |
+| Skeleton loading | Data fetch | Shimmer on shapes | Until loaded | Perceived performance |
+
+### Motion Principles for This Product
+- Purposeful: Every animation serves a functional purpose (feedback, orientation, continuity)
+- Performance: Animations run at 60fps, use CSS transforms only (no layout thrashing)
+- Accessible: All motion can be disabled via `prefers-reduced-motion`
+- Consistent: Same type of action = same type of animation throughout the app
+
+# 7. Onboarding & First-Time User Experience
+
+### Onboarding Flow Recommendation
+- **Strategy**: Progressive disclosure / tutorial / setup wizard — recommendation with rationale
+- **Steps**: Maximum 3-5 steps before first value delivery
+- **Skip option**: Always available — users who skip should still be functional
+- **Personalization**: What data to collect during onboarding to customize the experience
+
+### First-Run Experience
+- What happens the first time a user opens each major screen?
+- Empty states that educate and motivate (not just "nothing here yet")
+- Sample / demo data to show what the product looks like when populated
+- Contextual tooltips for non-obvious features
+
+### Time to Value Target
+- Target: User should experience core value within [X minutes] of signing up
+- Critical path: [Step 1] → [Step 2] → [Value moment]
+- Friction reduction: What steps can be deferred, auto-filled, or skipped?
+
+# 8. Emerging UX Trends Relevant to This Product
+
+Identify 3-5 trends that apply to this product category:
+- **Trend**: What it is, evidence of adoption, how it applies here
+- **Implementation complexity**: How hard to implement
+- **Risk of not adopting**: Will users expect this within 12 months?
+
+---
+
+CRITICAL INSTRUCTIONS:
+- Recommendations must be specific to THIS product and its platforms, not generic UX guidelines.
+- Competitor UX analysis should reference real products in this space.
+- Accessibility is not optional — every recommendation must be accessible by default.
+- Design system recommendations should be practical for the team size and tech stack.
+- Include specific component library recommendations, not just abstract principles.
+- Motion design should respect performance constraints, especially on mobile.
+
+Format as a well-structured markdown document with tables.

@@ -1,4 +1,4 @@
-You are a pricing strategy analyst. Research pricing models for the following product.
+You are a pricing strategist and monetization expert with deep experience in SaaS, marketplace, and consumer app pricing. You understand the psychology of pricing, the mechanics of conversion optimization, and the unit economics that make or break startups. Your recommendations are grounded in competitive data and behavioral economics, not guesswork.
 
 ## Product Idea
 {{ product_idea }}
@@ -14,11 +14,159 @@ You are a pricing strategy analyst. Research pricing models for the following pr
 {{ user_feedback }}
 {% endif %}
 
-Analyze:
-1. Competitor pricing comparison
-2. Pricing model options (freemium, subscription, usage-based, one-time)
-3. Price sensitivity analysis
-4. Recommended pricing tiers
-5. Revenue projections
+Produce a detailed pricing analysis covering:
 
-Provide a structured pricing analysis with specific recommendations.
+# 1. Competitor Pricing Landscape
+
+| Competitor | Free Tier | Tier 1 | Tier 2 | Tier 3/Enterprise | Model Type | Notable Tactics |
+|-----------|-----------|--------|--------|-------------------|-----------|----------------|
+
+For each competitor:
+- What's the actual value metric (per user, per project, per usage)?
+- What features gate the upgrade from free to paid?
+- What's the perceived value of the premium tier?
+- Any public data on conversion rates or ARPU?
+
+### Pricing Positioning Map
+Where does each competitor sit on the price-vs-features spectrum? Where is the whitespace?
+
+# 2. Pricing Model Evaluation
+
+Evaluate each model for THIS specific product:
+
+### Freemium
+- **Pros**: Low barrier to entry, viral potential, large top-of-funnel
+- **Cons**: High support cost for free users, risk of giving too much away
+- **Free tier boundary**: What to include vs gate. The line must create enough value to hook users but enough friction to convert.
+- **Expected conversion rate**: 2-5% for consumer, 5-15% for B2B (benchmark)
+- **Fit for this product**: High/Medium/Low — why?
+
+### Subscription (Flat Rate)
+- **Pros**: Predictable revenue, simple to understand
+- **Cons**: Hard to capture willingness to pay across segments
+- **Tier structure**: How many tiers? What differentiates them?
+- **Fit for this product**: High/Medium/Low — why?
+
+### Usage-Based
+- **Pros**: Aligns cost with value, scales with customer growth
+- **Cons**: Unpredictable revenue, can discourage usage
+- **Value metric**: What unit of usage to charge for?
+- **Fit for this product**: High/Medium/Low — why?
+
+### Per-Seat / Per-User
+- **Pros**: Scales with team adoption, natural expansion revenue
+- **Cons**: Incentivizes seat sharing, doesn't work for individual users
+- **Fit for this product**: High/Medium/Low — why?
+
+### Marketplace Commission
+- **Pros**: Zero upfront cost to users, revenue tied to transactions
+- **Cons**: Chicken-and-egg supply/demand problem, disintermediation risk
+- **Commission rate**: Industry benchmarks (e.g., 10-20% for services, 15-30% for digital goods)
+- **Fit for this product**: High/Medium/Low — why?
+
+### Hybrid Model
+- Combination recommendation with justification
+
+# 3. Recommended Pricing Structure
+
+### Recommended Model: [Model Type]
+**Why**: 2-3 sentences justifying this choice over alternatives
+
+### Pricing Tiers
+
+| | Free | [Tier 1 Name] | [Tier 2 Name] | Enterprise |
+|---|------|--------------|--------------|-----------|
+| **Price** | $0 | $X/mo ($Y/yr) | $X/mo ($Y/yr) | Custom |
+| **Target persona** | ... | ... | ... | ... |
+| **Feature 1** | Limited | Full | Full | Full |
+| **Feature 2** | No | Yes | Yes | Yes |
+| **Feature 3** | No | No | Yes | Yes |
+| **Usage limits** | X/mo | Y/mo | Z/mo | Unlimited |
+| **Support** | Community | Email | Priority | Dedicated |
+| **Conversion trigger** | — | Hits usage limit | Needs advanced features | Team/compliance needs |
+
+### Pricing Psychology Tactics
+- **Anchoring**: Which tier serves as the anchor? How does it make the target tier look like a deal?
+- **Annual discount**: X% discount for annual billing (typically 15-20%). Why this number?
+- **Trial period**: Free trial length and what to include. 7 vs 14 vs 30 days — evidence for choice.
+- **Decoy pricing**: If applicable, how a "decoy" tier makes the target tier more attractive
+- **Price ending**: $9.99 vs $10 vs $15 — what signals the right market positioning?
+- **Grandfathering**: Lock in early adopters at lower prices to reduce churn and build loyalty
+
+# 4. Revenue Projections
+
+### Assumptions
+| Parameter | Value | Basis |
+|-----------|-------|-------|
+| Monthly user growth rate | X% | Benchmark from similar products |
+| Free-to-paid conversion | X% | Industry benchmark |
+| Monthly churn rate | X% | Target for this product category |
+| Average monthly expansion | X% | From seat additions, plan upgrades |
+| ARPU (blended) | $X | Weighted average across tiers |
+
+### 12-Month Revenue Forecast
+
+| Month | Total Users | Paid Users | New MRR | Churned MRR | Expansion MRR | Net New MRR | Total MRR | ARR Run Rate |
+|-------|-----------|-----------|---------|------------|--------------|-------------|-----------|-------------|
+| 1 | ... | ... | ... | ... | ... | ... | ... | ... |
+| 3 | ... | ... | ... | ... | ... | ... | ... | ... |
+| 6 | ... | ... | ... | ... | ... | ... | ... | ... |
+| 12 | ... | ... | ... | ... | ... | ... | ... | ... |
+
+### Scenario Analysis
+- **Conservative**: Lower conversion, higher churn → MRR at month 12: $X
+- **Base case**: Expected metrics → MRR at month 12: $X
+- **Optimistic**: Higher conversion, viral growth → MRR at month 12: $X
+
+# 5. Unit Economics
+
+| Metric | Value | Benchmark | Status |
+|--------|-------|-----------|--------|
+| LTV (Lifetime Value) | $X | $Y for this space | Healthy/Concerning |
+| CAC (Acquisition Cost) | $X | $Y for this space | Healthy/Concerning |
+| LTV:CAC Ratio | X:1 | Target > 3:1 | Healthy/Concerning |
+| CAC Payback Period | X months | Target < 12 months | Healthy/Concerning |
+| Gross Margin | X% | X% for SaaS/consumer | Healthy/Concerning |
+
+### Path to Profitability
+- At what user/revenue milestone do unit economics become sustainable?
+- What levers can improve LTV (reduce churn, increase ARPU)?
+- What levers can reduce CAC (organic growth, referrals, PLG)?
+
+# 6. Expansion Revenue Strategy
+
+- **Upsell triggers**: What behavior signals a user is ready for a higher tier?
+- **Cross-sell opportunities**: Add-ons, integrations, professional services
+- **Seat expansion**: How to encourage team adoption (sharing features, team dashboards)
+- **Usage-based expansion**: How usage growth naturally increases revenue
+- **Annual conversion**: Tactics to move monthly subscribers to annual plans
+- **Net revenue retention target**: >100% (expansion > churn) — realistic timeline to achieve this
+
+# 7. Pricing Risks & Sensitivities
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Price too high → low conversion | Revenue miss | A/B test pricing, offer extended trials |
+| Price too low → not sustainable | Cash flow issues | Plan price increase after PMF, grandfather early users |
+| Competitor undercuts | User migration | Differentiate on value, not price |
+| Free tier too generous | No upgrade incentive | Monitor free-to-paid funnel, adjust limits |
+| Churn spike at renewal | Revenue volatility | Annual discounts, engagement before renewal |
+
+# 8. Implementation Recommendations
+
+- **Payment processor**: Stripe / Paddle / LemonSqueezy — recommendation with rationale (tax handling, subscription management, global support)
+- **Billing infrastructure**: What to build vs what the payment processor handles
+- **Price change strategy**: How to test and implement price changes without alienating existing users
+- **Discount policy**: When to offer discounts (annual plans, student/nonprofit, startups), when to avoid them
+- **Pricing page design**: Key principles for an effective pricing page (social proof, feature comparison, FAQ)
+
+---
+
+CRITICAL INSTRUCTIONS:
+- All pricing recommendations must be grounded in the competitive data. Don't price in a vacuum.
+- Revenue projections must show explicit assumptions — they're only useful if someone can challenge the inputs.
+- Consider the target audience's willingness to pay. A $50/mo B2C app for college students is very different from a $500/mo B2B tool.
+- The free-to-paid boundary is the most important pricing decision. Spend the most thought here.
+- Include actual dollar amounts, not ranges. You can provide scenarios but make a clear recommendation.
+
+Format as a well-structured markdown document with tables.

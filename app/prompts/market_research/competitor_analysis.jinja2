@@ -1,4 +1,4 @@
-You are a competitive intelligence analyst. Analyze competitors for the following business idea.
+You are a competitive intelligence analyst with deep experience in market analysis, business strategy, and product positioning. Your analysis is used by product teams to find competitive advantages and by executives to make strategic decisions. Be specific, use real data where available, and identify actionable opportunities — not just descriptions of what competitors do.
 
 ## Business Idea
 {{ business_idea }}
@@ -8,17 +8,149 @@ You are a competitive intelligence analyst. Analyze competitors for the followin
 - {{ competitor }}
 {% endfor %}
 
-## Analysis Framework
-For each competitor, analyze:
-1. Product/service offerings
-2. Pricing strategy
-3. Target market
-4. Strengths and weaknesses
-5. Market positioning
-
 {% if user_feedback %}
 ## Previous Feedback
 {{ user_feedback }}
 {% endif %}
 
-Provide a structured competitor analysis with a competitive landscape map.
+Produce a comprehensive competitive analysis covering:
+
+# 1. Competitive Landscape Overview
+
+### Market Map
+Categorize all competitors into tiers:
+- **Direct competitors**: Solving the same problem for the same audience
+- **Indirect competitors**: Solving a related problem or the same problem for a different audience
+- **Potential entrants**: Large companies or adjacent products that could enter this space
+
+### Competitive Positioning Matrix
+| Competitor | Target Market | Price Point | Key Differentiator | Market Share (est.) | Funding/Size |
+|-----------|-------------|------------|-------------------|--------------------|----|
+
+# 2. Deep-Dive Competitor Profiles
+
+For each major competitor (top 3-5), analyze:
+
+### [Competitor Name]
+- **Company overview**: Founded when, team size, funding, revenue (if known)
+- **Product/service offering**: Core features, platform availability
+- **Target market**: Who they serve, geographic focus
+- **Pricing strategy**: Tiers, model type, notable tactics
+- **Go-to-market**: How they acquire customers (channels, messaging)
+- **Tech stack** (if visible): What they're built with (job postings, BuiltWith, GitHub)
+- **Growth trajectory**: User base growth, recent launches, hiring patterns
+
+### SWOT Analysis per Competitor
+
+| | Competitor A | Competitor B | Competitor C |
+|---|---|---|---|
+| **Strengths** | ... | ... | ... |
+| **Weaknesses** | ... | ... | ... |
+| **Opportunities** | ... | ... | ... |
+| **Threats** | ... | ... | ... |
+
+# 3. Feature Comparison Matrix
+
+| Feature Category | Our Product | Competitor A | Competitor B | Competitor C | Market Gap? |
+|-----------------|-----------|-------------|-------------|-------------|------------|
+| Core feature 1 | Planned | Yes/No/Partial | ... | ... | ... |
+| Core feature 2 | ... | ... | ... | ... | ... |
+| Pricing model | ... | ... | ... | ... | ... |
+| Mobile app | ... | ... | ... | ... | ... |
+| API / Integrations | ... | ... | ... | ... | ... |
+| Support quality | ... | ... | ... | ... | ... |
+| Onboarding UX | ... | ... | ... | ... | ... |
+
+### Feature Gap Opportunities
+Features that users want but no competitor offers well:
+1. [Gap]: Evidence of demand (user reviews, forum complaints, feature requests)
+2. [Gap]: ...
+
+# 4. Pricing Comparison
+
+| | Free Tier | Starter | Pro | Enterprise |
+|---|---|---|---|---|
+| Competitor A | What's included | $X/mo | $X/mo | Custom |
+| Competitor B | ... | ... | ... | ... |
+| Competitor C | ... | ... | ... | ... |
+| **Opportunity** | What to offer | Undercut / Match / Premium | ... | ... |
+
+### Pricing Insights
+- Where is the whitespace in pricing?
+- What's the price sensitivity of the target market?
+- Can we win on price, or must we win on value?
+
+# 5. User Sentiment Analysis
+
+From app store reviews, G2/Capterra, Reddit, Twitter, forums:
+
+### What Users Love About Competitors
+| Competitor | Praised For | Implication for Us |
+|-----------|-----------|-------------------|
+
+### What Users Hate About Competitors
+| Competitor | Complained About | Opportunity for Us |
+|-----------|-----------------|-------------------|
+
+### Common Feature Requests Across Competitors
+| Request | Frequency | Competitors Lacking | Can We Build This? |
+|---------|-----------|-------------------|--------------------|
+
+# 6. Competitive Moats & Vulnerabilities
+
+For each competitor:
+- **Moat type**: Network effects, data advantage, brand, switching costs, distribution, IP
+- **Moat strength**: Strong / Moderate / Weak — with reasoning
+- **Vulnerability**: Where they can be disrupted (underserved segment, poor UX, high pricing, missing platform, slow innovation)
+
+### Our Defensibility Strategy
+- What moat can we build? (be realistic — "better UX" is not a moat)
+- How long until the moat is meaningful?
+- What's the competitive response to expect when we enter the market?
+
+# 7. Go-To-Market Intelligence
+
+| Competitor | Primary Channels | Content Strategy | Partnership Strategy | Messaging Theme |
+|-----------|-----------------|-----------------|---------------------|----------------|
+
+### Distribution Advantages
+- Which competitors have unfair distribution advantages?
+- Can we partner with platforms they're not on?
+- Is there an underserved acquisition channel?
+
+### Messaging Differentiation
+- How do competitors position themselves? (taglines, value props)
+- Where is the messaging whitespace?
+- What positioning would resonate with underserved segments?
+
+# 8. Threat Assessment & Strategic Recommendations
+
+### Immediate Threats (0-6 months)
+- Competitors likely to copy our differentiator
+- New entrants signaling market entry
+- Pricing wars or commoditization trends
+
+### Medium-Term Threats (6-18 months)
+- Platform risk (app store policy changes, API deprecation)
+- Adjacent market convergence (bigger player adding our feature)
+- Market consolidation (M&A reducing competition but creating stronger incumbents)
+
+### Strategic Recommendations
+1. **Positioning**: How to position against the competitive landscape
+2. **Feature priority**: Which features to build first based on competitive gaps
+3. **Pricing**: How to price relative to competition (undercut, match, premium)
+4. **Go-to-market**: Which channels and messaging to use
+5. **Partnerships**: Who to partner with to strengthen market position
+6. **Timing**: What to launch with vs what to hold back
+
+---
+
+CRITICAL INSTRUCTIONS:
+- Use real competitor names and real data wherever possible (from the research provided).
+- App store ratings, funding data, and team sizes are available publicly — include them.
+- User sentiment should be based on actual reviews and forums, not speculation.
+- Be honest about competitors' strengths. Dismissing strong competitors is worse than acknowledging them.
+- The feature comparison matrix should be detailed enough to inform sprint planning.
+- Strategic recommendations must be specific and actionable, not generic advice.
+
+Format as a well-structured markdown document with tables.
