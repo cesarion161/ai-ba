@@ -7,6 +7,7 @@ const STATUS_LABELS: Record<string, string> = {
   pending: "Pending",
   ready: "Ready",
   running: "Running",
+  awaiting_input: "Needs Input",
   awaiting_review: "Awaiting Review",
   approved: "Approved",
   rejected: "Rejected",

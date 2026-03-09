@@ -5,7 +5,7 @@ import uuid
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.workflow_node import NodeEdge, NodeStatus, WorkflowNode
+from app.models.workflow_node import NodeEdge, NodeStatus, NodeType, WorkflowNode
 
 
 async def resolve_ready_nodes(session: AsyncSession, project_id: uuid.UUID) -> list[WorkflowNode]:
@@ -33,7 +33,10 @@ async def resolve_ready_nodes(session: AsyncSession, project_id: uuid.UUID) -> l
     newly_ready = list(pending_result.scalars().all())
 
     for node in newly_ready:
-        node.status = NodeStatus.READY
+        if node.node_type == NodeType.ASK_USER:
+            node.status = NodeStatus.AWAITING_INPUT
+        else:
+            node.status = NodeStatus.READY
 
     if newly_ready:
         await session.flush()
@@ -80,7 +83,10 @@ async def propagate_completion(session: AsyncSession, node_id: uuid.UUID) -> lis
             )
         )
         if upstream_incomplete.scalar() == 0:
-            ds_node.status = NodeStatus.READY
+            if ds_node.node_type == NodeType.ASK_USER:
+                ds_node.status = NodeStatus.AWAITING_INPUT
+            else:
+                ds_node.status = NodeStatus.READY
             newly_ready.append(ds_node)
 
     if newly_ready:

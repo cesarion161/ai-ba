@@ -11,9 +11,10 @@ from app.models.workflow_node import NodeStatus, WorkflowNode
 from app.services import audit_service
 
 VALID_TRANSITIONS: dict[NodeStatus, set[NodeStatus]] = {
-    NodeStatus.PENDING: {NodeStatus.READY, NodeStatus.SKIPPED},
+    NodeStatus.PENDING: {NodeStatus.READY, NodeStatus.AWAITING_INPUT, NodeStatus.SKIPPED},
     NodeStatus.READY: {NodeStatus.RUNNING, NodeStatus.SKIPPED},
     NodeStatus.RUNNING: {NodeStatus.AWAITING_REVIEW, NodeStatus.APPROVED, NodeStatus.FAILED},
+    NodeStatus.AWAITING_INPUT: {NodeStatus.APPROVED, NodeStatus.SKIPPED},
     NodeStatus.AWAITING_REVIEW: {NodeStatus.APPROVED, NodeStatus.REJECTED},
     NodeStatus.REJECTED: {NodeStatus.RUNNING},
     NodeStatus.FAILED: {NodeStatus.RUNNING, NodeStatus.SKIPPED},
@@ -167,6 +168,10 @@ async def skip_node(session: AsyncSession, node: WorkflowNode) -> WorkflowNode:
 
 
 async def submit_answers(session: AsyncSession, node: WorkflowNode, answers: dict) -> WorkflowNode:
+    if node.status not in (NodeStatus.AWAITING_INPUT, NodeStatus.AWAITING_REVIEW):
+        raise InvalidTransitionError(
+            f"Cannot submit answers for node in status {node.status.value}"
+        )
     questions = (node.config or {}).get("questions", [])
     node.output_data = {"answers": answers, "questions": questions}
     node.status = NodeStatus.APPROVED
@@ -178,6 +183,10 @@ async def submit_answers(session: AsyncSession, node: WorkflowNode, answers: dic
         entity_id=node.id,
         project_id=node.project_id,
     )
+    # Propagate: mark downstream nodes as READY if all their deps are done
+    from app.engine.resolver import propagate_completion
+
+    await propagate_completion(session, node.id)
     await session.commit()
     await session.refresh(node)
     return node

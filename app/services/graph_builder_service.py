@@ -47,10 +47,13 @@ async def build_graph_from_json(
             session.add(edge)
             deps_for.setdefault(to_slug, set()).add(from_slug)
 
-    # Mark root nodes (no incoming edges) as READY
+    # Mark root nodes: ask_user → AWAITING_INPUT, others → READY
     for slug, node in slug_to_node.items():
         if slug not in deps_for:
-            node.status = NodeStatus.READY
+            if node.node_type == NodeType.ASK_USER:
+                node.status = NodeStatus.AWAITING_INPUT
+            else:
+                node.status = NodeStatus.READY
 
     await session.flush()
     return list(slug_to_node.values())

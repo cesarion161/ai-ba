@@ -144,6 +144,26 @@ async def stream_response_events(
 
     messages = [{"role": "system", "content": system_prompt}] + history
 
+    # Check requirements completeness BEFORE generating response
+    # so we can tell the LLM to wrap up instead of asking more questions
+    is_complete = False
+    if phase == "gathering_requirements":
+        completeness = await agent.is_requirements_complete(history)
+        is_complete = completeness["complete"]
+        if is_complete:
+            # Inject a system hint so the LLM summarises instead of asking questions
+            messages.append(
+                {
+                    "role": "system",
+                    "content": (
+                        "IMPORTANT: You now have enough information to proceed. "
+                        "Do NOT ask any more questions. Instead, briefly acknowledge "
+                        "what you've learned and tell the user you're ready to move "
+                        "to document selection."
+                    ),
+                }
+            )
+
     full_content = ""
     try:
         async for token in llm_gateway.complete_stream(messages=messages, task_type="chat"):
@@ -155,19 +175,17 @@ async def stream_response_events(
             full_content = await llm_gateway.complete(messages=messages, task_type="chat")
             yield _sse_event("assistant_token", {"token": full_content})
 
-    # Check requirements completeness for gathering phase
-    if phase == "gathering_requirements":
-        completeness = await agent.is_requirements_complete(history)
-        if completeness["complete"]:
-            suffix = (
-                "\n\n---\n**I have enough information to proceed.** "
-                "Now let's select the document types you'd like me to generate. "
-                "I'll show you the available options."
-            )
-            full_content += suffix
-            yield _sse_event("assistant_token", {"token": suffix})
-            project.chat_phase = "selecting_documents"
-            await session.flush()
+    # Transition to document selection if requirements are complete
+    if is_complete:
+        suffix = (
+            "\n\n---\n**I have enough information to proceed.** "
+            "Now let's select the document types you'd like me to generate. "
+            "I'll show you the available options."
+        )
+        full_content += suffix
+        yield _sse_event("assistant_token", {"token": suffix})
+        project.chat_phase = "selecting_documents"
+        await session.flush()
 
     # Save the complete assistant message
     msg = await _save_assistant(session, project_id, full_content)

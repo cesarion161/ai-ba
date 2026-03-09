@@ -33,13 +33,14 @@ function CustomNodeComponent({ data }: { data: CustomNodeData }) {
 
   const isRunning = status === "running";
   const isAnimated =
-    isRunning || status === "awaiting_review" || status === "failed";
+    isRunning || status === "awaiting_input" || status === "awaiting_review" || status === "failed";
 
   return (
     <div
       className={cn(
         "rounded-lg border-2 px-3 py-2 shadow-sm transition-all duration-300",
         isRunning && "shadow-lg shadow-blue-500/20",
+        status === "awaiting_input" && "animate-[slow-blink_2s_ease-in-out_infinite] shadow-md shadow-violet-500/20",
         status === "awaiting_review" && "animate-[slow-blink_2s_ease-in-out_infinite] shadow-md shadow-amber-500/20",
         status === "failed" && "animate-[glow-pulse_1.5s_ease-in-out_infinite]",
         status === "approved" && "shadow-md shadow-green-500/10",

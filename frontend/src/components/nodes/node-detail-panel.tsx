@@ -37,12 +37,13 @@ export function NodeDetailPanel() {
             <NodeActions projectId={selectedProjectId!} node={node} />
 
             {node.node_type === "ask_user" &&
-              node.status === "awaiting_review" &&
+              (node.status === "awaiting_input" || node.status === "awaiting_review") &&
               node.config?.questions ? (
                 <AskUserForm
                   projectId={selectedProjectId!}
                   slug={node.slug}
                   questions={node.config.questions as string[]}
+                  outputData={node.output_data as { answers?: Record<string, string>; prefilled?: boolean } | null}
                 />
               ) : null}
 

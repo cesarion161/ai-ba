@@ -16,6 +16,7 @@ export function useGraph(projectId: string | null) {
     queryKey: ["graph", projectId],
     queryFn: () => fetchGraph(projectId!),
     enabled: !!projectId,
+    refetchInterval: 5000,
   });
 }
 

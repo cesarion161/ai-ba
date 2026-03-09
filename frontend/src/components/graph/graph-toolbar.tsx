@@ -26,6 +26,7 @@ export function GraphToolbar({ projectId }: GraphToolbarProps) {
 
   const runningCount = status?.by_status?.running || 0;
   const awaitingCount = status?.by_status?.awaiting_review || 0;
+  const awaitingInputCount = status?.by_status?.awaiting_input || 0;
 
   const buttonLabel = runMutation.isPending
     ? "Starting..."
@@ -70,6 +71,11 @@ export function GraphToolbar({ projectId }: GraphToolbarProps) {
             {runningCount} processing
           </span>
         )}
+        {awaitingInputCount > 0 && (
+          <span className="text-xs font-medium text-violet-500">
+            {awaitingInputCount} need your input
+          </span>
+        )}
         {awaitingCount > 0 && (
           <span className="text-xs text-amber-500">
             {awaitingCount} awaiting review
@@ -81,11 +87,19 @@ export function GraphToolbar({ projectId }: GraphToolbarProps) {
           </span>
         )}
       </div>
+      {awaitingInputCount > 0 && !isExecuting && (
+        <div className="border-t border-violet-500/20 bg-violet-500/5 px-4 py-2">
+          <p className="text-xs text-violet-600 dark:text-violet-400">
+            {awaitingInputCount} question node{awaitingInputCount > 1 ? "s" : ""} need
+            your answers before running the graph. Click on the purple nodes to fill them in.
+          </p>
+        </div>
+      )}
       {hasIssues && (
         <div className="border-t border-destructive/20 bg-destructive/5 px-4 py-2">
           {preflight.issues.map((issue, i) => (
             <p key={i} className="text-xs text-destructive">
-              ⚠ {issue}
+              {issue}
             </p>
           ))}
         </div>

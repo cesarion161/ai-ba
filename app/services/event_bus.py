@@ -28,8 +28,20 @@ class EventBus:
         self._redis: aioredis.Redis | None = None
 
     async def _get_redis(self) -> aioredis.Redis:
-        if self._redis is None:
+        # Always create a fresh connection for the current event loop.
+        # Celery workers create a new event loop per task, making cached
+        # connections from a previous (closed) loop unusable.
+        import asyncio
+
+        loop = asyncio.get_running_loop()
+        if self._redis is None or getattr(self, "_loop_id", None) != id(loop):
+            if self._redis is not None:
+                try:
+                    await self._redis.close()
+                except Exception:
+                    pass
             self._redis = aioredis.from_url(self.settings.REDIS_URL)
+            self._loop_id = id(loop)
         return self._redis
 
     def _channel(self, project_id: str, node_slug: str | None = None) -> str:

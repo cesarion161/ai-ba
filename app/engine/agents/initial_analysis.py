@@ -44,17 +44,12 @@ class InitialAnalysisAgent:
             )
             return {"complete": True, "summary": summary}
 
-        # Build a message count hint for the prompt
-        if user_message_count >= 4:
+        # After 5+ messages, don't let parsing failures block progress
+        if user_message_count >= 5:
             message_count_hint = (
                 f"The user has sent {user_message_count} messages. "
                 "This is getting long — strongly prefer marking as COMPLETE now "
                 "unless the core idea is truly unclear."
-            )
-        elif user_message_count >= 3:
-            message_count_hint = (
-                f"The user has sent {user_message_count} messages. "
-                "If the basic idea and target market are clear, mark as COMPLETE."
             )
         else:
             message_count_hint = ""
@@ -169,11 +164,13 @@ When you have a clear picture, let the user know you're ready to proceed."""
 You analyze conversations to determine if enough \
 information has been gathered to proceed with automated research.
 
-Requirements are COMPLETE when we know:
-- What the business/product is (the core idea)
-- Who the target customers are (even roughly)
+Requirements are COMPLETE when ALL three are clearly answered:
+1. Core idea — what the product/service is and what problem it solves
+2. Target market — who the customers are (specific segments, not "everyone")
+3. Business model direction — how it will make money (rough direction counts)
 
-Lean toward COMPLETE. The system will research competitors, \
-market data, and technical details automatically.
+Mark COMPLETE only when all 3 have clear, specific answers. \
+Vague or one-word answers do not count. \
+The system will research competitors, market data, and technical details automatically.
 
 Respond ONLY with valid JSON: {"complete": true/false, "summary": "brief summary"}"""

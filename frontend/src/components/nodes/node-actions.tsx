@@ -104,7 +104,7 @@ export function NodeActions({ projectId, node }: NodeActionsProps) {
     );
   }
 
-  if (node.status === "pending" || node.status === "ready") {
+  if (node.status === "pending" || node.status === "ready" || node.status === "awaiting_input") {
     return (
       <Button
         size="sm"

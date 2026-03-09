@@ -178,6 +178,18 @@ DEFAULT_DOCUMENT_TYPES: list[dict[str, Any]] = [
 ]
 
 
+CATEGORY_ORDER = [
+    "strategy",
+    "research",
+    "requirements",
+    "product",
+    "technical",
+    "planning",
+    "delivery",
+]
+_cat_index = {cat: i for i, cat in enumerate(CATEGORY_ORDER)}
+
+
 async def list_document_types(
     session: AsyncSession, active_only: bool = True
 ) -> list[DocumentType]:
@@ -185,7 +197,9 @@ async def list_document_types(
     if active_only:
         query = query.where(DocumentType.is_active.is_(True))
     result = await session.execute(query)
-    return list(result.scalars().all())
+    docs = list(result.scalars().all())
+    docs.sort(key=lambda d: (_cat_index.get(d.category, 99), d.label))
+    return docs
 
 
 async def get_by_key(session: AsyncSession, key: str) -> DocumentType | None:

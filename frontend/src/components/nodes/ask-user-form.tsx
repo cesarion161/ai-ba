@@ -9,10 +9,17 @@ interface AskUserFormProps {
   projectId: string;
   slug: string;
   questions: string[];
+  outputData?: {
+    answers?: Record<string, string>;
+    prefilled?: boolean;
+  } | null;
 }
 
-export function AskUserForm({ projectId, slug, questions }: AskUserFormProps) {
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+export function AskUserForm({ projectId, slug, questions, outputData }: AskUserFormProps) {
+  const prefilled = outputData?.prefilled === true;
+  const [answers, setAnswers] = useState<Record<string, string>>(
+    outputData?.answers ?? {}
+  );
   const answerMutation = useAnswerNode(projectId);
 
   const handleSubmit = () => {
@@ -21,6 +28,11 @@ export function AskUserForm({ projectId, slug, questions }: AskUserFormProps) {
 
   return (
     <div className="space-y-3">
+      {prefilled && (
+        <p className="text-sm text-muted-foreground italic">
+          Pre-filled from your chat. Review and submit.
+        </p>
+      )}
       {questions.map((q, i) => (
         <div key={i}>
           <label className="mb-1 block text-sm font-medium">{q}</label>

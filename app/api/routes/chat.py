@@ -182,7 +182,12 @@ async def select_documents(
     graph_json = await generator.generate_graph(requirements, body.doc_type_keys)
 
     # Build graph in DB
-    await build_graph_from_json(db, project_id, graph_json)
+    nodes = await build_graph_from_json(db, project_id, graph_json)
+
+    # Pre-fill ask_user nodes from chat conversation
+    from app.services.answer_prefill_service import prefill_ask_user_answers
+
+    await prefill_ask_user_answers(db, project_id, requirements, nodes)
 
     project.requirements_summary = requirements
     project.chat_phase = "graph_ready"

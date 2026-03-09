@@ -5,7 +5,7 @@ import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.engine.templates.base import WorkflowTemplate
-from app.models.workflow_node import NodeEdge, NodeStatus, WorkflowNode
+from app.models.workflow_node import NodeEdge, NodeStatus, NodeType, WorkflowNode
 
 
 async def instantiate_workflow(
@@ -42,10 +42,14 @@ async def instantiate_workflow(
             )
             session.add(edge)
 
-    # Mark root nodes (no dependencies) as READY
+    # Mark root nodes: ask_user → AWAITING_INPUT, others → READY
     root_slugs = template.root_slugs()
     for slug in root_slugs:
-        slug_to_node[slug].status = NodeStatus.READY
+        node = slug_to_node[slug]
+        if node.node_type == NodeType.ASK_USER:
+            node.status = NodeStatus.AWAITING_INPUT
+        else:
+            node.status = NodeStatus.READY
 
     await session.flush()
     return list(slug_to_node.values())

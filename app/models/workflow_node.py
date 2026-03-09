@@ -20,6 +20,7 @@ class NodeStatus(enum.StrEnum):
     PENDING = "pending"
     READY = "ready"
     RUNNING = "running"
+    AWAITING_INPUT = "awaiting_input"
     AWAITING_REVIEW = "awaiting_review"
     APPROVED = "approved"
     REJECTED = "rejected"

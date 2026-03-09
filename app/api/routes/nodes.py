@@ -14,7 +14,17 @@ from app.api.schemas.node import (
 )
 from app.models.database import get_db
 from app.services import node_service
+from app.services.event_bus import NODE_STATUS_CHANGED, event_bus
 from app.services.node_service import InvalidTransitionError
+
+
+async def _publish_status(project_id: uuid.UUID, node: node_service.WorkflowNode) -> None:
+    """Publish an SSE event so the frontend updates in real time."""
+    await event_bus.publish(
+        str(project_id),
+        NODE_STATUS_CHANGED,
+        {"slug": node.slug, "status": node.status.value, "label": node.label},
+    )
 
 router = APIRouter(prefix="/api/projects/{project_id}/nodes", tags=["nodes"])
 
@@ -62,6 +72,8 @@ async def approve_node(
     except InvalidTransitionError as e:
         raise HTTPException(status_code=409, detail=str(e))
 
+    await _publish_status(project_id, node)
+
     # Trigger workflow continuation for any newly-ready nodes
     await _continue_workflow(db, project_id)
 
@@ -80,6 +92,7 @@ async def reject_node(
         node = await node_service.reject_node(db, node, body.feedback)
     except InvalidTransitionError as e:
         raise HTTPException(status_code=409, detail=str(e))
+    await _publish_status(project_id, node)
     return NodeResponse.model_validate(node)
 
 
@@ -92,6 +105,7 @@ async def edit_output(
 ) -> NodeResponse:
     node = await _get_node_or_404(db, project_id, slug)
     node = await node_service.update_node_output(db, node, body.output_data)
+    await _publish_status(project_id, node)
     return NodeResponse.model_validate(node)
 
 
@@ -106,6 +120,7 @@ async def retry_node(
         node = await node_service.retry_node(db, node)
     except InvalidTransitionError as e:
         raise HTTPException(status_code=409, detail=str(e))
+    await _publish_status(project_id, node)
     return NodeResponse.model_validate(node)
 
 
@@ -121,6 +136,7 @@ async def skip_node(
     except InvalidTransitionError as e:
         raise HTTPException(status_code=409, detail=str(e))
 
+    await _publish_status(project_id, node)
     await _continue_workflow(db, project_id)
 
     return NodeResponse.model_validate(node)
@@ -153,7 +169,12 @@ async def answer_node(
     db: AsyncSession = Depends(get_db),
 ) -> NodeResponse:
     node = await _get_node_or_404(db, project_id, slug)
-    node = await node_service.submit_answers(db, node, body.answers)
+    try:
+        node = await node_service.submit_answers(db, node, body.answers)
+    except InvalidTransitionError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    await _publish_status(project_id, node)
+    await _continue_workflow(db, project_id)
     return NodeResponse.model_validate(node)
 
 
@@ -200,6 +221,7 @@ async def _continue_workflow(db: AsyncSession, project_id: uuid.UUID) -> None:
                             NodeStatus.PENDING,
                             NodeStatus.READY,
                             NodeStatus.RUNNING,
+                            NodeStatus.AWAITING_INPUT,
                             NodeStatus.AWAITING_REVIEW,
                         ]
                     ),
