@@ -11,13 +11,10 @@ import structlog
 from langgraph.graph import END, StateGraph
 from langgraph.types import Send, interrupt
 
-from app.engine.errors import NonRetryableError, is_non_retryable
+from app.engine.errors import is_non_retryable
 from app.engine.handlers.base import get_handler
 from app.engine.state import WorkflowState
 from app.models.workflow_node import NodeStatus
-
-MAX_NODE_RETRIES = 3
-RETRY_BACKOFF = [2, 5, 10]
 from app.services.event_bus import (
     NODE_COMPLETED,
     NODE_FAILED,
@@ -25,6 +22,9 @@ from app.services.event_bus import (
     WORKFLOW_COMPLETED,
     event_bus,
 )
+
+MAX_NODE_RETRIES = 3
+RETRY_BACKOFF = [2, 5, 10]
 
 logger = structlog.get_logger()
 
@@ -144,6 +144,7 @@ async def execute_node(
             # Classify the error: non-retryable → fail immediately
             if is_non_retryable(e):
                 node.status = NodeStatus.FAILED
+                node.error_message = str(e)[:2000]
                 node.completed_at = datetime.now(UTC)
                 await session.commit()
                 logger.error(
@@ -183,6 +184,7 @@ async def execute_node(
 
             # Retries exhausted → fail
             node.status = NodeStatus.FAILED
+            node.error_message = str(e)[:2000]
             node.completed_at = datetime.now(UTC)
             await session.commit()
             logger.error(

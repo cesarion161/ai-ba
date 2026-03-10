@@ -26,6 +26,7 @@ async def _publish_status(project_id: uuid.UUID, node: node_service.WorkflowNode
         {"slug": node.slug, "status": node.status.value, "label": node.label},
     )
 
+
 router = APIRouter(prefix="/api/projects/{project_id}/nodes", tags=["nodes"])
 
 

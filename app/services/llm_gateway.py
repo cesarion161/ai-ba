@@ -105,7 +105,9 @@ class LLMGateway:
         last_error: Exception | None = None
 
         for m in models_to_try:
-            result, err = await self._complete_with_retry(m, messages, temperature, max_tokens, **kwargs)
+            result, err = await self._complete_with_retry(
+                m, messages, temperature, max_tokens, **kwargs
+            )
             if result is not None:
                 return result
             last_error = err

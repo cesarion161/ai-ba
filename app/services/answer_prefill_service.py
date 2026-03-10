@@ -69,18 +69,24 @@ async def prefill_ask_user_answers(
 
 def _build_prompt(requirements_summary: str, question_map: dict[str, list[str]]) -> str:
     questions_block = json.dumps(question_map, indent=2)
-    return f"""You are helping pre-fill a business analysis questionnaire based on information already gathered from the user.
+    return f"""\
+You are helping pre-fill a business analysis questionnaire \
+based on information already gathered from the user.
 
 ## Requirements Summary (from user conversation)
 {requirements_summary}
 
 ## Questions to Answer
-The following JSON maps node slugs to lists of questions. Answer each question using ONLY information from the requirements summary above. If the summary doesn't contain enough information to answer a question, use an empty string "".
+The following JSON maps node slugs to lists of questions. \
+Answer each question using ONLY information from the requirements \
+summary above. If the summary doesn't contain enough information \
+to answer a question, use an empty string "".
 
 {questions_block}
 
 ## Instructions
-- Return a JSON object where keys are node slugs and values are objects mapping each question to its answer.
+- Return a JSON object where keys are node slugs and values are \
+objects mapping each question to its answer.
 - Use the exact question text as keys in the answer objects.
 - Keep answers concise but informative (1-3 sentences).
 - Only use information from the requirements summary — do not invent or assume facts.
@@ -90,9 +96,7 @@ Example format:
 {{"node_slug": {{"Question text here?": "Answer based on summary"}}}}"""
 
 
-def _parse_response(
-    response: str, question_map: dict[str, list[str]]
-) -> dict[str, dict[str, str]]:
+def _parse_response(response: str, question_map: dict[str, list[str]]) -> dict[str, dict[str, str]]:
     """Parse LLM response into answers keyed by slug."""
     # Strip markdown fences if present
     text = response.strip()

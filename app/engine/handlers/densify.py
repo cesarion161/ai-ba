@@ -60,7 +60,7 @@ Output the densified directives.
             {"role": "user", "content": prompt},
         ]
 
-        densified = await llm_gateway.complete(messages, max_tokens=4096)
+        densified = await llm_gateway.complete(messages, task_type="densify")
 
         return {
             "densified": densified,

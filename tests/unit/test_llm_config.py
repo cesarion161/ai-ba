@@ -21,7 +21,7 @@ def test_all_node_types_have_config():
 
 def test_unknown_task_type_returns_default():
     config = get_model_config("nonexistent_task")
-    assert config.primary == "claude-sonnet-4-20250514"
+    assert config.primary == "gpt-4.1"
 
 
 def test_calculate_low_temperature():

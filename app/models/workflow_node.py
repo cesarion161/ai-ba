@@ -56,6 +56,7 @@ class WorkflowNode(Base):
     input_data: Mapped[dict | None] = mapped_column(JSONB, default=None)
     output_data: Mapped[dict | None] = mapped_column(JSONB, default=None)
     user_feedback: Mapped[str | None] = mapped_column(Text, default=None)
+    error_message: Mapped[str | None] = mapped_column(Text, default=None)
     retry_count: Mapped[int] = mapped_column(Integer, default=0)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)

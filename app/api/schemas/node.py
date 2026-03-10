@@ -18,6 +18,7 @@ class NodeResponse(BaseModel):
     input_data: dict | None
     output_data: dict | None
     user_feedback: str | None
+    error_message: str | None = None
     retry_count: int
     started_at: datetime | None
     completed_at: datetime | None

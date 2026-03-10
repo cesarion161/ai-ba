@@ -23,10 +23,10 @@ class Settings(BaseSettings):
     GOOGLE_API_KEY: str = ""
 
     # LLM defaults
-    DEFAULT_MODEL: str = "claude-sonnet-4-20250514"
+    DEFAULT_MODEL: str = "gpt-4.1"
     FALLBACK_MODELS: list[str] = [
-        "gpt-4o",
-        "gemini/gemini-2.0-flash",
+        "gpt-5.4",
+        "gpt-5.4-pro",
     ]
 
     # Search tools

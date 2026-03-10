@@ -21,6 +21,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     # PostgreSQL does not support removing enum values; convert any existing rows first
-    op.execute(
-        "UPDATE workflow_nodes SET status = 'ready' WHERE status = 'awaiting_input'"
-    )
+    op.execute("UPDATE workflow_nodes SET status = 'ready' WHERE status = 'awaiting_input'")

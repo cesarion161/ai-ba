@@ -14,60 +14,62 @@ class ModelConfig:
 
 
 # Task-specific model routing
+# Complex nodes use gpt-5.4-pro (best reasoning) with gpt-5.4 fallback
+# Less complex nodes use gpt-4.1 as the all-around workhorse
 MODEL_ROUTING: dict[str, ModelConfig] = {
     "research": ModelConfig(
-        primary="claude-sonnet-4-20250514",
-        fallbacks=["gpt-4o", "gemini/gemini-2.0-flash"],
+        primary="gpt-5.4-pro",
+        fallbacks=["gpt-5.4", "gpt-4.1"],
         temperature=0.3,
-        max_tokens=4096,
+        max_tokens=128000,
     ),
     "calculate": ModelConfig(
-        primary="claude-sonnet-4-20250514",
-        fallbacks=["gpt-4o"],
+        primary="gpt-4.1",
+        fallbacks=["gpt-5.4"],
         temperature=0.1,
-        max_tokens=4096,
+        max_tokens=32768,
     ),
     "generate_document": ModelConfig(
-        primary="claude-opus-4-20250514",
-        fallbacks=["claude-sonnet-4-20250514", "gpt-4o"],
+        primary="gpt-5.4-pro",
+        fallbacks=["gpt-5.4", "gpt-4.1"],
         temperature=0.4,
-        max_tokens=16384,
+        max_tokens=128000,
     ),
     "critic_review": ModelConfig(
-        primary="claude-sonnet-4-20250514",
-        fallbacks=["gpt-4o"],
+        primary="gpt-5.4-pro",
+        fallbacks=["gpt-5.4", "gpt-4.1"],
         temperature=0.3,
-        max_tokens=4096,
+        max_tokens=128000,
     ),
     "ask_user": ModelConfig(
-        primary="claude-sonnet-4-20250514",
-        fallbacks=["gpt-4o-mini"],
+        primary="gpt-4.1",
+        fallbacks=["gpt-5.4"],
         temperature=0.5,
-        max_tokens=2048,
+        max_tokens=32768,
     ),
     "densify": ModelConfig(
-        primary="claude-sonnet-4-20250514",
-        fallbacks=["gpt-4o"],
+        primary="gpt-5.4-pro",
+        fallbacks=["gpt-5.4", "gpt-4.1"],
         temperature=0.2,
-        max_tokens=8192,
+        max_tokens=128000,
     ),
     "format_export": ModelConfig(
-        primary="claude-sonnet-4-20250514",
-        fallbacks=["gpt-4o-mini"],
+        primary="gpt-4.1",
+        fallbacks=["gpt-5.4"],
         temperature=0.1,
-        max_tokens=2048,
+        max_tokens=32768,
     ),
     "chat": ModelConfig(
-        primary="claude-sonnet-4-20250514",
-        fallbacks=["gpt-4o"],
+        primary="gpt-4.1",
+        fallbacks=["gpt-5.4"],
         temperature=0.7,
-        max_tokens=2048,
+        max_tokens=32768,
     ),
     "analysis": ModelConfig(
-        primary="claude-sonnet-4-20250514",
-        fallbacks=["gpt-4o"],
+        primary="gpt-4.1",
+        fallbacks=["gpt-5.4"],
         temperature=0.2,
-        max_tokens=4096,
+        max_tokens=32768,
     ),
 }
 
@@ -75,5 +77,5 @@ MODEL_ROUTING: dict[str, ModelConfig] = {
 def get_model_config(task_type: str) -> ModelConfig:
     return MODEL_ROUTING.get(
         task_type,
-        ModelConfig(primary="claude-sonnet-4-20250514", fallbacks=["gpt-4o"]),
+        ModelConfig(primary="gpt-4.1", fallbacks=["gpt-5.4"]),
     )
