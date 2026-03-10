@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from collections.abc import AsyncIterator
 from typing import Any, cast
 
@@ -16,6 +17,17 @@ logger = structlog.get_logger()
 TRANSIENT_ERROR_STRINGS = ("rate_limit", "timeout", "connection", "429", "503", "502")
 MAX_RETRIES = 3
 BACKOFF_SECONDS = [1, 2, 4]
+
+_MARKDOWN_FENCE_RE = re.compile(
+    r"^\s*```(?:markdown|md)\s*\n(.*?)```\s*$",
+    re.DOTALL | re.IGNORECASE,
+)
+
+
+def _strip_markdown_fences(text: str) -> str:
+    """Strip outer ```markdown ... ``` wrapping that LLMs sometimes add."""
+    m = _MARKDOWN_FENCE_RE.match(text)
+    return m.group(1).strip() if m else text
 
 
 def _is_transient(error: Exception) -> bool:
@@ -109,7 +121,7 @@ class LLMGateway:
                 m, messages, temperature, max_tokens, **kwargs
             )
             if result is not None:
-                return result
+                return _strip_markdown_fences(result)
             last_error = err
             # Content/request-level errors apply to all models — stop immediately
             if last_error and is_non_retryable(last_error):
