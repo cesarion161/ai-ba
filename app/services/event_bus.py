@@ -20,6 +20,10 @@ WORKFLOW_COMPLETED = "workflow.completed"
 CHAT_MESSAGE = "chat.message"
 CHAT_TOKEN = "chat.token"
 GRAPH_GENERATED = "graph.generated"
+EXPORT_STARTED = "export.started"
+EXPORT_PROGRESS = "export.progress"
+EXPORT_COMPLETED = "export.completed"
+EXPORT_FAILED = "export.failed"
 
 
 class EventBus:

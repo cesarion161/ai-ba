@@ -35,6 +35,7 @@ class NodeType(enum.StrEnum):
     ASK_USER = "ask_user"
     CRITIC_REVIEW = "critic_review"
     DENSIFY = "densify"
+    GENERATE_BACKLOG = "generate_backlog"
     FORMAT_EXPORT = "format_export"
 
 

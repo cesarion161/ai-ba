@@ -391,6 +391,20 @@ FULL_ANALYSIS = WorkflowTemplate(
             ],
             config={"template": "traceability_matrix", "branch": "delivery"},
         ),
+        # --- Product Backlog (structured JSON + markdown) ---
+        NodeTemplate(
+            slug="product_backlog",
+            label="Product Backlog",
+            branch="delivery",
+            node_type=NodeType.GENERATE_BACKLOG,
+            depends_on=[
+                "user_stories_critic",
+                "execution_plan_critic",
+                "traceability_matrix",
+                "product_roadmap_critic",
+            ],
+            config={"template": "backlog", "branch": "delivery"},
+        ),
         # ===================================================================
         # PHASE 8: Densification
         # ===================================================================
@@ -405,6 +419,7 @@ FULL_ANALYSIS = WorkflowTemplate(
                 "data_model_spec",
                 "qa_strategy",
                 "traceability_matrix",
+                "product_backlog",
             ],
             config={"role": "developer"},
         ),
@@ -416,6 +431,7 @@ FULL_ANALYSIS = WorkflowTemplate(
             depends_on=[
                 *_ALL_CRITIC_NODES,
                 "traceability_matrix",
+                "product_backlog",
             ],
             config={"role": "designer"},
         ),
@@ -428,6 +444,7 @@ FULL_ANALYSIS = WorkflowTemplate(
                 *_ALL_CRITIC_NODES,
                 "qa_strategy",
                 "traceability_matrix",
+                "product_backlog",
             ],
             config={"role": "product_manager"},
         ),

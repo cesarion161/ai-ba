@@ -44,6 +44,7 @@ def create_app() -> FastAPI:
         chat,
         config,
         document_types,
+        exports,
         graph,
         graph_edit,
         health,
@@ -63,6 +64,7 @@ def create_app() -> FastAPI:
     app.include_router(config.router)
     app.include_router(document_types.router)
     app.include_router(chat.router)
+    app.include_router(exports.router)
 
     return app
 

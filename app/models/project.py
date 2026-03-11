@@ -29,6 +29,7 @@ class Project(Base):
     chat_phase: Mapped[str | None] = mapped_column(String(50), default=None)
     selected_doc_types: Mapped[list | None] = mapped_column(JSONB, default=None)  # type: ignore[type-arg]
     requirements_summary: Mapped[str | None] = mapped_column(Text, default=None)
+    notion_page_id: Mapped[str | None] = mapped_column(String(255), default=None)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     user: Mapped[User] = relationship(back_populates="projects")  # noqa: F821

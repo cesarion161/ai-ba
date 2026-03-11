@@ -148,6 +148,7 @@ class GenerateDocumentHandler:
             "execution_plan": context_parts.get("execution_plan", ""),
             "qa_strategy": context_parts.get("qa_strategy", ""),
             "nfr_context": context_parts.get("architecture_doc", ""),
+            "product_backlog": context_parts.get("product_backlog", ""),
         }
 
         # Try to render the branch-specific template

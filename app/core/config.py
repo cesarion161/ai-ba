@@ -42,6 +42,10 @@ class Settings(BaseSettings):
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
 
+    # Notion
+    NOTION_API_TOKEN: str = ""
+    NOTION_PARENT_PAGE_ID: str = ""  # optional: nest exports under this page
+
     # CORS
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",

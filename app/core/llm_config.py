@@ -53,6 +53,12 @@ MODEL_ROUTING: dict[str, ModelConfig] = {
         temperature=0.2,
         max_tokens=128000,
     ),
+    "generate_backlog": ModelConfig(
+        primary="gpt-5.4-pro",
+        fallbacks=["gpt-5.4", "gpt-4.1"],
+        temperature=0.2,
+        max_tokens=128000,
+    ),
     "format_export": ModelConfig(
         primary="gpt-4.1",
         fallbacks=["gpt-5.4"],

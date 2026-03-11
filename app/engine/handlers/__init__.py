@@ -6,6 +6,7 @@ from app.engine.handlers import (  # noqa: F401
     critic_review,
     densify,
     format_export,
+    generate_backlog,
     generate_document,
     research,
 )
